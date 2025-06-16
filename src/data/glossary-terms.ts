@@ -6,8 +6,8 @@ import {
   Keyboard, MousePointerBan, Bomb, Grab, Filter, ShieldCheck, Fingerprint, BadgeCheck, LockKeyhole, UnlockKeyhole,
   Hash, Grains, FileSignature, Stamp, DoorClosed, ShieldEllipsis, ScanFace, Siren, ShieldHalf, BrickWall,
   Container, Route, ServerProxy, FileText, ClipboardCheck, AreaChart, ShieldQuestion, ExternalLink, LifeBuoy, ShieldPlus,
-  Network, ScanLine, Explosion, SearchCode, FileScan, ServerSearch, Zap, Key, OctagonAlert, Wifi,
-  BrainCircuit, Router, CloudCog, Ear, ScanSearch, Search, HardDrive, MailSearch, DatabaseSearch, PawPrint, Globe,
+  Network, ScanLine, SearchCode, FileScan, ServerSearch, Zap, Key, OctagonAlert, Wifi,
+  BrainCircuit, Router, CloudCog, Ear, ScanSearch, Search, HardDrive, MailSearch, PawPrint, Globe,
   Terminal, KeySquare, Skull, Feather, Sparkles, UserRoundX, UserCog, Layers, PackageOpen, ShieldOff,
   Briefcase, Flame, FileUp, BoxSelect, Award, Droplets, FileX2, EarOff, Lightbulb, Gauge,
   BookMarked, Landmark, Gavel, Pipette, Swords, ShieldAlert, Globe2
@@ -81,7 +81,7 @@ export const glossaryTerms: GlossaryTerm[] = [
   // Tools & Technologies
   { id: '51', term: 'Wireshark', definition: 'Network protocol analyzer', category: 'Tools & Technologies', icon: Network },
   { id: '52', term: 'Nmap', definition: 'Network scanner and mapper', category: 'Tools & Technologies', icon: ScanLine },
-  { id: '53', term: 'Metasploit', definition: 'Penetration testing framework', category: 'Tools & Technologies', icon: Explosion },
+  { id: '53', term: 'Metasploit', definition: 'Penetration testing framework', category: 'Tools & Technologies', icon: Zap },
   { id: '54', term: 'Burp Suite', definition: 'Web vulnerability scanner', category: 'Tools & Technologies', icon: SearchCode },
   { id: '55', term: 'Nessus', definition: 'Vulnerability scanning tool', category: 'Tools & Technologies', icon: FileScan },
   { id: '56', term: 'Nikto', definition: 'Web server scanner', category: 'Tools & Technologies', icon: ServerSearch },
@@ -97,7 +97,7 @@ export const glossaryTerms: GlossaryTerm[] = [
   { id: '66', term: 'Autopsy', definition: 'Digital forensics platform', category: 'Tools & Technologies', icon: Search },
   { id: '67', term: 'FTK', definition: 'Forensic Toolkit for data analysis', category: 'Tools & Technologies', icon: HardDrive },
   { id: '68', term: 'TheHarvester', definition: 'Email and domain information gathering', category: 'Tools & Technologies', icon: MailSearch },
-  { id: '69', term: 'SQLMap', definition: 'Automated SQL injection tool', category: 'Tools & Technologies', icon: DatabaseSearch },
+  { id: '69', term: 'SQLMap', definition: 'Automated SQL injection tool', category: 'Tools & Technologies', icon: DatabaseZap },
   { id: '70', term: 'Netcat', definition: 'Networking tool for debugging', category: 'Tools & Technologies', icon: PawPrint },
   { id: '71', term: 'Tor', definition: 'Anonymity and privacy browser', category: 'Tools & Technologies', icon: Globe },
   { id: '72', term: 'SELinux', definition: 'Security-enhanced Linux access control', category: 'Tools & Technologies', icon: Terminal },

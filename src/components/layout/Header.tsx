@@ -1,7 +1,8 @@
+
 "use client";
 
 import Link from 'next/link';
-import { ShieldCheck, MessageCircle, FileText, BookOpen, Menu, X } from 'lucide-react';
+import { ShieldCheck, MessageCircle, FileText, BookOpen, Menu, X, Landmark, UsersRound, AlertTriangle, BookMarked, Gavel } from 'lucide-react'; // Added Gavel
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
 import { useState } from 'react';
@@ -11,7 +12,7 @@ import { cn } from '@/lib/utils';
 const navItems = [
   { href: '/', label: 'Home', icon: ShieldCheck },
   { href: '/chatbot', label: 'AI Chatbot', icon: MessageCircle },
-  { href: '/law-summaries', label: 'Law Summaries', icon: FileText },
+  { href: '/law-summaries', label: 'Law Summaries', icon: Gavel }, // Changed icon to Gavel
   { href: '/glossary', label: 'Cyber Glossary', icon: BookOpen },
 ];
 
@@ -89,3 +90,5 @@ export function Header() {
     </header>
   );
 }
+
+    

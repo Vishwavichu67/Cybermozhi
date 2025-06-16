@@ -1,46 +1,14 @@
 
 import type { LucideIcon } from 'lucide-react';
 import {
-  Gavel,
-  Ban,
-  WifiOff,
-  Server,
-  ShieldOff,
-  FileKey,
-  UserCheck,
-  TerminalSquare,
-  KeyRound,
-  Eye,
+  Gavel, Ban, WifiOff, Server, ShieldOff, FileKey, UserCheck, TerminalSquare, KeyRound, Eye,
   ShieldCheck as ShieldCheckIcon, // Renamed to avoid conflict if ShieldCheck is a component
-  LockKeyhole,
-  UsersRound,
-  CameraOff,
-  AlertTriangle,
-  FileX2,
-  Footprints,
-  FileArchive,
-  CircleDollarSign,
-  PencilRuler,
-  Quote,
-  MessageSquareWarning,
-  BookMarked,
-  Building2,
-  ClipboardList,
-  FileLock2,
-  Landmark,
-  Scale,
-  Siren,
+  LockKeyhole, UsersRound, CameraOff, AlertTriangle, FileX2, Footprints, FileArchive,
+  CircleDollarSign, PencilRuler, Quote, MessageSquareWarning, BookMarked, Building2,
+  ClipboardList, FileLock2, Landmark, Scale, Siren,
   Copyright as CopyrightIcon, // Renamed to avoid conflict
-  RadioTower,
-  ShoppingCart,
-  ReceiptIndianRupee,
-  IdCard,
-  Construction,
-  Frown, // Changed from Annoyed
-  VideoOff,
-  UserCog,
-  Gamepad2,
-  GlobeLock
+  RadioTower, ShoppingCart, ReceiptIndianRupee, IdCard, Construction, Frown, 
+  VideoOff, UserCog, Gamepad2, GlobeLock, ShieldAlert
 } from 'lucide-react';
 
 export type LawSummary = {
@@ -56,7 +24,6 @@ export type LawSummary = {
 };
 
 export const lawSummaries: LawSummary[] = [
-  // Existing IT Act Summaries (will be reviewed and potentially updated/merged)
   {
     id: '1',
     title: 'Tampering with Computer Source Documents',
@@ -134,7 +101,6 @@ export const lawSummaries: LawSummary[] = [
     icon: Ban,
     category: 'IT Act, 2000',
   },
-  // New/Updated IT Act Sections from user input
   {
     id: '8',
     title: 'Penalty for Damage to Computer, Computer System, etc.',
@@ -212,8 +178,6 @@ export const lawSummaries: LawSummary[] = [
     icon: UsersRound,
     category: 'IT Act, 2000',
   },
-
-  // Indian Penal Code (IPC) - Tech Extensions
   {
     id: '15',
     title: 'Sale, etc., of Obscene Books (Materials)',
@@ -291,8 +255,6 @@ export const lawSummaries: LawSummary[] = [
     icon: MessageSquareWarning,
     category: 'Indian Penal Code (IPC)',
   },
-
-  // Other Key Acts & Policies
   {
     id: '22',
     title: 'Admissibility of Electronic Records',
@@ -359,8 +321,6 @@ export const lawSummaries: LawSummary[] = [
     icon: Siren,
     category: 'Other Key Acts & Policies',
   },
-
-  // Financial & Transaction Regulations
   {
     id: '28',
     title: 'RBI Guidelines for Digital Payments & Cyber Frauds',
@@ -383,8 +343,6 @@ export const lawSummaries: LawSummary[] = [
     icon: ReceiptIndianRupee,
     category: 'Financial & Transaction Regulations',
   },
-  
-  // General & Consumer Rights
   {
     id: '30',
     title: 'Digital Piracy & Illegal Content Sharing',
@@ -440,8 +398,6 @@ export const lawSummaries: LawSummary[] = [
     icon: Construction,
     category: 'Other Key Acts & Policies',
   },
-
-  // Special Focus Areas
   {
     id: '35',
     title: 'Cyberbullying',
@@ -450,7 +406,7 @@ export const lawSummaries: LawSummary[] = [
     summary: 'Involves using electronic communication to bully a person, typically by sending messages of an intimidating or threatening nature, or spreading rumors.',
     details: 'Can be addressed under laws related to criminal intimidation, stalking, defamation, violation of privacy, or transmission of obscene material depending on the nature of bullying.',
     penalty: 'Varies based on the specific offence invoked.',
-    icon: Frown, // Changed from Annoyed
+    icon: Frown,
     category: 'Special Cybercrime Focus Areas',
   },
   {

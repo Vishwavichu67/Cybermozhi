@@ -49,7 +49,7 @@ function LawSummaryCard({ summaryItem }: { summaryItem: LawSummary }) {
 interface LawCategory {
   title: string;
   filter: (summary: LawSummary) => boolean;
-  icon?: React.ElementType; // Optional icon for the category title
+  icon?: React.ElementType; 
 }
 
 export default function LawSummariesPage() {
@@ -91,14 +91,13 @@ export default function LawSummariesPage() {
     },
   ];
 
-  // Fallback for items not fitting explicit categories, or to ensure all items are shown if category field is missing
-  const un categorizedFilter = (s: LawSummary) => !categories.some(cat => cat.filter(s));
+  const uncategorizedFilter = (s: LawSummary) => !categories.some(cat => cat.filter(s) && s.category === cat.title.split(" (")[0]);
 
 
   return (
     <div className="flex flex-col items-center w-full">
       <header className="mb-10 text-center">
-        <Gavel className="w-16 h-16 text-primary mx-auto mb-4" /> {/* Changed icon to Gavel to match header */}
+        <Gavel className="w-16 h-16 text-primary mx-auto mb-4" /> 
         <h1 className="text-4xl font-headline font-bold text-primary">Indian Cyber Law Summaries</h1>
         <p className="mt-2 text-lg text-foreground/70 max-w-2xl mx-auto">
           Understand key sections of Indian cyber laws and related policies. This information is for educational purposes and not legal advice.
@@ -124,11 +123,10 @@ export default function LawSummariesPage() {
         );
       })}
       
-      {/* Section for any uncategorized items - for development or if data is incomplete */}
       {(() => {
         const uncategorizedSummaries = lawSummaries.filter(uncategorizedFilter);
         if (uncategorizedSummaries.length > 0) {
-          console.warn("Uncategorized law summaries found:", uncategorizedSummaries.map(s => s.title));
+          console.warn("Uncategorized law summaries found:", uncategorizedSummaries.map(s => s.title + (s.category ? ` (Category: ${s.category})` : ' (No Category)')));
           return (
             <section className="w-full max-w-4xl mb-12">
               <h2 className="text-2xl font-headline font-semibold text-accent mb-6 pb-2 border-b-2 border-accent/30">

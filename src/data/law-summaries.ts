@@ -36,7 +36,7 @@ import {
   ReceiptIndianRupee,
   IdCard,
   Construction,
-  Annoyed,
+  Frown, // Changed from Annoyed
   VideoOff,
   UserCog,
   Gamepad2,
@@ -450,7 +450,7 @@ export const lawSummaries: LawSummary[] = [
     summary: 'Involves using electronic communication to bully a person, typically by sending messages of an intimidating or threatening nature, or spreading rumors.',
     details: 'Can be addressed under laws related to criminal intimidation, stalking, defamation, violation of privacy, or transmission of obscene material depending on the nature of bullying.',
     penalty: 'Varies based on the specific offence invoked.',
-    icon: Annoyed,
+    icon: Frown, // Changed from Annoyed
     category: 'Special Cybercrime Focus Areas',
   },
   {
@@ -509,5 +509,3 @@ export const lawSummaries: LawSummary[] = [
     category: 'Special Cybercrime Focus Areas',
   }
 ];
-
-    

@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -46,8 +47,13 @@ const cyberLawChatbotFlow = ai.defineFlow(
     inputSchema: CyberLawChatbotInputSchema,
     outputSchema: CyberLawChatbotOutputSchema,
   },
-  async input => {
+  async (input: CyberLawChatbotInput): Promise<CyberLawChatbotOutput> => {
     const {output} = await prompt(input);
-    return output!;
+
+    if (!output) {
+      console.error('Cyber law chatbot: AI did not return the expected output structure.');
+      throw new Error('The AI failed to generate a response in the expected format. Please try rephrasing your query.');
+    }
+    return output;
   }
 );

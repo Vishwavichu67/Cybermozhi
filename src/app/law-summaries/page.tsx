@@ -2,7 +2,7 @@
 import { lawSummaries, type LawSummary } from '@/data/law-summaries';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { FileText, AlertTriangle, Gavel } from 'lucide-react';
+import { FileText, AlertTriangle, Gavel, ShieldOff, BookMarked, Landmark, UsersRound } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 function LawSummaryCard({ summaryItem }: { summaryItem: LawSummary }) {
@@ -98,7 +98,7 @@ export default function LawSummariesPage() {
   return (
     <div className="flex flex-col items-center w-full">
       <header className="mb-10 text-center">
-        <FileText className="w-16 h-16 text-primary mx-auto mb-4" />
+        <Gavel className="w-16 h-16 text-primary mx-auto mb-4" /> {/* Changed icon to Gavel to match header */}
         <h1 className="text-4xl font-headline font-bold text-primary">Indian Cyber Law Summaries</h1>
         <p className="mt-2 text-lg text-foreground/70 max-w-2xl mx-auto">
           Understand key sections of Indian cyber laws and related policies. This information is for educational purposes and not legal advice.
@@ -148,5 +148,3 @@ export default function LawSummariesPage() {
     </div>
   );
 }
-
-    

@@ -13,7 +13,7 @@ import {
   FileText,
   BookOpen,
   LogIn,
-  UserPlus, // Used for Phishing Attacks
+  UserPlus,
   ArrowRight,
   Sparkles,
   LayoutDashboard,
@@ -21,9 +21,11 @@ import {
   Lightbulb,
   ScrollText,
   ClipboardCheck,
-  FileLock, // Used for Ransomware Threats
-  KeyRound, // Used for IT Act: Section 66C
-  FileSignature // Used for Digital Signatures
+  FileLock,
+  KeyRound,
+  FileSignature,
+  UserCircle2, // For Account Details
+  History // For Chat History
 } from "lucide-react";
 
 const sampleTopics = [
@@ -169,7 +171,7 @@ export default function HomePage() {
               Unlock CyberMozhi's Full Potential
             </h2>
             <p className="mt-4 max-w-2xl mx-auto text-lg text-foreground/80">
-              Create a free account or login to access personalized advice, save your learning progress, download FIR templates, take quizzes, and enjoy unlimited AI chatbot interactions.
+              Create a free account or login to access personalized advice, save your learning progress and chat history, download FIR templates, take quizzes, and enjoy unlimited AI chatbot interactions.
             </p>
             <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
               <Button asChild size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 shadow-md hover:shadow-lg transition-shadow">
@@ -211,22 +213,22 @@ export default function HomePage() {
           <h2 className="text-3xl font-headline font-bold text-primary">Your Dashboard</h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Card 1: Recent Activity / Continue Learning */}
+          {/* Card 1: Account Details (Conceptual) */}
           <Card className="shadow-lg hover:shadow-xl transition-shadow">
             <CardHeader>
               <div className="flex items-center gap-3">
-                <BookOpen className="w-7 h-7 text-primary" />
-                <CardTitle className="text-xl font-headline text-primary">Continue Learning</CardTitle>
+                <UserCircle2 className="w-7 h-7 text-primary" />
+                <CardTitle className="text-xl font-headline text-primary">Account Details</CardTitle>
               </div>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-foreground/70 mb-1">Your last session was on: <span className="font-semibold">Understanding Phishing Attacks.</span></p>
-              <p className="text-sm text-foreground/70">Keep building your knowledge!</p>
+              <p className="text-sm text-foreground/70 mb-1">Manage your profile information like name, phone, gender, and date of birth.</p>
+              <p className="text-sm text-foreground/70">This helps personalize your CyberMozhi experience.</p>
             </CardContent>
             <div className="p-4 pt-0">
-              <Button asChild variant="default" className="w-full">
-                <Link href="/glossary"> {/* Placeholder link */}
-                  Explore Topics <ArrowRight className="ml-2 h-4 w-4" />
+              <Button asChild variant="outline" className="w-full">
+                <Link href="#"> {/* Placeholder for /profile or /account page */}
+                  View/Edit Profile <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
             </div>
@@ -274,29 +276,29 @@ export default function HomePage() {
             </div>
           </Card>
 
-          {/* Card 4: Cyber Alerts & Updates (Conceptual) */}
-          <Card className="shadow-lg hover:shadow-xl transition-shadow md:col-span-1 lg:col-span-1">
+          {/* Card 4: Chat History (Conceptual) */}
+          <Card className="shadow-lg hover:shadow-xl transition-shadow">
             <CardHeader>
               <div className="flex items-center gap-3">
-                <AlertCircle className="w-7 h-7 text-destructive" />
-                <CardTitle className="text-xl font-headline text-destructive">Cyber Alerts</CardTitle>
+                <History className="w-7 h-7 text-primary" />
+                <CardTitle className="text-xl font-headline text-primary">Chat History</CardTitle>
               </div>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-foreground/70 mb-1"><span className="font-semibold text-destructive">New!</span> Updated advisory on SIM swap fraud techniques.</p>
-              <p className="text-sm text-foreground/70">Stay informed about the latest cyber threats.</p>
+              <p className="text-sm text-foreground/70 mb-1">Revisit your previous conversations with CyberMozhi AI.</p>
+              <p className="text-sm text-foreground/70">Your chat history helps the AI provide better, contextual answers over time.</p>
             </CardContent>
              <div className="p-4 pt-0">
-              <Button asChild variant="destructive" className="w-full">
-                <Link href="#"> {/* Placeholder link for /alerts */}
-                  Read Latest Alerts <ArrowRight className="ml-2 h-4 w-4" />
+              <Button asChild variant="outline" className="w-full">
+                <Link href="#"> {/* Placeholder for /chat-history page */}
+                  View Chat History <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
             </div>
           </Card>
 
            {/* Card 5: Suggested For You (Conceptual) */}
-          <Card className="shadow-lg hover:shadow-xl transition-shadow md:col-span-2 lg:col-span-2">
+          <Card className="shadow-lg hover:shadow-xl transition-shadow md:col-span-2">
             <CardHeader>
               <div className="flex items-center gap-3">
                 <Lightbulb className="w-7 h-7 text-primary" />
@@ -360,7 +362,7 @@ export default function HomePage() {
             Your AI Legal & Cyber Guide Awaits
           </h2>
           <p className="mt-4 max-w-2xl mx-auto text-lg text-foreground/80">
-            Leverage the full power of CyberMozhi's bilingual AI. Get detailed explanations on cyber laws, IT Act sections, penalties, attack mitigation, and guidance on filing complaints.
+            Leverage the full power of CyberMozhi's bilingual AI. Get detailed explanations on cyber laws, IT Act sections, penalties, attack mitigation, and guidance on filing complaints. The AI will also consider your chat history and profile (once available) for a more personalized experience.
           </p>
           <div className="mt-8">
             <Button asChild size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 shadow-md hover:shadow-lg transition-shadow">
@@ -379,5 +381,4 @@ export default function HomePage() {
     </div>
   );
 }
-
     

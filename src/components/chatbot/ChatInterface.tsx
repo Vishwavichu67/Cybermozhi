@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useRef, useEffect, FormEvent } from 'react';
@@ -5,11 +6,12 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Send, User, Sparkles, Loader2 } from 'lucide-react';
+import { Send, User, Sparkles, Loader2, History } from 'lucide-react';
 import { handleChatQuery } from '@/app/chatbot/actions';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface Message {
   id: string;
@@ -24,6 +26,7 @@ export function ChatInterface() {
   const [isLoading, setIsLoading] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+  const { isLoggedIn } = useAuth();
 
   useEffect(() => {
     if (scrollAreaRef.current) {
@@ -48,6 +51,9 @@ export function ChatInterface() {
     try {
       const formData = new FormData();
       formData.append('query', userMessage.text);
+      // Future enhancement: if (isLoggedIn && user) formData.append('userId', user.uid);
+      // Future enhancement: pass chat history if available
+
       const result = await handleChatQuery(formData);
       
       if (result.error) {
@@ -93,6 +99,15 @@ export function ChatInterface() {
     <Card className="w-full shadow-xl rounded-lg overflow-hidden">
       <CardContent className="p-0">
         <div className="flex flex-col h-[70vh]">
+          <div className="p-4 border-b border-border bg-background/70 backdrop-blur-sm flex justify-between items-center">
+            <h2 className="text-lg font-semibold text-primary">CyberMozhi AI Chat</h2>
+            {isLoggedIn && (
+              <Button variant="outline" size="sm" disabled> {/* Conceptual: To be implemented */}
+                <History className="mr-2 h-4 w-4" />
+                Chat History
+              </Button>
+            )}
+          </div>
           <ScrollArea className="flex-grow p-6 space-y-6" ref={scrollAreaRef}>
             {messages.map((message) => (
               <div

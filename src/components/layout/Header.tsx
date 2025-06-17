@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import Image from 'next/image';
+import { ThemeToggle } from './ThemeToggle';
 
 
 const navItems = [
@@ -47,7 +48,7 @@ export function Header() {
         description: 'You have been successfully logged out.',
       });
       if (isMobileMenuOpen) setIsMobileMenuOpen(false);
-      router.push('/'); // Redirect to home after logout
+      router.push('/'); 
     } catch (error) {
       console.error('Logout error:', error);
       toast({
@@ -84,7 +85,6 @@ export function Header() {
     if (!email) return 'U';
     const namePart = email.split('@')[0];
     if (namePart) {
-        // Attempt to get initials from name part if it contains a separator like '.' or '_'
         const parts = namePart.replace(/[^a-zA-Z0-9]/g, ' ').split(' ').filter(Boolean);
         if (parts.length > 1) {
             return (parts[0]?.[0] || '') + (parts[parts.length - 1]?.[0] || '');
@@ -113,17 +113,16 @@ export function Header() {
           </a>
         </Link>
 
-        {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-1">
           {navItems.map((item) => (
             <NavLink key={item.href} {...item} />
           ))}
         </nav>
 
-        {/* Auth Buttons - Desktop */}
         <div className="hidden md:flex items-center space-x-2">
+          <ThemeToggle />
           {authLoading ? (
-            <Button variant="ghost" size="sm" disabled>
+            <Button variant="ghost" size="icon" className="h-9 w-9" disabled>
               <Loader2 className="h-5 w-5 animate-spin" />
             </Button>
           ) : isLoggedIn && user ? (
@@ -164,11 +163,10 @@ export function Header() {
           )}
         </div>
 
-
-        {/* Mobile Navigation Trigger & Auth */}
         <div className="md:hidden flex items-center">
+          <ThemeToggle />
            {authLoading ? (
-             <Button variant="ghost" size="icon" className="mr-1" disabled>
+             <Button variant="ghost" size="icon" className="mr-1 h-9 w-9" disabled>
                 <Loader2 className="h-5 w-5 animate-spin" />
              </Button>
            ) : !isLoggedIn && (
@@ -206,6 +204,12 @@ export function Header() {
                   <NavLink key={item.href} {...item} />
                 ))}
               </nav>
+              
+              {/* ThemeToggle moved above user info for mobile for better grouping with actions */}
+              {/* <div className="p-4 border-t flex justify-center">
+                 <ThemeToggle />
+              </div> */}
+
 
               {!authLoading && isLoggedIn && user && (
                 <div className="p-4 border-t">

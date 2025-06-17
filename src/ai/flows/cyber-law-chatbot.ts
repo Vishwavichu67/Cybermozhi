@@ -12,15 +12,26 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
+const ChatMessageSchema = z.object({
+  role: z.enum(['user', 'model']),
+  parts: z.array(z.object({text: z.string()})),
+});
+export type ChatMessage = z.infer<typeof ChatMessageSchema>;
+
+
 const CyberLawChatbotInputSchema = z.object({
   query: z
     .string()
     .describe('The user query about cyber law or cybersecurity in Tamil or English.'),
+  userName: z.string().optional().describe('The name of the user, if known. Use for personalization if available.'),
+  chatHistory: z.array(ChatMessageSchema).optional().describe('The previous turns in the current conversation. Use this to maintain context, avoid repetition, and provide more relevant follow-up answers.'),
   // Placeholder for future enhancements:
   // userId: z.string().optional().describe('The unique ID of the logged-in user, if available.'),
   // userRole: z.enum(['student', 'professional', 'common_citizen', 'guest']).optional().describe('The role of the user, if known.'),
-  // userName: z.string().optional().describe('The name of the user, if known.'),
-  // chatHistory: z.array(z.object({sender: z.enum(['user', 'bot']), text: z.string()})).optional().describe('The previous turns in the current conversation.'),
+  // userDetails: z.object({ 
+  //   gender: z.string().optional(), 
+  //   dob: z.string().optional() 
+  // }).optional().describe('Additional details about the user like gender or date of birth.'),
 });
 export type CyberLawChatbotInput = z.infer<typeof CyberLawChatbotInputSchema>;
 
@@ -41,6 +52,10 @@ const prompt = ai.definePrompt({
   output: {schema: CyberLawChatbotOutputSchema},
   prompt: `You are CyberMozhi, an AI-powered bilingual assistant that educates users about cybersecurity and Indian cyber laws, both in Tamil and English.
 Your role is to serve both anonymous (guest) and authenticated (logged-in) users by guiding them through the CyberMozhi platform, offering them helpful, secure, and personalized content.
+
+{{#if userName}}
+Hello {{userName}}!
+{{/if}}
 
 Core Principles for Responding:
 1.  **Language & Bilingualism:**
@@ -66,9 +81,9 @@ Core Principles for Responding:
     *   **Mitigation Techniques:** Offer practical, actionable advice for prevention and response.
     *   **Legal Disclaimer:** Implicitly or explicitly remind users that your information is for educational and guidance purposes and does not constitute formal legal advice. For specific legal issues, consulting a qualified legal professional is recommended. (e.g., "Remember, this information is for educational purposes. For specific legal advice, please consult a legal professional.")
 
-4.  **Personalization & Context (Primarily for Logged-in Users - if data is provided in input):**
-    *   **Chat History:** If previous conversation history ({{{chatHistory}}}) is available, use it to understand the ongoing context, avoid repetition, and provide more relevant follow-up answers.
-    *   **User Details:** If user details like name ({{{userName}}}), role ({{{userRole}}}), gender, or DoB are provided, subtly adapt your tone or examples if appropriate, without being intrusive. For instance, if the user is a student, examples might be more relatable to student life. Always prioritize clarity and the core query.
+4.  **Personalization & Context (Utilize provided userName and chatHistory):**
+    *   **Chat History:** If previous conversation history ({{{chatHistory}}}) is available, use it to understand the ongoing context, avoid repetition, and provide more relevant follow-up answers. Refer to past user statements or bot answers if relevant.
+    *   **User Details:** If user name ({{{userName}}}) is provided, use it to personalize greetings. If other user details like role ({{{userRole}}}), gender, or DoB were provided (currently placeholders in schema), you would subtly adapt your tone or examples if appropriate, without being intrusive. For instance, if the user is a student, examples might be more relatable to student life. Always prioritize clarity and the core query.
     *   **Guest Users:** For guest users (or if no specific user data is available), provide general, helpful responses. You can mention that logging in unlocks more personalized features.
 
 5.  **Structure:**
@@ -89,7 +104,15 @@ Purpose:
 
 Never use complex legal jargon without explanation. Your goal is to make cyber law understandable, actionable, and relevant for every Indian citizen.
 
-User's Question: {{{query}}}
+{{#if chatHistory}}
+Here is the previous conversation history:
+{{#each chatHistory}}
+{{#if (eq role "user")}}User: {{parts.0.text}}{{/if}}
+{{#if (eq role "model")}}CyberMozhi: {{parts.0.text}}{{/if}}
+{{/each}}
+{{/if}}
+
+User's Current Question: {{{query}}}
 Answer:
 `,
 config: {
@@ -121,8 +144,6 @@ const cyberLawChatbotFlow = ai.defineFlow(
     outputSchema: CyberLawChatbotOutputSchema,
   },
   async (input: CyberLawChatbotInput): Promise<CyberLawChatbotOutput> => {
-    // In a full implementation, you would fetch user details and chat history here if input.userId is present
-    // and then pass it to the prompt. For now, the prompt is designed to handle their optional presence.
     const {output} = await prompt(input);
 
     if (!output) {
@@ -132,13 +153,3 @@ const cyberLawChatbotFlow = ai.defineFlow(
     return output;
   }
 );
-
-// Example User Queries (for testing or further refinement, not directly part of the prompt to the LLM):
-// - "What is the punishment for cyberstalking under Indian law?" → Respond in Tamil + English
-// - "Explain phishing attack in simple terms"
-// - "Which section of IT Act covers identity theft?"
-// - "How can I file a cybercrime complaint online?"
-// - "Cybercrime awareness tips for students"
-// - "Give example FIR draft for financial fraud"
-// - "என் கணினியில் Ransomware வந்தால் என்ன செய்வது?" (What to do if my computer gets Ransomware?)
-// - "Section 66A IT Act explained in Tamil"

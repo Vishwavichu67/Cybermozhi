@@ -5,7 +5,7 @@ import { useState, useRef, useEffect, FormEvent } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Send, User, Sparkles, Loader2, History } from 'lucide-react';
 import { handleChatQuery } from '@/app/chatbot/actions';
 import { useToast } from '@/hooks/use-toast';
@@ -13,12 +13,12 @@ import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { db } from '@/lib/firebase';
-import { collection, query, orderBy, limit, getDocs, Timestamp, onSnapshot, QuerySnapshot, DocumentData } from 'firebase/firestore';
+import { collection, query, orderBy, onSnapshot, Timestamp, type QuerySnapshot, type DocumentData } from 'firebase/firestore';
 
 interface Message {
   id: string;
   text: string;
-  role: 'user' | 'model'; // Changed from 'sender'
+  role: 'user' | 'model';
   timestamp: Date;
 }
 
@@ -28,9 +28,10 @@ export function ChatInterface() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(true); // For initial history load
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
-  const { user, isLoggedIn, loading: authLoading } = useAuth(); // Use user from useAuth
+  const { user, isLoggedIn, loading: authLoading } = useAuth();
 
   // Scroll to bottom effect
   useEffect(() => {
@@ -42,27 +43,25 @@ export function ChatInterface() {
   // Fetch initial chat history or listen for real-time updates
   useEffect(() => {
     if (isLoggedIn && user) {
-      setIsLoading(true);
+      setIsLoadingHistory(true);
       const chatMessagesRef = collection(db, `users/${user.uid}/chatMessages`);
-      const q = query(chatMessagesRef, orderBy('timestamp', 'asc')); // Fetch in ascending to display correctly
+      const q = query(chatMessagesRef, orderBy('timestamp', 'asc')); 
 
-      // Use onSnapshot for real-time updates, or getDocs for one-time fetch
       const unsubscribe = onSnapshot(q, (querySnapshot: QuerySnapshot<DocumentData>) => {
         const fetchedMessages: Message[] = [];
         querySnapshot.forEach((doc) => {
           const data = doc.data();
-          const timestamp = data.timestamp as Timestamp | null; // Firestore timestamp
+          const timestamp = data.timestamp as Timestamp | null; 
           fetchedMessages.push({
             id: doc.id,
             text: data.text,
             role: data.role as 'user' | 'model',
-            timestamp: timestamp ? timestamp.toDate() : new Date(), // Convert to JS Date
+            timestamp: timestamp ? timestamp.toDate() : new Date(), 
           });
         });
         
-        // Display a limited number of recent messages or all based on preference
         setMessages(fetchedMessages.slice(-MAX_CHAT_HISTORY_TO_DISPLAY));
-        setIsLoading(false);
+        setIsLoadingHistory(false);
       }, (error) => {
         console.error("Error fetching real-time chat history:", error);
         toast({
@@ -70,13 +69,13 @@ export function ChatInterface() {
           title: "Error",
           description: "Could not load chat history."
         });
-        setIsLoading(false);
+        setIsLoadingHistory(false);
       });
 
-      return () => unsubscribe(); // Cleanup listener on component unmount
+      return () => unsubscribe(); 
     } else {
-      setMessages([]); // Clear messages if user logs out
-      setIsLoading(false);
+      setMessages([]); 
+      setIsLoadingHistory(false);
     }
   }, [isLoggedIn, user, toast]);
   
@@ -85,12 +84,8 @@ export function ChatInterface() {
     if (!input.trim() || isLoading) return;
 
     const userMessageText = input;
-    setInput(''); // Clear input immediately
-
-    // Optimistically add user message to UI if desired, or wait for backend confirmation
-    // For simplicity, we'll add after successful backend processing if not using real-time updates fully for adding new messages
+    setInput(''); 
     
-    // If not logged in, the message won't be saved but AI will respond
     if (!isLoggedIn) {
          const tempUserMessage: Message = {
             id: Date.now().toString(),
@@ -100,7 +95,6 @@ export function ChatInterface() {
         };
         setMessages(prev => [...prev, tempUserMessage]);
     }
-
 
     setIsLoading(true);
 
@@ -114,7 +108,6 @@ export function ChatInterface() {
         throw new Error(result.error);
       }
 
-      // If not logged in (no real-time listener saving the bot message), add bot message manually
       if (!isLoggedIn) {
         const botMessage: Message = {
             id: (Date.now() + 1).toString(),
@@ -124,7 +117,7 @@ export function ChatInterface() {
         };
         setMessages((prev) => [...prev, botMessage]);
       }
-      // If logged in, onSnapshot should pick up the new bot message saved by handleChatQuery
+      // For logged-in users, onSnapshot will update the messages state with user and bot messages.
 
     } catch (error) {
       console.error('Chatbot error:', error);
@@ -134,7 +127,6 @@ export function ChatInterface() {
         title: 'Chatbot Error',
         description: errorMessage,
       });
-      // Add error message to chat UI only if not logged in (as logged-in would rely on snapshot)
        if (!isLoggedIn) {
         const errorBotMessage: Message = {
             id: (Date.now() + 1).toString(),
@@ -164,15 +156,15 @@ export function ChatInterface() {
           <div className="p-4 border-b border-border bg-background/70 backdrop-blur-sm flex justify-between items-center">
             <h2 className="text-lg font-semibold text-primary">Ask CyberMozhi (English or Tamil)...</h2>
             {isLoggedIn && (
-              <Button variant="outline" size="sm" disabled> {/* Conceptual: To be implemented for viewing full history page */}
+              <Button variant="outline" size="sm" disabled> 
                 <History className="mr-2 h-4 w-4" />
                 Chat History
               </Button>
             )}
           </div>
           <ScrollArea className="flex-grow p-6 space-y-6" ref={scrollAreaRef}>
-            {authLoading && !isLoggedIn && <div className="flex justify-center items-center h-full"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>}
-            {messages.map((message) => (
+            {isLoadingHistory && <div className="flex justify-center items-center h-full"><Loader2 className="h-8 w-8 animate-spin text-primary" /><p className="ml-2 text-muted-foreground">Loading chat history...</p></div>}
+            {!isLoadingHistory && messages.map((message) => (
               <div
                 key={message.id}
                 className={cn(
@@ -224,10 +216,10 @@ export function ChatInterface() {
                 </div>
               </div>
             )}
-             {!isLoading && authLoading && isLoggedIn && messages.length === 0 && ( // Show loader specifically for initial history load
+             {!isLoading && !isLoadingHistory && authLoading && isLoggedIn && messages.length === 0 && (
                 <div className="flex justify-center items-center h-full">
                     <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                    <p className="ml-2 text-muted-foreground">Loading chat history...</p>
+                    <p className="ml-2 text-muted-foreground">Checking authentication...</p>
                 </div>
             )}
           </ScrollArea>
@@ -242,9 +234,9 @@ export function ChatInterface() {
                 rows={1}
                 maxRows={5}
                 aria-label="Chat input"
-                disabled={isLoading || authLoading}
+                disabled={isLoading || authLoading && !isLoggedIn }
               />
-              <Button type="submit" size="icon" disabled={isLoading || authLoading || !input.trim()} aria-label="Send message">
+              <Button type="submit" size="icon" disabled={isLoading || (authLoading && !isLoggedIn) || !input.trim()} aria-label="Send message">
                 {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
               </Button>
             </div>

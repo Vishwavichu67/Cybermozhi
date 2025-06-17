@@ -4,13 +4,13 @@
 import { cyberLawChatbot, type CyberLawChatbotInput, type CyberLawChatbotOutput, type ChatMessage } from '@/ai/flows/cyber-law-chatbot';
 import { z } from 'zod';
 import { auth, db } from '@/lib/firebase';
-import { collection, addDoc, query, orderBy, limit, getDocs, serverTimestamp, Timestamp, where } from 'firebase/firestore';
+import { collection, addDoc, query, orderBy, limit, getDocs, serverTimestamp, Timestamp } from 'firebase/firestore';
 
 const ChatQuerySchema = z.object({
   query: z.string().min(1, "Query cannot be empty."),
 });
 
-const MAX_CHAT_HISTORY_TO_FETCH = 20; // Fetch last 20 messages (10 pairs)
+const MAX_CHAT_HISTORY_TO_FETCH = 20; // Fetch last 20 messages (10 user + 10 model) for AI context
 
 export async function handleChatQuery(formData: FormData): Promise<CyberLawChatbotOutput & { error?: string }> {
   const rawQuery = formData.get('query');
@@ -31,7 +31,7 @@ export async function handleChatQuery(formData: FormData): Promise<CyberLawChatb
   if (currentUser) {
     userName = currentUser.displayName || currentUser.email?.split('@')[0] || undefined;
     
-    // Fetch chat history
+    // Fetch chat history for AI context
     try {
       const chatMessagesRef = collection(db, `users/${currentUser.uid}/chatMessages`);
       const q = query(chatMessagesRef, orderBy('timestamp', 'desc'), limit(MAX_CHAT_HISTORY_TO_FETCH));
@@ -41,15 +41,15 @@ export async function handleChatQuery(formData: FormData): Promise<CyberLawChatb
         fetchedMessages.push(doc.data() as { role: 'user' | 'model'; text: string; timestamp: Timestamp });
       });
       
-      // Transform to Genkit format (parts field) and reverse to maintain chronological order for the AI
+      // Transform to Genkit ChatMessage format (with 'parts') and reverse to maintain chronological order for the AI
       chatHistoryForAI = fetchedMessages.reverse().map(msg => ({
         role: msg.role,
         parts: [{ text: msg.text }]
       }));
 
     } catch (historyError) {
-      console.error("Error fetching chat history:", historyError);
-      // Non-fatal error, proceed without history
+      console.error("Error fetching chat history for AI:", historyError);
+      // Non-fatal error, proceed without history for AI if fetching fails
     }
   }
 

@@ -2,6 +2,7 @@
 "use client";
 
 import Link from 'next/link';
+import Image from 'next/image'; // Ensure Image is imported
 import { MessageCircle, Gavel, BookOpen, Menu, X, LogIn, LogOut, Rocket, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
@@ -21,7 +22,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import Image from 'next/image';
 import { ThemeToggle } from './ThemeToggle';
 
 
@@ -59,11 +59,10 @@ export function Header() {
     }
   };
 
-  const NavLink = ({ href, label, icon: Icon, onClick }: { href: string, label: string, icon: React.ElementType, onClick?: () => void }) => (
+  const NavLink = ({ href, label, icon: Icon }: { href: string, label: string, icon: React.ElementType }) => (
     <Link
       href={href}
       onClick={() => {
-        if (onClick) onClick();
         if (isMobileMenuOpen) setIsMobileMenuOpen(false);
       }}
       className={cn(
@@ -109,7 +108,7 @@ export function Header() {
             alt="CyberMozhi Logo"
             width={150}
             height={40}
-            priority
+            // Removed priority prop
           />
         </Link>
 
@@ -188,7 +187,7 @@ export function Header() {
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                    <Image
-                      src="/logo.png"
+                      src="/logo.png" // Use the same logo for mobile
                       alt="CyberMozhi Logo"
                       width={120}
                       height={30}

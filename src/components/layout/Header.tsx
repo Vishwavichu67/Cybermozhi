@@ -2,7 +2,7 @@
 "use client";
 
 import Link from 'next/link';
-import { ShieldCheck, MessageCircle, Gavel, BookOpen, Menu, X, LogIn, LogOut, Rocket, Loader2 } from 'lucide-react'; // Added Rocket, Loader2
+import { MessageCircle, Gavel, BookOpen, Menu, X, LogIn, LogOut, Rocket, Loader2 } from 'lucide-react'; // Added Rocket, Loader2
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
 import { useState } from 'react';
@@ -21,14 +21,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+// Import next/image at the top if it's not already there
+// import Image from 'next/image';
 
 
 const navItems = [
-  { href: '/', label: 'Home', icon: ShieldCheck },
+  { href: '/', label: 'Home', icon: Rocket }, // Changed icon for Home to Rocket as ShieldCheck was part of logo
   { href: '/chatbot', label: 'AI Chatbot', icon: MessageCircle },
   { href: '/law-summaries', label: 'Law Summaries', icon: Gavel },
   { href: '/glossary', label: 'Cyber Glossary', icon: BookOpen },
-  { href: '/guide', label: 'Site Guide', icon: Rocket }, // Added Site Guide
+  { href: '/guide', label: 'Site Guide', icon: Rocket },
 ];
 
 export function Header() {
@@ -100,10 +102,11 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
+        {/* This Link component is where you'll add your logo */}
         <Link href="/" legacyBehavior passHref>
           <a className="flex items-center gap-2 text-xl font-headline font-semibold text-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background rounded-md p-1">
-            <ShieldCheck className="h-7 w-7" />
-            <span>CyberMozhi</span>
+            {/* Instructions for adding logo will go here */}
+            {/* Example: <Image src="/logo.png" alt="CyberMozhi Logo" width={150} height={40} /> */}
           </a>
         </Link>
 
@@ -180,8 +183,9 @@ export function Header() {
               <div className="flex items-center justify-between p-4 border-b">
                  <Link href="/" legacyBehavior passHref>
                   <a className="flex items-center gap-2 text-lg font-headline font-semibold text-primary" onClick={() => setIsMobileMenuOpen(false)}>
-                    <ShieldCheck className="h-6 w-6" />
-                    <span>CyberMozhi</span>
+                    {/* Mobile Logo Area - You might want a smaller version or just text here */}
+                    {/* Example: <Image src="/logo-mobile.png" alt="CyberMozhi Logo" width={120} height={30} /> */}
+                    <span>CyberMozhi</span> {/* Fallback or mobile specific text */}
                   </a>
                 </Link>
                 <SheetClose asChild>

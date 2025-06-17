@@ -1,17 +1,47 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { MessageCircle, FileText, BookOpen, ArrowRight, ShieldCheck, Search, Gavel } from "lucide-react";
+
+"use client";
+
+import { useAuth } from "@/contexts/AuthContext";
 import Link from "next/link";
 import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { 
+  Loader2, 
+  MessageCircle, 
+  FileText, 
+  BookOpen, 
+  LogIn, 
+  UserPlus, 
+  ArrowRight, 
+  Sparkles, 
+  LayoutDashboard, 
+  AlertCircle, 
+  Lightbulb,
+  ScrollText,
+  ClipboardCheck,
+  ShieldCheck,
+  Gavel,
+  FileLock, // Added
+  KeyRound, // Added
+  FileSignature // Added
+} from "lucide-react";
 
-const features = [
+const sampleTopics = [
+  { name: "Phishing Attacks", icon: UserPlus, description: "Learn to identify and avoid deceptive emails and messages.", link: "/glossary#1" },
+  { name: "Ransomware Threats", icon: FileLock, description: "Understand how ransomware works and how to protect your data.", link: "/glossary#10" }, // Changed FileLock2 to FileLock
+  { name: "IT Act: Section 66C", icon: KeyRound, description: "Identity theft and its legal consequences under Indian law.", link: "/law-summaries#3" },
+  { name: "Digital Signatures", icon: FileSignature, description: "The role and legality of digital signatures in India.", link: "/glossary#33" },
+];
+
+const coreFeatures = [
   {
     icon: MessageCircle,
     title: "AI Chatbot Assistant",
     description: "Get instant, bilingual (Tamil & English) answers to your cyber law and security questions. Understand complex terms and mitigation techniques.",
     link: "/chatbot",
     linkText: "Ask AI Now",
-    dataAiHint: "chatbot conversation",
   },
   {
     icon: FileText,
@@ -19,7 +49,6 @@ const features = [
     description: "Explore concise summaries of key sections from the Indian IT Act 2000 and relevant IPC sections. Know your rights and legal remedies.",
     link: "/law-summaries",
     linkText: "Explore Laws",
-    dataAiHint: "legal document",
   },
   {
     icon: BookOpen,
@@ -27,28 +56,40 @@ const features = [
     description: "Demystify complex cybersecurity and legal jargon with our layman-friendly glossary. Enhance your digital literacy.",
     link: "/glossary",
     linkText: "Browse Glossary",
-    dataAiHint: "open book",
   },
 ];
 
+
 export default function HomePage() {
-  return (
-    <div className="flex flex-col items-center">
-      {/* Hero Section */}
-      <section className="w-full py-12 md:py-20 lg:py-28 bg-gradient-to-br from-primary/10 via-background to-accent/10 rounded-xl shadow-lg">
-        <div className="container px-4 md:px-6 text-center">
-          <div className="max-w-3xl mx-auto">
-            <ShieldCheck className="w-16 h-16 md:w-20 md:h-20 text-primary mx-auto mb-6" />
-            <h1 className="text-4xl font-headline font-bold tracking-tight sm:text-5xl md:text-6xl text-primary">
-              CyberMozhi
+  const { user, isLoggedIn, loading: authLoading } = useAuth();
+
+  if (authLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[70vh]">
+        <Loader2 className="h-16 w-16 animate-spin text-primary" />
+        <p className="mt-4 text-lg text-muted-foreground">Loading Your CyberMozhi Experience...</p>
+      </div>
+    );
+  }
+
+  // Guest User View
+  if (!isLoggedIn) {
+    return (
+      <div className="flex flex-col items-center space-y-16">
+        {/* Hero Section for Guests */}
+        <section className="w-full py-12 md:py-20 lg:py-28 bg-gradient-to-br from-primary/10 via-background to-accent/10 rounded-xl shadow-lg text-center">
+          <div className="container px-4 md:px-6">
+            <Sparkles className="w-16 h-16 md:w-20 md:h-20 text-primary mx-auto mb-6" />
+            <h1 className="text-3xl font-headline font-bold tracking-tight sm:text-4xl md:text-5xl text-primary">
+              Welcome to CyberMozhi! வணக்கம்!
             </h1>
-            <p className="mt-6 text-lg md:text-xl text-foreground/80">
-              Your one-stop AI-powered hub for understanding Indian cyber laws, cybersecurity threats, and your digital rights. Empowering netizens across India.
+            <p className="mt-6 text-lg md:text-xl text-foreground/80 max-w-3xl mx-auto">
+              Your AI-powered bilingual (Tamil & English) assistant for understanding Indian cyber laws, online threats, cybersecurity best practices, and legal remedies.
             </p>
             <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
               <Button asChild size="lg" className="shadow-md hover:shadow-lg transition-shadow">
                 <Link href="/chatbot">
-                  Ask our AI Legal Guide <MessageCircle className="ml-2 h-5 w-5" />
+                  Try AI Chatbot (Limited Access) <MessageCircle className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
               <Button asChild variant="outline" size="lg" className="shadow-md hover:shadow-lg transition-shadow">
@@ -58,37 +99,236 @@ export default function HomePage() {
               </Button>
             </div>
           </div>
+        </section>
+
+        {/* What You Can Learn Section */}
+        <section className="w-full container px-4 md:px-6">
+          <h2 className="text-3xl font-headline font-bold tracking-tight text-center text-primary mb-12">
+            Discover Key Cyber Topics
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {sampleTopics.map((topic) => (
+              <Card key={topic.name} className="shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-lg flex flex-col">
+                <CardHeader className="pb-3">
+                  <div className="flex items-center gap-3">
+                    <topic.icon className="w-8 h-8 text-accent flex-shrink-0" />
+                    <CardTitle className="text-lg font-headline text-accent">{topic.name}</CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent className="flex-grow">
+                  <p className="text-sm text-foreground/70">{topic.description}</p>
+                </CardContent>
+                <div className="p-4 pt-0">
+                  <Button asChild variant="link" className="text-primary p-0 h-auto hover:text-accent text-sm">
+                    <Link href={topic.link}>
+                      Learn More <ArrowRight className="ml-1 h-4 w-4" />
+                    </Link>
+                  </Button>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </section>
+        
+        {/* Core Features Section for Guests */}
+        <section className="w-full py-12 md:py-16 bg-background">
+          <div className="container px-4 md:px-6">
+            <h2 className="text-3xl font-headline font-bold tracking-tight text-center text-primary mb-12">
+              Explore Our Resources
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {coreFeatures.map((feature) => (
+                <Card key={feature.title} className="flex flex-col shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out rounded-lg overflow-hidden">
+                  <CardHeader className="bg-primary/5 p-6">
+                    <div className="flex items-center gap-4">
+                      <feature.icon className="w-10 h-10 text-primary" />
+                      <CardTitle className="text-xl font-headline text-primary">{feature.title}</CardTitle>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="p-6 flex-grow">
+                    <CardDescription className="text-foreground/70 leading-relaxed">
+                      {feature.description}
+                    </CardDescription>
+                  </CardContent>
+                  <div className="p-6 pt-0 mt-auto">
+                    <Button asChild variant="link" className="text-primary p-0 h-auto hover:text-accent">
+                      <Link href={feature.link}>
+                        {feature.linkText} <ArrowRight className="ml-2 h-4 w-4" />
+                      </Link>
+                    </Button>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Unlock Full Potential Section */}
+        <section className="w-full py-12 md:py-20 bg-accent/10 rounded-xl shadow-lg text-center">
+          <div className="container px-4 md:px-6">
+            <LogIn className="w-12 h-12 text-accent mx-auto mb-6" />
+            <h2 className="text-3xl font-headline font-bold tracking-tight text-accent mb-4">
+              Unlock CyberMozhi's Full Potential
+            </h2>
+            <p className="mt-4 max-w-2xl mx-auto text-lg text-foreground/80">
+              Create a free account or login to access personalized advice, save your learning progress, download FIR templates, take quizzes, and enjoy unlimited AI chatbot interactions.
+            </p>
+            <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+              <Button asChild size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 shadow-md hover:shadow-lg transition-shadow">
+                <Link href="/signup">
+                  Create Free Account <UserPlus className="ml-2 h-5 w-5" />
+                </Link>
+              </Button>
+              <Button asChild variant="outline" size="lg" className="shadow-md hover:shadow-lg transition-shadow border-accent text-accent hover:bg-accent/20">
+                <Link href="/login">
+                  Login to Your Account <LogIn className="ml-2 h-5 w-5" />
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </section>
+      </div>
+    );
+  }
+
+  // Logged-in User View
+  return (
+    <div className="flex flex-col items-center space-y-12">
+      {/* Personalized Greeting */}
+      <section className="w-full py-10 text-center bg-gradient-to-r from-primary/10 to-accent/10 rounded-xl shadow-md">
+        <div className="container px-4 md:px-6">
+          <h1 className="text-3xl sm:text-4xl font-headline font-bold text-primary">
+            Vanakkam, {user?.displayName || user?.email?.split('@')[0]}!
+          </h1>
+          <p className="mt-3 text-lg text-foreground/80">
+            Welcome back to your CyberMozhi dashboard. Let's continue your journey to digital safety and legal awareness.
+          </p>
         </div>
       </section>
 
-      {/* Placeholder Image Section */}
-      <section className="w-full py-12 md:py-20">
-        <div className="container px-4 md:px-6">
-          <Card className="overflow-hidden shadow-xl">
-            <Image 
-              src="https://placehold.co/1200x400.png" 
-              alt="Cybersecurity conceptual image" 
-              width={1200} 
-              height={400} 
-              className="w-full h-auto object-cover"
-              data-ai-hint="cybersecurity abstract"
-            />
-            <CardContent className="p-6 bg-card">
-              <h2 className="text-2xl font-headline font-semibold text-primary">Stay Informed, Stay Secure</h2>
-              <p className="text-foreground/70 mt-2">Navigate the digital world with confidence. Our platform provides the knowledge and tools you need to protect yourself online and understand your legal standing in cyberspace.</p>
+      {/* Conceptual Dashboard Section */}
+      <section className="w-full container px-4 md:px-6">
+        <div className="flex items-center gap-3 mb-8">
+          <LayoutDashboard className="w-8 h-8 text-primary" />
+          <h2 className="text-3xl font-headline font-bold text-primary">Your Dashboard</h2>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Card 1: Recent Activity / Continue Learning */}
+          <Card className="shadow-lg hover:shadow-xl transition-shadow">
+            <CardHeader>
+              <div className="flex items-center gap-3">
+                <BookOpen className="w-7 h-7 text-primary" />
+                <CardTitle className="text-xl font-headline text-primary">Continue Learning</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-foreground/70 mb-1">Your last session was on: <span className="font-semibold">Understanding Phishing Attacks.</span></p>
+              <p className="text-sm text-foreground/70">Keep building your knowledge!</p>
             </CardContent>
+            <div className="p-4 pt-0">
+              <Button asChild variant="default" className="w-full">
+                <Link href="/glossary"> {/* Placeholder link */}
+                  Explore Topics <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
+          </Card>
+
+          {/* Card 2: Saved FIR Drafts (Conceptual) */}
+          <Card className="shadow-lg hover:shadow-xl transition-shadow">
+            <CardHeader>
+               <div className="flex items-center gap-3">
+                <ScrollText className="w-7 h-7 text-primary" />
+                <CardTitle className="text-xl font-headline text-primary">FIR Drafts</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-foreground/70 mb-1">You have <span className="font-semibold">1 FIR draft</span> in progress for 'Online Financial Fraud'.</p>
+              <p className="text-sm text-foreground/70">Access and manage your saved complaint drafts.</p>
+            </CardContent>
+             <div className="p-4 pt-0">
+              <Button asChild variant="outline" className="w-full">
+                <Link href="#"> {/* Placeholder link for /fir-drafts */}
+                  Manage My Drafts <FileText className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
+          </Card>
+
+          {/* Card 3: Quiz Progress (Conceptual) */}
+          <Card className="shadow-lg hover:shadow-xl transition-shadow">
+            <CardHeader>
+              <div className="flex items-center gap-3">
+                <ClipboardCheck className="w-7 h-7 text-primary" />
+                <CardTitle className="text-xl font-headline text-primary">Quiz Progress</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-foreground/70 mb-1">Latest Quiz: <span className="font-semibold">IT Act Basics - 75% Score.</span></p>
+              <p className="text-sm text-foreground/70">Keep testing your knowledge and earn badges!</p>
+            </CardContent>
+             <div className="p-4 pt-0">
+              <Button asChild variant="outline" className="w-full">
+                <Link href="#"> {/* Placeholder link for /quizzes */}
+                  View All Quizzes <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
+          </Card>
+
+          {/* Card 4: Cyber Alerts & Updates (Conceptual) */}
+          <Card className="shadow-lg hover:shadow-xl transition-shadow md:col-span-1 lg:col-span-1">
+            <CardHeader>
+              <div className="flex items-center gap-3">
+                <AlertCircle className="w-7 h-7 text-destructive" />
+                <CardTitle className="text-xl font-headline text-destructive">Cyber Alerts</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-foreground/70 mb-1"><span className="font-semibold text-destructive">New!</span> Updated advisory on SIM swap fraud techniques.</p>
+              <p className="text-sm text-foreground/70">Stay informed about the latest cyber threats.</p>
+            </CardContent>
+             <div className="p-4 pt-0">
+              <Button asChild variant="destructive" className="w-full">
+                <Link href="#"> {/* Placeholder link for /alerts */}
+                  Read Latest Alerts <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
+          </Card>
+
+           {/* Card 5: Suggested For You (Conceptual) */}
+          <Card className="shadow-lg hover:shadow-xl transition-shadow md:col-span-2 lg:col-span-2">
+            <CardHeader>
+              <div className="flex items-center gap-3">
+                <Lightbulb className="w-7 h-7 text-primary" />
+                <CardTitle className="text-xl font-headline text-primary">Suggested For You</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-foreground/70 mb-1">Based on your recent activity exploring the IT Act, you might be interested in:</p>
+              <Badge variant="secondary" className="mr-2 my-1">Data Privacy Laws in India</Badge>
+              <Badge variant="secondary" className="my-1">Understanding Section 69 of IT Act</Badge>
+              <p className="text-sm text-foreground/70 mt-2">Deepen your understanding of crucial legal aspects.</p>
+            </CardContent>
+            <div className="p-4 pt-0">
+              <Button asChild variant="default" className="w-full">
+                <Link href="/law-summaries"> {/* Placeholder link */}
+                  Explore Suggested Topics <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
           </Card>
         </div>
       </section>
-
-      {/* Features Section */}
-      <section className="w-full py-12 md:py-20">
-        <div className="container px-4 md:px-6">
-          <h2 className="text-3xl font-headline font-bold tracking-tight text-center text-primary mb-12">
-            Core Features
+      
+      {/* Quick Access to Core Features */}
+      <section className="w-full container px-4 md:px-6 py-10">
+         <h2 className="text-3xl font-headline font-bold tracking-tight text-center text-primary mb-12">
+            Quick Access to Resources
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {features.map((feature) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {coreFeatures.map((feature) => (
               <Card key={feature.title} className="flex flex-col shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out rounded-lg overflow-hidden">
                 <CardHeader className="bg-primary/5 p-6">
                   <div className="flex items-center gap-4">
@@ -102,7 +342,7 @@ export default function HomePage() {
                   </CardDescription>
                 </CardContent>
                 <div className="p-6 pt-0 mt-auto">
-                  <Button asChild variant="link" className="text-primary p-0 h-auto hover:text-accent">
+                  <Button asChild className="w-full">
                     <Link href={feature.link}>
                       {feature.linkText} <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>
@@ -111,28 +351,35 @@ export default function HomePage() {
               </Card>
             ))}
           </div>
-        </div>
       </section>
 
-      {/* Call to Action Section */}
-      <section className="w-full py-12 md:py-20 bg-accent/10 rounded-xl shadow-lg">
+
+      {/* Full AI Chatbot Access Section */}
+      <section className="w-full py-12 md:py-16 bg-accent/10 rounded-xl shadow-lg">
         <div className="container px-4 md:px-6 text-center">
-          <Gavel className="w-12 h-12 text-accent mx-auto mb-6" />
+          <MessageCircle className="w-12 h-12 text-accent mx-auto mb-6" />
           <h2 className="text-3xl font-headline font-bold tracking-tight text-accent">
-            Understand Your Digital Rights
+            Your AI Legal & Cyber Guide Awaits
           </h2>
           <p className="mt-4 max-w-2xl mx-auto text-lg text-foreground/80">
-            Knowledge is power, especially in the digital age. CyberMozhi is committed to making legal and security information accessible to everyone.
+            Leverage the full power of CyberMozhi's bilingual AI. Get detailed explanations on cyber laws, IT Act sections, penalties, attack mitigation, and guidance on filing complaints.
           </p>
           <div className="mt-8">
-            <Button asChild size="lg" variant="default" className="bg-accent text-accent-foreground hover:bg-accent/90 shadow-md hover:shadow-lg transition-shadow">
-              <Link href="/glossary">
-                Start Learning Now <Search className="ml-2 h-5 w-5" />
+            <Button asChild size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 shadow-md hover:shadow-lg transition-shadow">
+              <Link href="/chatbot">
+                Chat with CyberMozhi AI <Sparkles className="ml-2 h-5 w-5" />
               </Link>
             </Button>
           </div>
         </div>
       </section>
+
+      {/* Slogan */}
+      <footer className="py-10 text-center">
+        <p className="text-xl font-semibold text-primary">CyberMozhi: Speak Law. Speak Secure. Speak Smart. 💬⚖️🌐</p>
+      </footer>
     </div>
   );
 }
+
+    

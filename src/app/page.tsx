@@ -7,30 +7,28 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Loader2, 
-  MessageCircle, 
-  FileText, 
-  BookOpen, 
-  LogIn, 
-  UserPlus, 
-  ArrowRight, 
-  Sparkles, 
-  LayoutDashboard, 
-  AlertCircle, 
+import {
+  Loader2,
+  MessageCircle,
+  FileText,
+  BookOpen,
+  LogIn,
+  UserPlus, // Used for Phishing Attacks
+  ArrowRight,
+  Sparkles,
+  LayoutDashboard,
+  AlertCircle,
   Lightbulb,
   ScrollText,
   ClipboardCheck,
-  ShieldCheck,
-  Gavel,
-  FileLock, // Added
-  KeyRound, // Added
-  FileSignature // Added
+  FileLock, // Used for Ransomware Threats
+  KeyRound, // Used for IT Act: Section 66C
+  FileSignature // Used for Digital Signatures
 } from "lucide-react";
 
 const sampleTopics = [
   { name: "Phishing Attacks", icon: UserPlus, description: "Learn to identify and avoid deceptive emails and messages.", link: "/glossary#1" },
-  { name: "Ransomware Threats", icon: FileLock, description: "Understand how ransomware works and how to protect your data.", link: "/glossary#10" }, // Changed FileLock2 to FileLock
+  { name: "Ransomware Threats", icon: FileLock, description: "Understand how ransomware works and how to protect your data.", link: "/glossary#10" },
   { name: "IT Act: Section 66C", icon: KeyRound, description: "Identity theft and its legal consequences under Indian law.", link: "/law-summaries#3" },
   { name: "Digital Signatures", icon: FileSignature, description: "The role and legality of digital signatures in India.", link: "/glossary#33" },
 ];
@@ -129,7 +127,7 @@ export default function HomePage() {
             ))}
           </div>
         </section>
-        
+
         {/* Core Features Section for Guests */}
         <section className="w-full py-12 md:py-16 bg-background">
           <div className="container px-4 md:px-6">
@@ -321,7 +319,7 @@ export default function HomePage() {
           </Card>
         </div>
       </section>
-      
+
       {/* Quick Access to Core Features */}
       <section className="w-full container px-4 md:px-6 py-10">
          <h2 className="text-3xl font-headline font-bold tracking-tight text-center text-primary mb-12">

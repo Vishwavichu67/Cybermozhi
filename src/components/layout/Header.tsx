@@ -48,7 +48,7 @@ export function Header() {
         description: 'You have been successfully logged out.',
       });
       if (isMobileMenuOpen) setIsMobileMenuOpen(false);
-      router.push('/'); 
+      router.push('/');
     } catch (error) {
       console.error('Logout error:', error);
       toast({
@@ -60,24 +60,23 @@ export function Header() {
   };
 
   const NavLink = ({ href, label, icon: Icon, onClick }: { href: string, label: string, icon: React.ElementType, onClick?: () => void }) => (
-    <Link href={href} legacyBehavior passHref>
-      <a
-        onClick={() => {
-          if (onClick) onClick();
-          if (isMobileMenuOpen) setIsMobileMenuOpen(false);
-        }}
-        className={cn(
-          "flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors",
-          pathname === href
-            ? "bg-primary/10 text-primary hover:bg-primary/20"
-            : "text-foreground/70 hover:text-foreground hover:bg-accent/50",
-          "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background"
-        )}
-        aria-current={pathname === href ? "page" : undefined}
-      >
-        <Icon className="h-5 w-5" />
-        <span>{label}</span>
-      </a>
+    <Link
+      href={href}
+      onClick={() => {
+        if (onClick) onClick();
+        if (isMobileMenuOpen) setIsMobileMenuOpen(false);
+      }}
+      className={cn(
+        "flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors",
+        pathname === href
+          ? "bg-primary/10 text-primary hover:bg-primary/20"
+          : "text-foreground/70 hover:text-foreground hover:bg-accent/50",
+        "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background"
+      )}
+      aria-current={pathname === href ? "page" : undefined}
+    >
+      <Icon className="h-5 w-5" />
+      <span>{label}</span>
     </Link>
   );
 
@@ -101,16 +100,17 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        <Link href="/" legacyBehavior passHref>
-          <a className="flex items-center gap-2 text-xl font-headline font-semibold text-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background rounded-md p-1">
-            <Image 
-              src="/logo.png"
-              alt="CyberMozhi Logo" 
-              width={150} 
-              height={40} 
-              priority 
-            />
-          </a>
+        <Link
+          href="/"
+          className="flex items-center gap-2 text-xl font-headline font-semibold text-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background rounded-md p-1"
+        >
+          <Image
+            src="/logo.png"
+            alt="CyberMozhi Logo"
+            width={150}
+            height={40}
+            priority
+          />
         </Link>
 
         <nav className="hidden md:flex items-center space-x-1">
@@ -182,15 +182,17 @@ export function Header() {
             </SheetTrigger>
             <SheetContent side="right" className="w-full max-w-xs p-0 bg-background flex flex-col">
               <div className="flex items-center justify-between p-4 border-b">
-                 <Link href="/" legacyBehavior passHref>
-                  <a className="flex items-center gap-2 text-lg font-headline font-semibold text-primary" onClick={() => setIsMobileMenuOpen(false)}>
-                     <Image 
-                        src="/logo.png" 
-                        alt="CyberMozhi Logo" 
-                        width={120} 
-                        height={30} 
-                      />
-                  </a>
+                 <Link
+                    href="/"
+                    className="flex items-center gap-2 text-lg font-headline font-semibold text-primary"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                   <Image
+                      src="/logo.png"
+                      alt="CyberMozhi Logo"
+                      width={120}
+                      height={30}
+                    />
                 </Link>
                 <SheetClose asChild>
                    <Button variant="ghost" size="icon" aria-label="Close menu">
@@ -198,18 +200,12 @@ export function Header() {
                     </Button>
                 </SheetClose>
               </div>
-              
+
               <nav className="flex-grow p-4 space-y-2">
                 {navItems.map((item) => (
                   <NavLink key={item.href} {...item} />
                 ))}
               </nav>
-              
-              {/* ThemeToggle moved above user info for mobile for better grouping with actions */}
-              {/* <div className="p-4 border-t flex justify-center">
-                 <ThemeToggle />
-              </div> */}
-
 
               {!authLoading && isLoggedIn && user && (
                 <div className="p-4 border-t">
@@ -240,3 +236,5 @@ export function Header() {
     </header>
   );
 }
+
+    

@@ -86,15 +86,14 @@ export function ChatInterface() {
     const userMessageText = input;
     setInput(''); 
     
-    if (!isLoggedIn) {
-         const tempUserMessage: Message = {
-            id: Date.now().toString(),
-            text: userMessageText,
-            role: 'user',
-            timestamp: new Date(),
-        };
-        setMessages(prev => [...prev, tempUserMessage]);
-    }
+    // Optimistically add user's message to the UI for all users
+    const optimisticUserMessage: Message = {
+        id: Date.now().toString() + '-optimistic', // Unique temporary ID
+        text: userMessageText,
+        role: 'user',
+        timestamp: new Date(),
+    };
+    setMessages(prev => [...prev, optimisticUserMessage]);
 
     setIsLoading(true);
 
@@ -108,6 +107,8 @@ export function ChatInterface() {
         throw new Error(result.error);
       }
 
+      // For guest users, add bot response locally if no error
+      // For logged-in users, onSnapshot will handle updating messages with the bot's response from Firestore
       if (!isLoggedIn) {
         const botMessage: Message = {
             id: (Date.now() + 1).toString(),
@@ -115,9 +116,10 @@ export function ChatInterface() {
             role: 'model',
             timestamp: new Date(),
         };
-        setMessages((prev) => [...prev, botMessage]);
+        setMessages((prev) => [...prev.filter(m => m.id !== optimisticUserMessage.id), optimisticUserMessage, botMessage]); // Replace optimistic with final if needed, or just add bot
       }
-      // For logged-in users, onSnapshot will update the messages state with user and bot messages.
+      // For logged-in users, onSnapshot will update the messages state with user and bot messages from Firestore.
+      // The optimisticUserMessage will be replaced by the one from Firestore if IDs match or handled by Firestore's own message addition.
 
     } catch (error) {
       console.error('Chatbot error:', error);
@@ -127,6 +129,7 @@ export function ChatInterface() {
         title: 'Chatbot Error',
         description: errorMessage,
       });
+       // If an error occurs, and user is a guest, add an error message from the bot
        if (!isLoggedIn) {
         const errorBotMessage: Message = {
             id: (Date.now() + 1).toString(),
@@ -134,8 +137,10 @@ export function ChatInterface() {
             role: 'model',
             timestamp: new Date(),
         };
-        setMessages((prev) => [...prev, errorBotMessage]);
+        setMessages((prev) => [...prev.filter(m => m.id !== optimisticUserMessage.id), optimisticUserMessage, errorBotMessage]);
        }
+       // For logged-in users, if the AI call fails, their optimistic message remains, and an error is toasted.
+       // If saving to Firestore fails after a successful AI call, the optimistic message remains, but the bot response won't appear via onSnapshot.
     } finally {
       setIsLoading(false);
     }
@@ -233,7 +238,7 @@ export function ChatInterface() {
                 className="flex-grow resize-none focus-visible:ring-primary text-sm"
                 rows={1}
                 aria-label="Chat input"
-                disabled={isLoading || authLoading && !isLoggedIn }
+                disabled={isLoading || (authLoading && !isLoggedIn) }
               />
               <Button type="submit" size="icon" disabled={isLoading || (authLoading && !isLoggedIn) || !input.trim()} aria-label="Send message">
                 {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}

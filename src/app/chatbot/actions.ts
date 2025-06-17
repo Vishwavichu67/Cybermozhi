@@ -41,10 +41,12 @@ export async function handleChatQuery(formData: FormData): Promise<CyberLawChatb
         fetchedMessages.push(doc.data() as { role: 'user' | 'model'; text: string; timestamp: Timestamp });
       });
       
-      // Transform to Genkit ChatMessage format (with 'parts') and reverse to maintain chronological order for the AI
+      // Transform to Genkit ChatMessage format (with 'parts' and boolean flags) and reverse to maintain chronological order for the AI
       chatHistoryForAI = fetchedMessages.reverse().map(msg => ({
         role: msg.role,
-        parts: [{ text: msg.text }]
+        parts: [{ text: msg.text }],
+        isUser: msg.role === 'user',
+        isModel: msg.role === 'model',
       }));
 
     } catch (historyError) {

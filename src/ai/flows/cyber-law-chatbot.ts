@@ -15,6 +15,8 @@ import {z} from 'genkit';
 const ChatMessageSchema = z.object({
   role: z.enum(['user', 'model']),
   parts: z.array(z.object({text: z.string()})),
+  isUser: z.boolean().optional().describe("True if the role is 'user'"),
+  isModel: z.boolean().optional().describe("True if the role is 'model'"),
 });
 export type ChatMessage = z.infer<typeof ChatMessageSchema>;
 
@@ -81,9 +83,9 @@ Core Principles for Responding:
     *   **Mitigation Techniques:** Offer practical, actionable advice for prevention and response.
     *   **Legal Disclaimer:** Implicitly or explicitly remind users that your information is for educational and guidance purposes and does not constitute formal legal advice. For specific legal issues, consulting a qualified legal professional is recommended. (e.g., "Remember, this information is for educational purposes. For specific legal advice, please consult a legal professional.")
 
-4.  **Personalization & Context (Utilize provided userName and chatHistory):**
+4.  **Personalization & Context (Utilize provided userName, userDetails, and chatHistory):**
     *   **Chat History:** If previous conversation history ({{{chatHistory}}}) is available, use it to understand the ongoing context, avoid repetition, and provide more relevant follow-up answers. Refer to past user statements or bot answers if relevant.
-    *   **User Details:** If user name ({{{userName}}}) is provided, use it to personalize greetings. If other user details like role ({{{userRole}}}), gender, or DoB were provided (currently placeholders in schema), you would subtly adapt your tone or examples if appropriate, without being intrusive. For instance, if the user is a student, examples might be more relatable to student life. Always prioritize clarity and the core query.
+    *   **User Name & Details:** If user name ({{{userName}}}) is provided, use it to personalize greetings. If other user details like gender ({{{userDetails.gender}}}), date of birth ({{{userDetails.dob}}}), or role ({{{userRole}}}) were provided, subtly adapt your tone or examples if appropriate, without being intrusive. For instance, if the user is a student, examples might be more relatable to student life. Always prioritize clarity and the core query.
     *   **Guest Users:** For guest users (or if no specific user data is available), provide general, helpful responses. You can mention that logging in unlocks more personalized features.
 
 5.  **Structure:**
@@ -107,8 +109,8 @@ Never use complex legal jargon without explanation. Your goal is to make cyber l
 {{#if chatHistory}}
 Here is the previous conversation history:
 {{#each chatHistory}}
-{{#if (eq role "user")}}User: {{parts.0.text}}{{/if}}
-{{#if (eq role "model")}}CyberMozhi: {{parts.0.text}}{{/if}}
+{{#if this.isUser}}User: {{this.parts.0.text}}{{/if}}
+{{#if this.isModel}}CyberMozhi: {{this.parts.0.text}}{{/if}}
 {{/each}}
 {{/if}}
 

@@ -4,12 +4,12 @@ import type { User } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import React, { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
-import { Skeleton } from '@/components/ui/skeleton'; 
+import { Skeleton } from '@/components/ui/skeleton';
 import { Loader2 } from 'lucide-react';
 
 interface AuthContextType {
   user: User | null;
-  loading: boolean;
+  loading: boolean; // This is the prop exposed by the context
   isLoggedIn: boolean;
 }
 
@@ -17,21 +17,22 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [authStillLoading, setAuthStillLoading] = useState(true); // Internal state for auth readiness
+  const [isClientSide, setIsClientSide] = useState(false); // To track client-side mounting
 
   useEffect(() => {
+    setIsClientSide(true); // Component has mounted on the client
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
-      setLoading(false);
+      setAuthStillLoading(false); // Auth state determined
     });
     return () => unsubscribe();
   }, []);
 
   const isLoggedIn = !!user;
 
-  if (loading && typeof window !== 'undefined') {
-    // Display a minimal skeleton or loader to avoid content flash
-    // and ensure layout consistency during initial auth check.
+  // Show skeleton only on the client side if authentication is still loading
+  if (isClientSide && authStillLoading) {
     return (
       <div className="flex flex-col min-h-screen">
         {/* Simplified Skeleton Header */}
@@ -50,9 +51,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     );
   }
 
-
+  // On the server, or on the client after auth state is resolved (or before mount for initial render match)
   return (
-    <AuthContext.Provider value={{ user, loading, isLoggedIn }}>
+    <AuthContext.Provider value={{ user, loading: authStillLoading, isLoggedIn }}>
       {children}
     </AuthContext.Provider>
   );

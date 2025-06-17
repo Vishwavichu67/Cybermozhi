@@ -232,7 +232,6 @@ export function ChatInterface() {
                 placeholder={authLoading ? "Authenticating..." : (isLoggedIn ? "Ask CyberMozhi..." : "Ask CyberMozhi (guests have limited interaction)...")}
                 className="flex-grow resize-none focus-visible:ring-primary text-sm"
                 rows={1}
-                maxRows={5}
                 aria-label="Chat input"
                 disabled={isLoading || authLoading && !isLoggedIn }
               />

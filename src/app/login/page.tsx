@@ -79,7 +79,7 @@ export default function LoginPage() {
         <CardHeader className="text-center">
           <LogIn className="w-12 h-12 text-primary mx-auto mb-3" />
           <CardTitle className="text-2xl font-headline">Welcome Back!</CardTitle>
-          <CardDescription>Sign in to your CyberLaw Simplified account.</CardDescription>
+          <CardDescription>Sign in to your CyberMozhi account.</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-6">

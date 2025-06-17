@@ -40,7 +40,7 @@ export default function HomePage() {
           <div className="max-w-3xl mx-auto">
             <ShieldCheck className="w-16 h-16 md:w-20 md:h-20 text-primary mx-auto mb-6" />
             <h1 className="text-4xl font-headline font-bold tracking-tight sm:text-5xl md:text-6xl text-primary">
-              CyberLaw Simplified
+              CyberMozhi
             </h1>
             <p className="mt-6 text-lg md:text-xl text-foreground/80">
               Your one-stop AI-powered hub for understanding Indian cyber laws, cybersecurity threats, and your digital rights. Empowering netizens across India.
@@ -122,7 +122,7 @@ export default function HomePage() {
             Understand Your Digital Rights
           </h2>
           <p className="mt-4 max-w-2xl mx-auto text-lg text-foreground/80">
-            Knowledge is power, especially in the digital age. CyberLaw Simplified is committed to making legal and security information accessible to everyone.
+            Knowledge is power, especially in the digital age. CyberMozhi is committed to making legal and security information accessible to everyone.
           </p>
           <div className="mt-8">
             <Button asChild size="lg" variant="default" className="bg-accent text-accent-foreground hover:bg-accent/90 shadow-md hover:shadow-lg transition-shadow">

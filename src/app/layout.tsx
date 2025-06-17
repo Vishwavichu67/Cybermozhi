@@ -6,7 +6,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { AuthProvider } from '@/contexts/AuthContext'; // Import AuthProvider
 
 export const metadata: Metadata = {
-  title: 'CyberLaw Simplified',
+  title: 'CyberMozhi',
   description: 'Your one-stop cybersecurity knowledge center and virtual legal advisor for Indian netizens.',
 };
 

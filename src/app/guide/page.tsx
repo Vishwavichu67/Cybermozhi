@@ -4,8 +4,8 @@ import type { Metadata } from 'next';
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: 'Site Guide - CyberLaw Simplified',
-  description: 'Learn how to effectively use CyberLaw Simplified to understand Indian cyber laws and cybersecurity.',
+  title: 'Site Guide - CyberMozhi',
+  description: 'Learn how to effectively use CyberMozhi to understand Indian cyber laws and cybersecurity.',
 };
 
 const guideSections = [
@@ -52,7 +52,7 @@ const guideSections = [
   {
     icon: LifeBuoy, 
     title: "General Tips for Effective Use",
-    content: "CyberLaw Simplified is designed to be an empowering resource. Here’s how to make the most of it:",
+    content: "CyberMozhi is designed to be an empowering resource. Here’s how to make the most of it:",
     tips: [
       "Start with the area most relevant to your immediate needs (e.g., chatbot for quick questions, summaries for detailed law info, glossary for definitions).",
       "Cross-reference information: if the chatbot mentions a specific law, look it up in the Law Summaries. If you encounter an unfamiliar term, check the Glossary.",
@@ -69,7 +69,7 @@ export default function GuidePage() {
         <Rocket className="w-16 h-16 text-primary mx-auto mb-4" />
         <h1 className="text-4xl font-headline font-bold text-primary">Site Guide</h1>
         <p className="mt-2 text-lg text-foreground/70 max-w-2xl mx-auto">
-          Learn how to effectively use CyberLaw Simplified to navigate the world of cyber laws and cybersecurity.
+          Learn how to effectively use CyberMozhi to navigate the world of cyber laws and cybersecurity.
         </p>
       </header>
 
@@ -105,7 +105,7 @@ export default function GuidePage() {
           <div>
             <h2 className="text-2xl font-headline font-semibold text-accent">Important Disclaimer</h2>
             <p className="text-foreground/70 mt-2 leading-relaxed">
-              The information provided on CyberLaw Simplified is for general informational and educational purposes only, and does not constitute legal advice. While we strive to keep the information up-to-date and correct, we make no representations or warranties of any kind, express or implied, about the completeness, accuracy, reliability, suitability, or availability with respect to the website or the information, products, services, or related graphics contained on the website for any purpose. Any reliance you place on such information is therefore strictly at your own risk.
+              The information provided on CyberMozhi is for general informational and educational purposes only, and does not constitute legal advice. While we strive to keep the information up-to-date and correct, we make no representations or warranties of any kind, express or implied, about the completeness, accuracy, reliability, suitability, or availability with respect to the website or the information, products, services, or related graphics contained on the website for any purpose. Any reliance you place on such information is therefore strictly at your own risk.
             </p>
             <p className="text-foreground/70 mt-3 leading-relaxed">
               For specific legal advice or concerns, please consult with a qualified legal professional.

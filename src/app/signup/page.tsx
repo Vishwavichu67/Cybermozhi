@@ -94,7 +94,7 @@ export default function SignupPage() {
         <CardHeader className="text-center">
           <UserPlus className="w-12 h-12 text-primary mx-auto mb-3" />
           <CardTitle className="text-2xl font-headline">Create an Account</CardTitle>
-          <CardDescription>Join CyberLaw Simplified to get started.</CardDescription>
+          <CardDescription>Join CyberMozhi to get started.</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSignup} className="space-y-6">

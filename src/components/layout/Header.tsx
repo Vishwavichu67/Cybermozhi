@@ -103,7 +103,7 @@ export function Header() {
         <Link href="/" legacyBehavior passHref>
           <a className="flex items-center gap-2 text-xl font-headline font-semibold text-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background rounded-md p-1">
             <ShieldCheck className="h-7 w-7" />
-            <span>CyberLaw Simplified</span>
+            <span>CyberMozhi</span>
           </a>
         </Link>
 
@@ -181,7 +181,7 @@ export function Header() {
                  <Link href="/" legacyBehavior passHref>
                   <a className="flex items-center gap-2 text-lg font-headline font-semibold text-primary" onClick={() => setIsMobileMenuOpen(false)}>
                     <ShieldCheck className="h-6 w-6" />
-                    <span>CyberLaw Simplified</span>
+                    <span>CyberMozhi</span>
                   </a>
                 </Link>
                 <SheetClose asChild>

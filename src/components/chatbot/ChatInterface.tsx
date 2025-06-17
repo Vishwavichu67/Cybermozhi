@@ -153,7 +153,7 @@ export function ChatInterface() {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder="Type your question here (English or Tamil)..."
+                placeholder="Ask CyberMozhi (English or Tamil)..."
                 className="flex-grow resize-none focus-visible:ring-primary text-sm"
                 rows={1}
                 maxRows={5}

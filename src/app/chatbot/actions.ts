@@ -13,6 +13,11 @@ const ChatQuerySchema = z.object({
 const MAX_CHAT_HISTORY_TO_FETCH = 20; // Fetch last 20 messages (10 user + 10 model) for AI context
 
 export async function handleChatQuery(formData: FormData): Promise<CyberLawChatbotOutput & { error?: string }> {
+  if (!auth || !db) {
+    console.error("Firebase auth or db not initialized in handleChatQuery. This might be due to Firebase service unavailability or incorrect configuration.");
+    return { answer: '', error: "The chatbot service is temporarily unavailable due to a configuration issue. Please try again later." };
+  }
+
   const rawQuery = formData.get('query');
   const currentUser = auth.currentUser;
 
@@ -41,7 +46,6 @@ export async function handleChatQuery(formData: FormData): Promise<CyberLawChatb
         fetchedMessages.push(doc.data() as { role: 'user' | 'model'; text: string; timestamp: Timestamp });
       });
       
-      // Transform to Genkit ChatMessage format (with 'parts' and boolean flags) and reverse to maintain chronological order for the AI
       chatHistoryForAI = fetchedMessages.reverse().map(msg => ({
         role: msg.role,
         parts: [{ text: msg.text }],
@@ -50,8 +54,8 @@ export async function handleChatQuery(formData: FormData): Promise<CyberLawChatb
       }));
 
     } catch (historyError) {
-      console.error("Error fetching chat history for AI:", historyError);
-      // Non-fatal error, proceed without history for AI if fetching fails
+      console.error("Error fetching chat history for AI (potentially due to Firestore unavailability):", historyError);
+      // Non-fatal error for AI context, proceed without history if fetching fails
     }
   }
 
@@ -64,31 +68,39 @@ export async function handleChatQuery(formData: FormData): Promise<CyberLawChatb
   try {
     const result = await cyberLawChatbot(input);
 
-    // Save user message and bot response to Firestore if user is logged in
     if (currentUser) {
       try {
         const chatMessagesRef = collection(db, `users/${currentUser.uid}/chatMessages`);
-        // Save user message
         await addDoc(chatMessagesRef, {
           role: 'user',
           text: userQueryText,
           timestamp: serverTimestamp(),
         });
-        // Save bot response
         await addDoc(chatMessagesRef, {
           role: 'model',
           text: result.answer,
           timestamp: serverTimestamp(),
         });
       } catch (saveError) {
-        console.error("Error saving chat message to Firestore:", saveError);
-        // Non-fatal error, user still gets the response
+        console.error("Error saving chat message to Firestore (potentially due to Firestore unavailability or rules):", saveError);
+        // Non-fatal error for saving history, user still gets the AI response
       }
     }
     return result;
-  } catch (error) {
-    console.error("Error in cyberLawChatbot flow:", error);
-    const errorMessage = error instanceof Error ? error.message : "An unexpected error occurred while processing your request.";
+  } catch (e) {
+    let errorMessage = "An unexpected error occurred while processing your request with the AI assistant.";
+    if (e instanceof Error) {
+      errorMessage = e.message;
+    } else if (typeof e === 'string') {
+      errorMessage = e;
+    } else {
+      try {
+        errorMessage = JSON.stringify(e);
+      } catch (stringifyError) {
+        // Fallback if stringify fails
+      }
+    }
+    console.error("Error in cyberLawChatbot flow processing:", e);
     return { answer: '', error: errorMessage };
   }
 }

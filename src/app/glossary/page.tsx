@@ -11,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 function GlossaryItemCard({ termItem, delay = 0 }: { termItem: GlossaryTerm, delay?: number }) {
   return (
     <Card
-      className="shadow-md hover:shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105 rounded-lg overflow-hidden flex flex-col h-full animate-in fade-in-0 slide-in-from-bottom-4 duration-500 ease-out"
+      className="shadow-md hover:shadow-lg transition-transform duration-300 ease-out transform hover:scale-105 hover:-rotate-y-1 rounded-lg overflow-hidden flex flex-col h-full animate-in fade-in-0 slide-in-from-bottom-4 duration-500 ease-out"
       style={{ animationDelay: `${delay}ms` }}
     >
       <CardHeader className="bg-accent/10 p-4">

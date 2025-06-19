@@ -116,7 +116,7 @@ export default function HomePage() {
             {sampleTopics.map((topic, index) => (
               <Card
                 key={topic.name}
-                className="shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:scale-105 rounded-lg flex flex-col animate-in fade-in-0 slide-in-from-bottom-4 duration-500 ease-out"
+                className="shadow-lg hover:shadow-xl transition-transform duration-300 ease-out transform hover:scale-105 hover:-rotate-y-2 rounded-lg flex flex-col animate-in fade-in-0 slide-in-from-bottom-4 duration-500 ease-out"
                 style={{ animationDelay: `${index * 100 + 500}ms` }}
               >
                 <CardHeader className="pb-3">
@@ -150,7 +150,7 @@ export default function HomePage() {
               {coreFeatures.map((feature, index) => (
                 <Card
                   key={feature.title}
-                  className="flex flex-col shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:scale-105 rounded-lg overflow-hidden animate-in fade-in-0 slide-in-from-bottom-4 duration-500 ease-out"
+                  className="flex flex-col shadow-lg hover:shadow-xl transition-transform duration-300 ease-out transform hover:scale-105 hover:rotate-y-1 rounded-lg overflow-hidden animate-in fade-in-0 slide-in-from-bottom-4 duration-500 ease-out"
                   style={{ animationDelay: `${index * 100 + 700}ms` }}
                 >
                   <CardHeader className="bg-primary/5 p-6">
@@ -229,7 +229,7 @@ export default function HomePage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {/* Card 1: Account Details (Conceptual) */}
           <Card
-            className="shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:scale-105 animate-in fade-in-0 slide-in-from-bottom-4 duration-500 ease-out"
+            className="shadow-lg hover:shadow-xl transition-transform duration-300 ease-out transform hover:scale-105 hover:rotate-y-1 animate-in fade-in-0 slide-in-from-bottom-4 duration-500 ease-out"
             style={{ animationDelay: '300ms' }}
           >
             <CardHeader>
@@ -253,7 +253,7 @@ export default function HomePage() {
 
           {/* Card 2: Chat History (Conceptual) */}
           <Card
-            className="shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:scale-105 animate-in fade-in-0 slide-in-from-bottom-4 duration-500 ease-out"
+            className="shadow-lg hover:shadow-xl transition-transform duration-300 ease-out transform hover:scale-105 hover:-rotate-y-1 animate-in fade-in-0 slide-in-from-bottom-4 duration-500 ease-out"
             style={{ animationDelay: '400ms' }}
           >
             <CardHeader>
@@ -277,7 +277,7 @@ export default function HomePage() {
 
           {/* Card 3: Saved FIR Drafts (Conceptual) */}
           <Card
-            className="shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:scale-105 animate-in fade-in-0 slide-in-from-bottom-4 duration-500 ease-out"
+            className="shadow-lg hover:shadow-xl transition-transform duration-300 ease-out transform hover:scale-105 hover:rotate-y-1 animate-in fade-in-0 slide-in-from-bottom-4 duration-500 ease-out"
             style={{ animationDelay: '500ms' }}
           >
             <CardHeader>
@@ -301,7 +301,7 @@ export default function HomePage() {
 
           {/* Card 4: Quiz Progress (Conceptual) */}
           <Card
-            className="shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:scale-105 animate-in fade-in-0 slide-in-from-bottom-4 duration-500 ease-out"
+            className="shadow-lg hover:shadow-xl transition-transform duration-300 ease-out transform hover:scale-105 hover:-rotate-y-1 animate-in fade-in-0 slide-in-from-bottom-4 duration-500 ease-out"
             style={{ animationDelay: '600ms' }}
           >
             <CardHeader>
@@ -325,7 +325,7 @@ export default function HomePage() {
 
            {/* Card 5: Suggested For You (Conceptual) */}
           <Card
-            className="shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:scale-105 md:col-span-2 lg:col-span-3 animate-in fade-in-0 slide-in-from-bottom-4 duration-500 ease-out"
+            className="shadow-lg hover:shadow-xl transition-transform duration-300 ease-out transform hover:scale-105 hover:rotate-x-1 md:col-span-2 lg:col-span-3 animate-in fade-in-0 slide-in-from-bottom-4 duration-500 ease-out"
             style={{ animationDelay: '700ms' }}
           >
             <CardHeader>
@@ -363,7 +363,7 @@ export default function HomePage() {
             {coreFeatures.map((feature, index) => (
               <Card
                 key={feature.title}
-                className="flex flex-col shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:scale-105 rounded-lg overflow-hidden animate-in fade-in-0 slide-in-from-bottom-4 duration-500 ease-out"
+                className="flex flex-col shadow-lg hover:shadow-xl transition-transform duration-300 ease-out transform hover:scale-105 hover:rotate-y-1 rounded-lg overflow-hidden animate-in fade-in-0 slide-in-from-bottom-4 duration-500 ease-out"
                 style={{ animationDelay: `${index * 100 + 900}ms` }}
               >
                 <CardHeader className="bg-primary/5 p-6">

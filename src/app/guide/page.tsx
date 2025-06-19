@@ -79,7 +79,7 @@ export default function GuidePage() {
         {guideSections.map((section, index) => (
           <Card
             key={index}
-            className="shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:scale-[1.02] rounded-lg animate-in fade-in-0 slide-in-from-bottom-8 duration-500 ease-out"
+            className="shadow-lg hover:shadow-xl transition-transform duration-300 ease-in-out transform hover:scale-[1.02] hover:rotate-x-1 hover:-rotate-y-1 rounded-lg animate-in fade-in-0 slide-in-from-bottom-8 duration-500 ease-out"
             style={{ animationDelay: `${index * 100}ms` }}
           >
             <CardHeader className="flex flex-row items-start gap-4 bg-primary/5 p-6">
@@ -106,7 +106,7 @@ export default function GuidePage() {
       </div>
 
       <section
-        className="group w-full max-w-4xl mt-12 p-6 sm:p-8 bg-accent/5 rounded-2xl shadow-xl border border-accent/20 transition-all duration-300 ease-in-out hover:shadow-accent/20 hover:scale-[1.02] animate-in fade-in-0 slide-in-from-bottom-8 duration-500 ease-out"
+        className="group w-full max-w-4xl mt-12 p-6 sm:p-8 bg-accent/5 rounded-2xl shadow-xl border border-accent/20 transition-transform duration-300 ease-in-out hover:shadow-accent/20 hover:scale-[1.02] hover:rotate-y-1 animate-in fade-in-0 slide-in-from-bottom-8 duration-500 ease-out"
         style={{ animationDelay: `${guideSections.length * 100}ms` }}
       >
         <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 mb-6">

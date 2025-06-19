@@ -15,7 +15,7 @@ export function SplashScreen() {
           priority // Ensures logo loads quickly for splash
         />
       </div>
-      <p className="mt-4 text-sm text-primary/80">Loading CyberMozhi...</p>
     </div>
   );
 }
+

@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Send, User, Sparkles, Loader2, History } from 'lucide-react';
+import { Send, User, Sparkles, Loader2, History, MessageCircle } from 'lucide-react'; // Added MessageCircle
 import { handleChatQuery } from '@/app/chatbot/actions';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent } from '@/components/ui/card';
@@ -70,7 +70,7 @@ export function ChatInterface() {
       });
       return () => unsubscribe();
     } else {
-      setMessages([]);
+      setMessages([]); // Clear messages for guest users or when logged out
       setIsLoadingHistory(false);
     }
   }, [isLoggedIn, user, toast]);
@@ -80,7 +80,7 @@ export function ChatInterface() {
     if (!input.trim() || isLoading) return;
 
     const userMessageText = input;
-    setInput('');
+    setInput(''); // Clear input immediately
 
     const optimisticUserMessage: Message = {
       id: Date.now().toString() + '-optimistic',
@@ -101,6 +101,8 @@ export function ChatInterface() {
         throw new Error(result.error);
       }
 
+      // For logged-in users, onSnapshot handles UI updates for both user and AI messages from Firestore.
+      // For guest users, we need to manually add the AI's response.
       if (!isLoggedIn) {
         const botMessage: Message = {
           id: (Date.now() + 1).toString(),
@@ -109,18 +111,12 @@ export function ChatInterface() {
           timestamp: new Date(),
         };
         setMessages((prev) => {
-            // Remove optimistic user message and add the real one if IDs are different, or just add bot message.
-            // For simplicity, let's assume optimistic ID is temporary and we just add the bot message.
-            // If server returns user message ID, more sophisticated update logic can be used.
-            // For now, ensure user message is there, then add bot message.
-            const userMsgExists = prev.find(m => m.id === optimisticUserMessage.id);
-            if (userMsgExists) {
-                 return [...prev.filter(m => m.id !== optimisticUserMessage.id), optimisticUserMessage, botMessage];
-            }
-            return [...prev, optimisticUserMessage, botMessage];
+            // Remove the optimistic user message IF it's still there (it should be) and add it back with the bot message.
+            // This ensures the user message is displayed even if Firestore ops were skipped for guests.
+            const updatedMessages = prev.filter(m => m.id !== optimisticUserMessage.id);
+            return [...updatedMessages, optimisticUserMessage, botMessage];
         });
       }
-      // For logged-in users, onSnapshot handles UI updates from Firestore.
     } catch (error) {
       console.error('Chatbot error:', error);
       const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred.';
@@ -129,6 +125,7 @@ export function ChatInterface() {
         title: 'Chatbot Error',
         description: errorMessage,
       });
+      // For guests, if there's an error, show an error message from the bot
       if (!isLoggedIn) {
         const errorBotMessage: Message = {
           id: (Date.now() + 1).toString(),
@@ -136,13 +133,13 @@ export function ChatInterface() {
           role: 'model',
           timestamp: new Date(),
         };
-        setMessages((prev) => {
-             const userMsgExists = prev.find(m => m.id === optimisticUserMessage.id);
-            if (userMsgExists) {
-                 return [...prev.filter(m => m.id !== optimisticUserMessage.id), optimisticUserMessage, errorBotMessage];
-            }
-            return [...prev, optimisticUserMessage, errorBotMessage];
+         setMessages((prev) => {
+            const updatedMessages = prev.filter(m => m.id !== optimisticUserMessage.id);
+            return [...updatedMessages, optimisticUserMessage, errorBotMessage];
         });
+      } else {
+        // For logged-in users, remove the optimistic message if the AI call failed before saving.
+        setMessages(prev => prev.filter(m => m.id !== optimisticUserMessage.id));
       }
     } finally {
       setIsLoading(false);

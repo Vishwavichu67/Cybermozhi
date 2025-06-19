@@ -98,3 +98,5 @@ export default function GlossaryPage() {
     </div>
   );
 }
+
+    

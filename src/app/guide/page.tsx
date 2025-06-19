@@ -77,7 +77,7 @@ export default function GuidePage() {
 
       <div className="w-full max-w-4xl space-y-8">
         {guideSections.map((section, index) => (
-          <Card key={index} className="shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:scale-105 rounded-lg">
+          <Card key={index} className="shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:scale-[1.02] rounded-lg">
             <CardHeader className="flex flex-row items-start gap-4 bg-primary/5 p-6">
               <section.icon className="w-8 h-8 text-primary mt-1 flex-shrink-0" />
               <div>
@@ -101,52 +101,54 @@ export default function GuidePage() {
         ))}
       </div>
 
-      <section className="w-full max-w-4xl mt-12 p-6 bg-card rounded-xl shadow-lg border border-border transition-all duration-300 ease-in-out hover:shadow-2xl">
-        <div className="flex items-center gap-4 mb-4">
-          <UserCircle className="w-10 h-10 text-accent flex-shrink-0" />
-          <h2 className="text-2xl font-headline font-semibold text-accent">Meet the Creator</h2>
+      <section className="group w-full max-w-4xl mt-12 p-6 sm:p-8 bg-accent/5 rounded-2xl shadow-xl border border-accent/20 transition-all duration-300 ease-in-out hover:shadow-accent/20 hover:scale-[1.02]">
+        <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 mb-6">
+          <UserCircle className="w-16 h-16 sm:w-20 sm:h-20 text-accent flex-shrink-0 border-2 border-accent/30 rounded-full p-1" />
+          <div className="text-center sm:text-left">
+            <h2 className="text-3xl font-headline font-bold text-accent">Meet the Creator</h2>
+            <p className="text-xl font-semibold text-primary mt-1">Vishwa</p>
+          </div>
         </div>
-        <p className="text-foreground/80 leading-relaxed mb-2">
-          CyberMozhi was created by <span className="font-semibold text-primary">Vishwa</span>.
+        <p className="text-foreground/75 text-center sm:text-left leading-relaxed mb-6 text-md">
+          Driven by passion to build CyberMozhi as a <strong className="font-semibold text-primary">public service platform</strong> for spreading cyber law awareness and digital safety — not just a project, but a <strong className="font-semibold text-accent">purpose</strong>.
         </p>
-        <p className="text-foreground/70 text-sm leading-relaxed mb-4">
-          Driven by passion to build CyberMozhi as a public service platform for spreading cyber law awareness and digital safety — not just a project, but a purpose.
-        </p>
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-          <span className="text-sm font-medium text-foreground/70">Connect with Vishwa:</span>
-          <Button variant="outline" size="icon" asChild className="text-foreground/70 hover:text-primary hover:border-primary transition-colors duration-200">
-            <Link href="https://vichu-portfolio.netlify.app/" target="_blank" rel="noopener noreferrer" aria-label="Vishwa's Portfolio">
-              <ExternalLink className="h-5 w-5" />
-            </Link>
-          </Button>
-          <Button variant="outline" size="icon" asChild className="text-foreground/70 hover:text-primary hover:border-primary transition-colors duration-200">
-            <Link href="https://github.com/vishwavichu67" target="_blank" rel="noopener noreferrer" aria-label="Vishwa's GitHub">
-              <Github className="h-5 w-5" />
-            </Link>
-          </Button>
-          <Button variant="outline" size="icon" asChild className="text-foreground/70 hover:text-primary hover:border-primary transition-colors duration-200">
-            <Link href="https://www.instagram.com/vi.s.h.w.a_/?igsh=MnltMW11cmp1NTJw" target="_blank" rel="noopener noreferrer" aria-label="Vishwa's Instagram">
-              <Instagram className="h-5 w-5" />
-            </Link>
-          </Button>
-          <Button variant="outline" size="icon" asChild className="text-foreground/70 hover:text-primary hover:border-primary transition-colors duration-200">
-            <Link href="https://www.linkedin.com/in/urlvishwa" target="_blank" rel="noopener noreferrer" aria-label="Vishwa's LinkedIn">
-              <Linkedin className="h-5 w-5" />
-            </Link>
-          </Button>
-          <Button variant="outline" size="icon" asChild className="text-foreground/70 hover:text-primary hover:border-primary transition-colors duration-200">
-            <Link href="mailto:vishwaceo67@gmail.com" aria-label="Email Vishwa">
-              <Mail className="h-5 w-5" />
-            </Link>
-          </Button>
+        <div className="flex flex-col items-center sm:items-start">
+          <span className="text-md font-medium text-foreground/70 mb-3">Connect with Vishwa:</span>
+          <div className="flex flex-wrap justify-center sm:justify-start items-center gap-3">
+            <Button variant="outline" size="icon" asChild className="text-foreground/70 hover:text-primary hover:border-primary transition-all duration-200 ease-in-out transform hover:scale-110 group-hover:text-primary group-hover:border-primary">
+              <Link href="https://vichu-portfolio.netlify.app/" target="_blank" rel="noopener noreferrer" aria-label="Vishwa's Portfolio">
+                <ExternalLink className="h-5 w-5 transition-transform duration-200 ease-in-out transform hover:scale-110" />
+              </Link>
+            </Button>
+            <Button variant="outline" size="icon" asChild className="text-foreground/70 hover:text-primary hover:border-primary transition-all duration-200 ease-in-out transform hover:scale-110 group-hover:text-primary group-hover:border-primary">
+              <Link href="https://github.com/vishwavichu67" target="_blank" rel="noopener noreferrer" aria-label="Vishwa's GitHub">
+                <Github className="h-5 w-5 transition-transform duration-200 ease-in-out transform hover:scale-110" />
+              </Link>
+            </Button>
+            <Button variant="outline" size="icon" asChild className="text-foreground/70 hover:text-primary hover:border-primary transition-all duration-200 ease-in-out transform hover:scale-110 group-hover:text-primary group-hover:border-primary">
+              <Link href="https://www.instagram.com/vi.s.h.w.a_/?igsh=MnltMW11cmp1NTJw" target="_blank" rel="noopener noreferrer" aria-label="Vishwa's Instagram">
+                <Instagram className="h-5 w-5 transition-transform duration-200 ease-in-out transform hover:scale-110" />
+              </Link>
+            </Button>
+            <Button variant="outline" size="icon" asChild className="text-foreground/70 hover:text-primary hover:border-primary transition-all duration-200 ease-in-out transform hover:scale-110 group-hover:text-primary group-hover:border-primary">
+              <Link href="https://www.linkedin.com/in/urlvishwa" target="_blank" rel="noopener noreferrer" aria-label="Vishwa's LinkedIn">
+                <Linkedin className="h-5 w-5 transition-transform duration-200 ease-in-out transform hover:scale-110" />
+              </Link>
+            </Button>
+            <Button variant="outline" size="icon" asChild className="text-foreground/70 hover:text-primary hover:border-primary transition-all duration-200 ease-in-out transform hover:scale-110 group-hover:text-primary group-hover:border-primary">
+              <Link href="mailto:vishwaceo67@gmail.com" aria-label="Email Vishwa">
+                <Mail className="h-5 w-5 transition-transform duration-200 ease-in-out transform hover:scale-110" />
+              </Link>
+            </Button>
+          </div>
         </div>
       </section>
 
-       <section className="w-full max-w-4xl mt-12 p-6 bg-accent/10 rounded-xl shadow-lg">
+       <section className="w-full max-w-4xl mt-12 p-6 bg-destructive/10 rounded-xl shadow-lg border border-destructive/20">
         <div className="flex items-start gap-4">
-          <AlertTriangle className="w-10 h-10 text-accent flex-shrink-0 mt-1" />
+          <AlertTriangle className="w-10 h-10 text-destructive flex-shrink-0 mt-1" />
           <div>
-            <h2 className="text-2xl font-headline font-semibold text-accent">Important Disclaimer</h2>
+            <h2 className="text-2xl font-headline font-semibold text-destructive">Important Disclaimer</h2>
             <p className="text-foreground/70 mt-2 leading-relaxed">
               The information provided on CyberMozhi is for general informational and educational purposes only, and does not constitute legal advice. While we strive to keep the information up-to-date and correct, we make no representations or warranties of any kind, express or implied, about the completeness, accuracy, reliability, suitability, or availability with respect to the website or the information, products, services, or related graphics contained on the website for any purpose. Any reliance you place on such information is therefore strictly at your own risk.
             </p>

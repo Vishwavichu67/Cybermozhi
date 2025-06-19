@@ -1,7 +1,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Rocket, MessageCircle, FileText, BookOpen, ShieldCheck, Users, AlertTriangle, LifeBuoy, LogIn, UserCircle, Linkedin, Github, Twitter } from "lucide-react";
+import { Rocket, MessageCircle, FileText, BookOpen, ShieldCheck, Users, AlertTriangle, LifeBuoy, LogIn, UserCircle, Linkedin, Github, Instagram, Mail, ExternalLink } from "lucide-react";
 import type { Metadata } from 'next';
 import Link from "next/link";
 
@@ -107,32 +107,39 @@ export default function GuidePage() {
           <h2 className="text-2xl font-headline font-semibold text-accent">Meet the Creator</h2>
         </div>
         <p className="text-foreground/80 leading-relaxed mb-2">
-          CyberMozhi was created by <span className="font-semibold text-primary">Vignesh</span>, a passionate developer dedicated to making legal and cybersecurity information accessible to everyone.
+          CyberMozhi was created by <span className="font-semibold text-primary">Vishwa</span>.
         </p>
         <p className="text-foreground/70 text-sm leading-relaxed mb-4">
-          This platform aims to bridge the language gap and empower Indian citizens with the knowledge to navigate the digital world safely and confidently.
+          Driven by passion to build CyberMozhi as a public service platform for spreading cyber law awareness and digital safety — not just a project, but a purpose.
         </p>
-        <div className="flex items-center space-x-4">
-          <span className="text-sm font-medium text-foreground/70">Connect:</span>
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+          <span className="text-sm font-medium text-foreground/70">Connect with Vishwa:</span>
           <Button variant="outline" size="icon" asChild className="text-foreground/70 hover:text-primary hover:border-primary transition-colors duration-200">
-            <Link href="#" target="_blank" rel="noopener noreferrer" aria-label="Creator's LinkedIn">
-              <Linkedin className="h-5 w-5" />
+            <Link href="https://vichu-portfolio.netlify.app/" target="_blank" rel="noopener noreferrer" aria-label="Vishwa's Portfolio">
+              <ExternalLink className="h-5 w-5" />
             </Link>
           </Button>
           <Button variant="outline" size="icon" asChild className="text-foreground/70 hover:text-primary hover:border-primary transition-colors duration-200">
-            <Link href="#" target="_blank" rel="noopener noreferrer" aria-label="Creator's GitHub">
+            <Link href="https://github.com/vishwavichu67" target="_blank" rel="noopener noreferrer" aria-label="Vishwa's GitHub">
               <Github className="h-5 w-5" />
             </Link>
           </Button>
           <Button variant="outline" size="icon" asChild className="text-foreground/70 hover:text-primary hover:border-primary transition-colors duration-200">
-            <Link href="#" target="_blank" rel="noopener noreferrer" aria-label="Creator's Twitter">
-              <Twitter className="h-5 w-5" />
+            <Link href="https://www.instagram.com/vi.s.h.w.a_/?igsh=MnltMW11cmp1NTJw" target="_blank" rel="noopener noreferrer" aria-label="Vishwa's Instagram">
+              <Instagram className="h-5 w-5" />
+            </Link>
+          </Button>
+          <Button variant="outline" size="icon" asChild className="text-foreground/70 hover:text-primary hover:border-primary transition-colors duration-200">
+            <Link href="https://www.linkedin.com/in/urlvishwa" target="_blank" rel="noopener noreferrer" aria-label="Vishwa's LinkedIn">
+              <Linkedin className="h-5 w-5" />
+            </Link>
+          </Button>
+          <Button variant="outline" size="icon" asChild className="text-foreground/70 hover:text-primary hover:border-primary transition-colors duration-200">
+            <Link href="mailto:vishwaceo67@gmail.com" aria-label="Email Vishwa">
+              <Mail className="h-5 w-5" />
             </Link>
           </Button>
         </div>
-         <p className="text-xs text-muted-foreground mt-4">
-            (Please replace '#' with actual social media profile links.)
-          </p>
       </section>
 
        <section className="w-full max-w-4xl mt-12 p-6 bg-accent/10 rounded-xl shadow-lg">

@@ -5,9 +5,12 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { FileText, AlertTriangle, Gavel, ShieldOff, BookMarked, Landmark, UsersRound } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
-function LawSummaryCard({ summaryItem }: { summaryItem: LawSummary }) {
+function LawSummaryCard({ summaryItem, delay = 0 }: { summaryItem: LawSummary, delay?: number }) {
   return (
-    <Card className="w-full shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:scale-105 rounded-lg overflow-hidden flex flex-col h-full">
+    <Card
+      className="w-full shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:scale-105 rounded-lg overflow-hidden flex flex-col h-full animate-in fade-in-0 slide-in-from-bottom-4 duration-500 ease-out"
+      style={{ animationDelay: `${delay}ms` }}
+    >
       <CardHeader className="bg-primary/5 p-6">
         <div className="flex items-start gap-4">
           <summaryItem.icon className="w-8 h-8 text-primary mt-1 flex-shrink-0" />
@@ -49,7 +52,7 @@ function LawSummaryCard({ summaryItem }: { summaryItem: LawSummary }) {
 interface LawCategory {
   title: string;
   filter: (summary: LawSummary) => boolean;
-  icon?: React.ElementType; 
+  icon?: React.ElementType;
 }
 
 export default function LawSummariesPage() {
@@ -96,45 +99,52 @@ export default function LawSummariesPage() {
 
   return (
     <div className="flex flex-col items-center w-full">
-      <header className="mb-10 text-center">
-        <Gavel className="w-16 h-16 text-primary mx-auto mb-4" /> 
+      <header className="mb-10 text-center animate-in fade-in-0 slide-in-from-top-12 duration-700 ease-out">
+        <Gavel className="w-16 h-16 text-primary mx-auto mb-4" />
         <h1 className="text-4xl font-headline font-bold text-primary">Indian Cyber Law Summaries</h1>
         <p className="mt-2 text-lg text-foreground/70 max-w-2xl mx-auto">
           Understand key sections of Indian cyber laws and related policies. This information is for educational purposes and not legal advice.
         </p>
       </header>
 
-      {categories.map((category) => {
+      {categories.map((category, catIndex) => {
         const summaries = lawSummaries.filter(category.filter);
         if (summaries.length === 0) return null;
 
         return (
-          <section key={category.title} className="w-full max-w-4xl mb-12">
+          <section
+            key={category.title}
+            className="w-full max-w-4xl mb-12 animate-in fade-in-0 slide-in-from-bottom-8 duration-700 ease-out"
+            style={{ animationDelay: `${catIndex * 150 + 200}ms` }}
+          >
             <h2 className="text-2xl font-headline font-semibold text-primary mb-6 pb-2 border-b-2 border-primary/30 flex items-center gap-2">
               {category.icon && <category.icon className="w-6 h-6 text-primary" />}
               {category.title}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {summaries.map((summary) => (
-                <LawSummaryCard key={summary.id} summaryItem={summary} />
+              {summaries.map((summary, summaryIndex) => (
+                <LawSummaryCard key={summary.id} summaryItem={summary} delay={summaryIndex * 70} />
               ))}
             </div>
           </section>
         );
       })}
-      
+
       {(() => {
         const uncategorizedSummaries = lawSummaries.filter(uncategorizedFilter);
         if (uncategorizedSummaries.length > 0) {
           console.warn("Uncategorized law summaries found:", uncategorizedSummaries.map(s => s.title + (s.category ? ` (Category: ${s.category})` : ' (No Category)')));
           return (
-            <section className="w-full max-w-4xl mb-12">
+            <section
+              className="w-full max-w-4xl mb-12 animate-in fade-in-0 slide-in-from-bottom-8 duration-700 ease-out"
+              style={{ animationDelay: `${categories.length * 150 + 200}ms` }}
+            >
               <h2 className="text-2xl font-headline font-semibold text-accent mb-6 pb-2 border-b-2 border-accent/30">
                 Other Information
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {uncategorizedSummaries.map((summary) => (
-                  <LawSummaryCard key={summary.id} summaryItem={summary} />
+                {uncategorizedSummaries.map((summary, index) => (
+                  <LawSummaryCard key={summary.id} summaryItem={summary} delay={index * 70} />
                 ))}
               </div>
             </section>

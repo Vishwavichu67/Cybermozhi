@@ -8,9 +8,12 @@ import { Input } from '@/components/ui/input';
 import { BookOpen, Search } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-function GlossaryItemCard({ termItem }: { termItem: GlossaryTerm }) {
+function GlossaryItemCard({ termItem, delay = 0 }: { termItem: GlossaryTerm, delay?: number }) {
   return (
-    <Card className="shadow-md hover:shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105 rounded-lg overflow-hidden flex flex-col h-full">
+    <Card
+      className="shadow-md hover:shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105 rounded-lg overflow-hidden flex flex-col h-full animate-in fade-in-0 slide-in-from-bottom-4 duration-500 ease-out"
+      style={{ animationDelay: `${delay}ms` }}
+    >
       <CardHeader className="bg-accent/10 p-4">
         <div className="flex items-center gap-3">
           <termItem.icon className="w-7 h-7 text-accent flex-shrink-0" />
@@ -28,7 +31,7 @@ function GlossaryItemCard({ termItem }: { termItem: GlossaryTerm }) {
 
 export default function GlossaryPage() {
   const [searchTerm, setSearchTerm] = useState('');
-  
+
   const categories = useMemo(() => {
     const uniqueCategories = new Set(glossaryTerms.map(term => term.category));
     return ["All", ...Array.from(uniqueCategories)];
@@ -46,7 +49,7 @@ export default function GlossaryPage() {
 
   return (
     <div className="flex flex-col items-center w-full">
-      <header className="mb-10 text-center">
+      <header className="mb-10 text-center animate-in fade-in-0 slide-in-from-top-12 duration-700 ease-out">
         <BookOpen className="w-16 h-16 text-primary mx-auto mb-4" />
         <h1 className="text-4xl font-headline font-bold text-primary">Cyber Glossary</h1>
         <p className="mt-2 text-lg text-foreground/70 max-w-2xl mx-auto">
@@ -54,7 +57,7 @@ export default function GlossaryPage() {
         </p>
       </header>
 
-      <div className="w-full max-w-5xl">
+      <div className="w-full max-w-5xl animate-in fade-in-0 slide-in-from-bottom-8 duration-700 ease-out" style={{ animationDelay: '200ms' }}>
         <div className="mb-8 flex flex-col sm:flex-row gap-4 items-center">
           <div className="relative flex-grow w-full sm:w-auto">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
@@ -80,12 +83,12 @@ export default function GlossaryPage() {
 
         {filteredTerms.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredTerms.map((term) => (
-              <GlossaryItemCard key={term.id} termItem={term} />
+            {filteredTerms.map((term, index) => (
+              <GlossaryItemCard key={term.id} termItem={term} delay={index * 50} />
             ))}
           </div>
         ) : (
-          <div className="text-center py-12">
+          <div className="text-center py-12 animate-in fade-in-0 duration-500 ease-out">
             <Search className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
             <p className="text-xl font-semibold text-foreground">No terms found.</p>
             <p className="text-muted-foreground mt-1">Try adjusting your search or category filters.</p>

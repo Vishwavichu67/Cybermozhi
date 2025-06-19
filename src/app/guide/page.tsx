@@ -1,7 +1,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Rocket, MessageCircle, FileText, BookOpen, ShieldCheck, Users, AlertTriangle, LifeBuoy, LogIn, UserCircle, Linkedin, Github, Instagram, Mail, ExternalLink } from "lucide-react";
+import { Rocket, MessageCircle, FileText, BookOpen, ShieldCheck, Users, AlertTriangle, LifeBuoy, LogIn, UserCircle, Linkedin, Github, Instagram, Mail, SquareArrowOutUpRight } from "lucide-react";
 import type { Metadata } from 'next';
 import Link from "next/link";
 
@@ -52,7 +52,7 @@ const guideSections = [
     ]
   },
   {
-    icon: LifeBuoy, 
+    icon: LifeBuoy,
     title: "General Tips for Effective Use",
     content: "CyberMozhi is designed to be an empowering resource. Here’s how to make the most of it:",
     tips: [
@@ -67,7 +67,7 @@ const guideSections = [
 export default function GuidePage() {
   return (
     <div className="flex flex-col items-center w-full">
-      <header className="mb-10 text-center">
+      <header className="mb-10 text-center animate-in fade-in-0 slide-in-from-top-12 duration-700 ease-out">
         <Rocket className="w-16 h-16 text-primary mx-auto mb-4" />
         <h1 className="text-4xl font-headline font-bold text-primary">Site Guide</h1>
         <p className="mt-2 text-lg text-foreground/70 max-w-2xl mx-auto">
@@ -77,7 +77,11 @@ export default function GuidePage() {
 
       <div className="w-full max-w-4xl space-y-8">
         {guideSections.map((section, index) => (
-          <Card key={index} className="shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:scale-[1.02] rounded-lg">
+          <Card
+            key={index}
+            className="shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:scale-[1.02] rounded-lg animate-in fade-in-0 slide-in-from-bottom-8 duration-500 ease-out"
+            style={{ animationDelay: `${index * 100}ms` }}
+          >
             <CardHeader className="flex flex-row items-start gap-4 bg-primary/5 p-6">
               <section.icon className="w-8 h-8 text-primary mt-1 flex-shrink-0" />
               <div>
@@ -101,7 +105,10 @@ export default function GuidePage() {
         ))}
       </div>
 
-      <section className="group w-full max-w-4xl mt-12 p-6 sm:p-8 bg-accent/5 rounded-2xl shadow-xl border border-accent/20 transition-all duration-300 ease-in-out hover:shadow-accent/20 hover:scale-[1.02]">
+      <section
+        className="group w-full max-w-4xl mt-12 p-6 sm:p-8 bg-accent/5 rounded-2xl shadow-xl border border-accent/20 transition-all duration-300 ease-in-out hover:shadow-accent/20 hover:scale-[1.02] animate-in fade-in-0 slide-in-from-bottom-8 duration-500 ease-out"
+        style={{ animationDelay: `${guideSections.length * 100}ms` }}
+      >
         <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 mb-6">
           <UserCircle className="w-16 h-16 sm:w-20 sm:h-20 text-accent flex-shrink-0 border-2 border-accent/30 rounded-full p-1" />
           <div className="text-center sm:text-left">
@@ -117,7 +124,7 @@ export default function GuidePage() {
           <div className="flex flex-wrap justify-center sm:justify-start items-center gap-3">
             <Button variant="outline" size="icon" asChild className="text-foreground/70 hover:text-primary hover:border-primary transition-all duration-200 ease-in-out transform hover:scale-110 group-hover:text-primary group-hover:border-primary">
               <Link href="https://vichu-portfolio.netlify.app/" target="_blank" rel="noopener noreferrer" aria-label="Vishwa's Portfolio">
-                <ExternalLink className="h-5 w-5 transition-transform duration-200 ease-in-out transform hover:scale-110" />
+                <SquareArrowOutUpRight className="h-5 w-5 transition-transform duration-200 ease-in-out transform hover:scale-110" />
               </Link>
             </Button>
             <Button variant="outline" size="icon" asChild className="text-foreground/70 hover:text-primary hover:border-primary transition-all duration-200 ease-in-out transform hover:scale-110 group-hover:text-primary group-hover:border-primary">
@@ -144,7 +151,10 @@ export default function GuidePage() {
         </div>
       </section>
 
-       <section className="w-full max-w-4xl mt-12 p-6 bg-destructive/10 rounded-xl shadow-lg border border-destructive/20">
+       <section
+        className="w-full max-w-4xl mt-12 p-6 bg-destructive/10 rounded-xl shadow-lg border border-destructive/20 animate-in fade-in-0 slide-in-from-bottom-8 duration-500 ease-out"
+        style={{ animationDelay: `${(guideSections.length + 1) * 100}ms` }}
+      >
         <div className="flex items-start gap-4">
           <AlertTriangle className="w-10 h-10 text-destructive flex-shrink-0 mt-1" />
           <div>

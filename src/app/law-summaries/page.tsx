@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 
 function LawSummaryCard({ summaryItem }: { summaryItem: LawSummary }) {
   return (
-    <Card className="w-full shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-lg overflow-hidden flex flex-col h-full">
+    <Card className="w-full shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:scale-105 rounded-lg overflow-hidden flex flex-col h-full">
       <CardHeader className="bg-primary/5 p-6">
         <div className="flex items-start gap-4">
           <summaryItem.icon className="w-8 h-8 text-primary mt-1 flex-shrink-0" />
@@ -23,7 +23,7 @@ function LawSummaryCard({ summaryItem }: { summaryItem: LawSummary }) {
         <p className="text-sm text-foreground/80 mb-3 leading-relaxed">{summaryItem.summary}</p>
         <Accordion type="single" collapsible className="w-full">
           <AccordionItem value="details">
-            <AccordionTrigger className="text-sm font-medium text-primary hover:text-accent py-2 text-left">
+            <AccordionTrigger className="text-sm font-medium text-primary hover:text-accent py-2 text-left transition-colors duration-200">
               Read More Details
             </AccordionTrigger>
             <AccordionContent className="text-sm text-foreground/70 pt-2 pb-0 leading-relaxed whitespace-pre-line">

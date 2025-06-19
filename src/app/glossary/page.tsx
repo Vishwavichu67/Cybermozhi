@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useMemo } from 'react';
@@ -9,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 function GlossaryItemCard({ termItem }: { termItem: GlossaryTerm }) {
   return (
-    <Card className="shadow-md hover:shadow-lg transition-shadow duration-300 rounded-lg overflow-hidden flex flex-col h-full">
+    <Card className="shadow-md hover:shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105 rounded-lg overflow-hidden flex flex-col h-full">
       <CardHeader className="bg-accent/10 p-4">
         <div className="flex items-center gap-3">
           <termItem.icon className="w-7 h-7 text-accent flex-shrink-0" />

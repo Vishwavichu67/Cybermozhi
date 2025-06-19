@@ -21,11 +21,11 @@ import {
   Lightbulb,
   ScrollText,
   ClipboardCheck,
-  FileLock,
-  KeyRound,
+  FileLock, 
+  KeyRound, 
   FileSignature,
-  UserCircle2, // For Account Details
-  History // For Chat History
+  UserCircle2, 
+  History
 } from "lucide-react";
 
 const sampleTopics = [
@@ -87,12 +87,12 @@ export default function HomePage() {
               Your AI-powered bilingual (Tamil & English) assistant for understanding Indian cyber laws, online threats, cybersecurity best practices, and legal remedies.
             </p>
             <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
-              <Button asChild size="lg" className="shadow-md hover:shadow-lg transition-shadow">
+              <Button asChild size="lg" className="shadow-md hover:shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105">
                 <Link href="/chatbot">
                   Try AI Chatbot (Limited Access) <MessageCircle className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
-              <Button asChild variant="outline" size="lg" className="shadow-md hover:shadow-lg transition-shadow">
+              <Button asChild variant="outline" size="lg" className="shadow-md hover:shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105">
                 <Link href="/law-summaries">
                   Explore Cyber Laws <FileText className="ml-2 h-5 w-5" />
                 </Link>
@@ -108,7 +108,7 @@ export default function HomePage() {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {sampleTopics.map((topic) => (
-              <Card key={topic.name} className="shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-lg flex flex-col">
+              <Card key={topic.name} className="shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:scale-105 rounded-lg flex flex-col">
                 <CardHeader className="pb-3">
                   <div className="flex items-center gap-3">
                     <topic.icon className="w-8 h-8 text-accent flex-shrink-0" />
@@ -119,7 +119,7 @@ export default function HomePage() {
                   <p className="text-sm text-foreground/70">{topic.description}</p>
                 </CardContent>
                 <div className="p-4 pt-0">
-                  <Button asChild variant="link" className="text-primary p-0 h-auto hover:text-accent text-sm">
+                  <Button asChild variant="link" className="text-primary p-0 h-auto hover:text-accent text-sm transition-colors duration-200">
                     <Link href={topic.link}>
                       Learn More <ArrowRight className="ml-1 h-4 w-4" />
                     </Link>
@@ -138,7 +138,7 @@ export default function HomePage() {
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {coreFeatures.map((feature) => (
-                <Card key={feature.title} className="flex flex-col shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out rounded-lg overflow-hidden">
+                <Card key={feature.title} className="flex flex-col shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:scale-105 rounded-lg overflow-hidden">
                   <CardHeader className="bg-primary/5 p-6">
                     <div className="flex items-center gap-4">
                       <feature.icon className="w-10 h-10 text-primary" />
@@ -151,7 +151,7 @@ export default function HomePage() {
                     </CardDescription>
                   </CardContent>
                   <div className="p-6 pt-0 mt-auto">
-                    <Button asChild variant="link" className="text-primary p-0 h-auto hover:text-accent">
+                    <Button asChild variant="link" className="text-primary p-0 h-auto hover:text-accent transition-colors duration-200">
                       <Link href={feature.link}>
                         {feature.linkText} <ArrowRight className="ml-2 h-4 w-4" />
                       </Link>
@@ -174,12 +174,12 @@ export default function HomePage() {
               Create a free account or login to access personalized advice, save your learning progress and chat history, download FIR templates, take quizzes, and enjoy unlimited AI chatbot interactions.
             </p>
             <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-              <Button asChild size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 shadow-md hover:shadow-lg transition-shadow">
+              <Button asChild size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 shadow-md hover:shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105">
                 <Link href="/signup">
                   Create Free Account <UserPlus className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
-              <Button asChild variant="outline" size="lg" className="shadow-md hover:shadow-lg transition-shadow border-accent text-accent hover:bg-accent/20">
+              <Button asChild variant="outline" size="lg" className="shadow-md hover:shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105 border-accent text-accent hover:bg-accent/20">
                 <Link href="/login">
                   Login to Your Account <LogIn className="ml-2 h-5 w-5" />
                 </Link>
@@ -214,7 +214,7 @@ export default function HomePage() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {/* Card 1: Account Details (Conceptual) */}
-          <Card className="shadow-lg hover:shadow-xl transition-shadow">
+          <Card className="shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:scale-105">
             <CardHeader>
               <div className="flex items-center gap-3">
                 <UserCircle2 className="w-7 h-7 text-primary" />
@@ -223,10 +223,10 @@ export default function HomePage() {
             </CardHeader>
             <CardContent>
               <p className="text-sm text-foreground/70 mb-1">Manage your profile information like name, phone, gender, and date of birth.</p>
-              <p className="text-sm text-foreground/70">This helps personalize your CyberMozhi experience.</p>
+              <p className="text-sm text-foreground/70">This helps personalize your CyberMozhi experience and the AI Chatbot's responses.</p>
             </CardContent>
             <div className="p-4 pt-0">
-              <Button asChild variant="outline" className="w-full">
+              <Button asChild variant="outline" className="w-full transition-shadow hover:shadow-md">
                 <Link href="#"> {/* Placeholder for /profile or /account page */}
                   View/Edit Profile <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
@@ -234,50 +234,8 @@ export default function HomePage() {
             </div>
           </Card>
 
-          {/* Card 2: Saved FIR Drafts (Conceptual) */}
-          <Card className="shadow-lg hover:shadow-xl transition-shadow">
-            <CardHeader>
-               <div className="flex items-center gap-3">
-                <ScrollText className="w-7 h-7 text-primary" />
-                <CardTitle className="text-xl font-headline text-primary">FIR Drafts</CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-foreground/70 mb-1">You have <span className="font-semibold">1 FIR draft</span> in progress for 'Online Financial Fraud'.</p>
-              <p className="text-sm text-foreground/70">Access and manage your saved complaint drafts.</p>
-            </CardContent>
-             <div className="p-4 pt-0">
-              <Button asChild variant="outline" className="w-full">
-                <Link href="#"> {/* Placeholder link for /fir-drafts */}
-                  Manage My Drafts <FileText className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-            </div>
-          </Card>
-
-          {/* Card 3: Quiz Progress (Conceptual) */}
-          <Card className="shadow-lg hover:shadow-xl transition-shadow">
-            <CardHeader>
-              <div className="flex items-center gap-3">
-                <ClipboardCheck className="w-7 h-7 text-primary" />
-                <CardTitle className="text-xl font-headline text-primary">Quiz Progress</CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-foreground/70 mb-1">Latest Quiz: <span className="font-semibold">IT Act Basics - 75% Score.</span></p>
-              <p className="text-sm text-foreground/70">Keep testing your knowledge and earn badges!</p>
-            </CardContent>
-             <div className="p-4 pt-0">
-              <Button asChild variant="outline" className="w-full">
-                <Link href="#"> {/* Placeholder link for /quizzes */}
-                  View All Quizzes <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-            </div>
-          </Card>
-
-          {/* Card 4: Chat History (Conceptual) */}
-          <Card className="shadow-lg hover:shadow-xl transition-shadow">
+          {/* Card 2: Chat History (Conceptual) */}
+          <Card className="shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:scale-105">
             <CardHeader>
               <div className="flex items-center gap-3">
                 <History className="w-7 h-7 text-primary" />
@@ -289,16 +247,58 @@ export default function HomePage() {
               <p className="text-sm text-foreground/70">Your chat history helps the AI provide better, contextual answers over time.</p>
             </CardContent>
              <div className="p-4 pt-0">
-              <Button asChild variant="outline" className="w-full">
-                <Link href="#"> {/* Placeholder for /chat-history page */}
+              <Button asChild variant="outline" className="w-full transition-shadow hover:shadow-md">
+                <Link href="/chatbot"> 
                   View Chat History <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
+          </Card>
+          
+          {/* Card 3: Saved FIR Drafts (Conceptual) */}
+          <Card className="shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:scale-105">
+            <CardHeader>
+               <div className="flex items-center gap-3">
+                <ScrollText className="w-7 h-7 text-primary" />
+                <CardTitle className="text-xl font-headline text-primary">FIR Drafts</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-foreground/70 mb-1">You have <span className="font-semibold">0 FIR drafts</span> in progress.</p>
+              <p className="text-sm text-foreground/70">Access and manage your saved complaint drafts (Feature Coming Soon).</p>
+            </CardContent>
+             <div className="p-4 pt-0">
+              <Button asChild variant="outline" className="w-full transition-shadow hover:shadow-md" disabled>
+                <Link href="#"> {/* Placeholder link for /fir-drafts */}
+                  Manage My Drafts <FileText className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
+          </Card>
+
+          {/* Card 4: Quiz Progress (Conceptual) */}
+          <Card className="shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:scale-105">
+            <CardHeader>
+              <div className="flex items-center gap-3">
+                <ClipboardCheck className="w-7 h-7 text-primary" />
+                <CardTitle className="text-xl font-headline text-primary">Quiz Progress</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-foreground/70 mb-1">Latest Quiz: <span className="font-semibold">No quizzes taken yet.</span></p>
+              <p className="text-sm text-foreground/70">Test your knowledge and earn badges! (Feature Coming Soon).</p>
+            </CardContent>
+             <div className="p-4 pt-0">
+              <Button asChild variant="outline" className="w-full transition-shadow hover:shadow-md" disabled>
+                <Link href="#"> {/* Placeholder link for /quizzes */}
+                  View All Quizzes <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
             </div>
           </Card>
 
            {/* Card 5: Suggested For You (Conceptual) */}
-          <Card className="shadow-lg hover:shadow-xl transition-shadow md:col-span-2">
+          <Card className="shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:scale-105 md:col-span-2 lg:col-span-3">
             <CardHeader>
               <div className="flex items-center gap-3">
                 <Lightbulb className="w-7 h-7 text-primary" />
@@ -306,15 +306,18 @@ export default function HomePage() {
               </div>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-foreground/70 mb-1">Based on your recent activity exploring the IT Act, you might be interested in:</p>
-              <Badge variant="secondary" className="mr-2 my-1">Data Privacy Laws in India</Badge>
-              <Badge variant="secondary" className="my-1">Understanding Section 69 of IT Act</Badge>
-              <p className="text-sm text-foreground/70 mt-2">Deepen your understanding of crucial legal aspects.</p>
+              <p className="text-sm text-foreground/70 mb-2">Based on your interests, you might want to explore:</p>
+              <div className="flex flex-wrap gap-2">
+                <Badge variant="secondary" className="transition-transform hover:scale-110 cursor-pointer">Understanding Data Privacy</Badge>
+                <Badge variant="secondary" className="transition-transform hover:scale-110 cursor-pointer">Key IT Act Sections</Badge>
+                <Badge variant="secondary" className="transition-transform hover:scale-110 cursor-pointer">Reporting Cybercrime</Badge>
+              </div>
+              <p className="text-sm text-foreground/70 mt-3">Deepen your understanding of crucial legal and security aspects.</p>
             </CardContent>
             <div className="p-4 pt-0">
-              <Button asChild variant="default" className="w-full">
-                <Link href="/law-summaries"> {/* Placeholder link */}
-                  Explore Suggested Topics <ArrowRight className="ml-2 h-4 w-4" />
+              <Button asChild className="w-full transition-shadow hover:shadow-md">
+                <Link href="/law-summaries"> 
+                  Explore Topics <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
             </div>
@@ -329,7 +332,7 @@ export default function HomePage() {
           </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {coreFeatures.map((feature) => (
-              <Card key={feature.title} className="flex flex-col shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out rounded-lg overflow-hidden">
+              <Card key={feature.title} className="flex flex-col shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:scale-105 rounded-lg overflow-hidden">
                 <CardHeader className="bg-primary/5 p-6">
                   <div className="flex items-center gap-4">
                     <feature.icon className="w-10 h-10 text-primary" />
@@ -342,7 +345,7 @@ export default function HomePage() {
                   </CardDescription>
                 </CardContent>
                 <div className="p-6 pt-0 mt-auto">
-                  <Button asChild className="w-full">
+                  <Button asChild className="w-full transition-shadow hover:shadow-md">
                     <Link href={feature.link}>
                       {feature.linkText} <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>
@@ -362,10 +365,10 @@ export default function HomePage() {
             Your AI Legal & Cyber Guide Awaits
           </h2>
           <p className="mt-4 max-w-2xl mx-auto text-lg text-foreground/80">
-            Leverage the full power of CyberMozhi's bilingual AI. Get detailed explanations on cyber laws, IT Act sections, penalties, attack mitigation, and guidance on filing complaints. The AI will also consider your chat history and profile (once available) for a more personalized experience.
+            Leverage the full power of CyberMozhi's bilingual AI. Get detailed explanations on cyber laws, IT Act sections, penalties, attack mitigation, and guidance on filing complaints. The AI will also consider your chat history for a more personalized experience.
           </p>
           <div className="mt-8">
-            <Button asChild size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 shadow-md hover:shadow-lg transition-shadow">
+            <Button asChild size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 shadow-md hover:shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105">
               <Link href="/chatbot">
                 Chat with CyberMozhi AI <Sparkles className="ml-2 h-5 w-5" />
               </Link>
@@ -381,4 +384,3 @@ export default function HomePage() {
     </div>
   );
 }
-    

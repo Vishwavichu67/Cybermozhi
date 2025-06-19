@@ -1,5 +1,7 @@
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Rocket, MessageCircle, FileText, BookOpen, ShieldCheck, Users, AlertTriangle, LifeBuoy, LogIn } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Rocket, MessageCircle, FileText, BookOpen, ShieldCheck, Users, AlertTriangle, LifeBuoy, LogIn, UserCircle, Linkedin, Github, Twitter } from "lucide-react";
 import type { Metadata } from 'next';
 import Link from "next/link";
 
@@ -42,7 +44,7 @@ const guideSections = [
   {
     icon: LogIn,
     title: "User Accounts",
-    content: "Creating a user account by logging in (registration functionality will be added in the future) helps in providing a pathway for more personalized experiences. Currently, logging in is the first step towards potential future features like saving chat history or custom preferences.",
+    content: "Creating a user account by logging in (registration functionality will be added in the future) helps in providing a pathway for more personalized experiences. Currently, logging in allows for chat history persistence and is the first step towards future features like saving FIR drafts or custom preferences.",
     tips: [
       "Use the 'Login' button in the header to access your account.",
       "Keep your account credentials secure and do not share them.",
@@ -75,7 +77,7 @@ export default function GuidePage() {
 
       <div className="w-full max-w-4xl space-y-8">
         {guideSections.map((section, index) => (
-          <Card key={index} className="shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-lg">
+          <Card key={index} className="shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:scale-105 rounded-lg">
             <CardHeader className="flex flex-row items-start gap-4 bg-primary/5 p-6">
               <section.icon className="w-8 h-8 text-primary mt-1 flex-shrink-0" />
               <div>
@@ -98,6 +100,40 @@ export default function GuidePage() {
           </Card>
         ))}
       </div>
+
+      <section className="w-full max-w-4xl mt-12 p-6 bg-card rounded-xl shadow-lg border border-border transition-all duration-300 ease-in-out hover:shadow-2xl">
+        <div className="flex items-center gap-4 mb-4">
+          <UserCircle className="w-10 h-10 text-accent flex-shrink-0" />
+          <h2 className="text-2xl font-headline font-semibold text-accent">Meet the Creator</h2>
+        </div>
+        <p className="text-foreground/80 leading-relaxed mb-2">
+          CyberMozhi was created by <span className="font-semibold text-primary">Vignesh</span>, a passionate developer dedicated to making legal and cybersecurity information accessible to everyone.
+        </p>
+        <p className="text-foreground/70 text-sm leading-relaxed mb-4">
+          This platform aims to bridge the language gap and empower Indian citizens with the knowledge to navigate the digital world safely and confidently.
+        </p>
+        <div className="flex items-center space-x-4">
+          <span className="text-sm font-medium text-foreground/70">Connect:</span>
+          <Button variant="outline" size="icon" asChild className="text-foreground/70 hover:text-primary hover:border-primary transition-colors duration-200">
+            <Link href="#" target="_blank" rel="noopener noreferrer" aria-label="Creator's LinkedIn">
+              <Linkedin className="h-5 w-5" />
+            </Link>
+          </Button>
+          <Button variant="outline" size="icon" asChild className="text-foreground/70 hover:text-primary hover:border-primary transition-colors duration-200">
+            <Link href="#" target="_blank" rel="noopener noreferrer" aria-label="Creator's GitHub">
+              <Github className="h-5 w-5" />
+            </Link>
+          </Button>
+          <Button variant="outline" size="icon" asChild className="text-foreground/70 hover:text-primary hover:border-primary transition-colors duration-200">
+            <Link href="#" target="_blank" rel="noopener noreferrer" aria-label="Creator's Twitter">
+              <Twitter className="h-5 w-5" />
+            </Link>
+          </Button>
+        </div>
+         <p className="text-xs text-muted-foreground mt-4">
+            (Please replace '#' with actual social media profile links.)
+          </p>
+      </section>
 
        <section className="w-full max-w-4xl mt-12 p-6 bg-accent/10 rounded-xl shadow-lg">
         <div className="flex items-start gap-4">

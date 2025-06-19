@@ -2,8 +2,8 @@
 "use client";
 
 import Link from 'next/link';
-import Image from 'next/image'; // Ensure Image is imported
-import { MessageCircle, Gavel, BookOpen, Menu, X, LogIn, LogOut, Rocket, Loader2 } from 'lucide-react';
+import Image from 'next/image';
+import { MessageCircle, Gavel, BookOpen, Menu, X, LogIn, LogOut, Rocket, Loader2, Github, Linkedin, Twitter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
 import { useState } from 'react';
@@ -66,7 +66,7 @@ export function Header() {
         if (isMobileMenuOpen) setIsMobileMenuOpen(false);
       }}
       className={cn(
-        "flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors",
+        "flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200",
         pathname === href
           ? "bg-primary/10 text-primary hover:bg-primary/20"
           : "text-foreground/70 hover:text-foreground hover:bg-accent/50",
@@ -106,9 +106,8 @@ export function Header() {
           <Image
             src="/logo.png"
             alt="CyberMozhi Logo"
-            width={150}
-            height={40}
-            // Removed priority prop
+            width={120} // Reduced width
+            height={32} // Reduced height to maintain aspect ratio (approx 150/40 -> 120/32)
           />
         </Link>
 
@@ -154,7 +153,7 @@ export function Header() {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <Button asChild variant="default" size="sm">
+            <Button asChild variant="default" size="sm" className="transition-shadow hover:shadow-md">
               <Link href="/login">
                 <LogIn className="mr-2 h-4 w-4" /> Login
               </Link>
@@ -187,10 +186,10 @@ export function Header() {
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                    <Image
-                      src="/logo.png" // Use the same logo for mobile
+                      src="/logo.png"
                       alt="CyberMozhi Logo"
-                      width={120}
-                      height={30}
+                      width={100} // Adjusted mobile logo size
+                      height={26} // Adjusted mobile logo size
                     />
                 </Link>
                 <SheetClose asChild>
@@ -223,7 +222,7 @@ export function Header() {
                       </p>
                     </div>
                   </div>
-                  <Button onClick={handleLogout} variant="outline" className="w-full">
+                  <Button onClick={handleLogout} variant="outline" className="w-full transition-shadow hover:shadow-md">
                     <LogOut className="mr-2 h-4 w-4" /> Logout
                   </Button>
                 </div>
@@ -235,5 +234,3 @@ export function Header() {
     </header>
   );
 }
-
-    

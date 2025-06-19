@@ -24,7 +24,10 @@ import {
   KeyRound,
   FileSignature,
   UserCircle2,
-  History
+  History,
+  ShieldCheck,
+  Network as NetworkIcon, // Renamed to avoid conflict with Tailwind's network
+  ClipboardCheck
 } from "lucide-react";
 
 const sampleTopics = [
@@ -76,8 +79,12 @@ export default function HomePage() {
     return (
       <div className="flex flex-col items-center space-y-16">
         {/* Hero Section for Guests */}
-        <section className="w-full py-12 md:py-20 lg:py-28 bg-gradient-to-br from-primary/10 via-background to-accent/10 rounded-xl shadow-lg text-center animate-in fade-in-0 slide-in-from-top-12 duration-700 ease-out">
-          <div className="container px-4 md:px-6">
+        <section className="relative w-full py-12 md:py-20 lg:py-28 bg-gradient-to-br from-primary/10 via-background to-accent/10 rounded-xl shadow-lg text-center animate-in fade-in-0 slide-in-from-top-12 duration-700 ease-out overflow-hidden">
+          
+          <ShieldCheck className="absolute -top-5 -left-5 h-24 w-24 text-primary/10 animate-float-up-down opacity-70" style={{ animationDuration: '5s', animationDelay: '0.2s' }} />
+          <NetworkIcon className="absolute -bottom-8 -right-8 h-32 w-32 text-accent/10 animate-float-left-right opacity-60" style={{ animationDuration: '6s', animationDelay: '0.5s' }} />
+
+          <div className="container px-4 md:px-6 relative z-10">
             <Sparkles className="w-16 h-16 md:w-20 md:h-20 text-primary mx-auto mb-6 animate-pulse delay-300" />
             <h1 className="text-3xl font-headline font-bold tracking-tight sm:text-4xl md:text-5xl text-primary">
               Welcome to CyberMozhi! வணக்கம்!

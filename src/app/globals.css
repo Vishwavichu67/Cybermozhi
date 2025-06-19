@@ -95,11 +95,28 @@
     opacity: 0.9;
   }
   50% {
-    transform: scale(1.03); /* Made slightly more subtle */
+    transform: scale(1.03);
     opacity: 1;
   }
 }
 
 .animate-logo-pulse {
   animation: logo-pulse 2s infinite ease-in-out;
+}
+
+@keyframes float-up-down {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes float-left-right {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(8px); }
+}
+
+.animate-float-up-down {
+  animation: float-up-down 3s infinite ease-in-out;
+}
+.animate-float-left-right {
+  animation: float-left-right 3.5s infinite ease-in-out;
 }

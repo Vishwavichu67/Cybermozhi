@@ -1,106 +1,205 @@
 
 "use server";
 
-import { cyberLawChatbot, type CyberLawChatbotInput, type CyberLawChatbotOutput, type ChatMessage } from '@/ai/flows/cyber-law-chatbot';
+import { cyberLawChatbot, type CyberLawChatbotInput, type ChatMessage as AIChatMessage } from '@/ai/flows/cyber-law-chatbot';
 import { z } from 'zod';
 import { auth, db } from '@/lib/firebase';
-import { collection, addDoc, query, orderBy, limit, getDocs, serverTimestamp, Timestamp } from 'firebase/firestore';
+import { collection, query, orderBy, limit, getDocs, serverTimestamp, Timestamp, doc, setDoc, writeBatch, updateDoc } from 'firebase/firestore';
 
-const ChatQuerySchema = z.object({
+const ChatQueryInputSchema = z.object({
   query: z.string().min(1, "Query cannot be empty."),
 });
 
-const MAX_CHAT_HISTORY_TO_FETCH = 20; // Fetch last 20 messages (10 user + 10 model) for AI context
+const MAX_CHAT_HISTORY_TO_FETCH = 20; 
 
-export async function handleChatQuery(formData: FormData): Promise<CyberLawChatbotOutput & { error?: string }> {
+export interface ChatSession {
+  id: string;
+  title: string;
+  createdAt: Timestamp | Date; 
+  lastMessageAt: Timestamp | Date;
+  userId: string;
+}
+
+export interface MessageForClient {
+  id: string;
+  text: string;
+  role: 'user' | 'model';
+  timestamp: Timestamp | Date; 
+}
+
+
+export async function handleChatQuery(
+  formData: FormData
+): Promise<CyberLawChatbotOutput & { error?: string; chatSessionId?: string; newChatSession?: ChatSession }> {
   if (!auth || !db) {
-    console.error("Firebase auth or db not initialized in handleChatQuery. This might be due to Firebase service unavailability or incorrect configuration.");
-    return { answer: '', error: "The chatbot service is temporarily unavailable due to a configuration issue. Please try again later." };
+    console.error("Firebase auth or db not initialized.");
+    return { answer: '', error: "Chatbot service temporarily unavailable." };
   }
 
-  const rawQuery = formData.get('query');
   const currentUser = auth.currentUser;
+  if (!currentUser) {
+    return { answer: '', error: "User not authenticated. Please login." };
+  }
 
-  const validatedFields = ChatQuerySchema.safeParse({
-    query: rawQuery,
-  });
+  const rawQuery = formData.get('query') as string;
+  const rawChatSessionId = formData.get('chatSessionId') as string | null;
+  
+  let currentChatSessionId: string | null = (rawChatSessionId === "null" || !rawChatSessionId || rawChatSessionId === "undefined") ? null : rawChatSessionId;
+
+  const validatedFields = ChatQueryInputSchema.safeParse({ query: rawQuery });
 
   if (!validatedFields.success) {
     return { answer: '', error: validatedFields.error.flatten().fieldErrors.query?.join(", ") || "Invalid input." };
   }
-
   const userQueryText = validatedFields.data.query;
-  let chatHistoryForAI: ChatMessage[] = [];
-  let userName: string | undefined = undefined;
 
-  if (currentUser) {
-    userName = currentUser.displayName || currentUser.email?.split('@')[0] || undefined;
-    
-    // Fetch chat history for AI context
-    try {
-      const chatMessagesRef = collection(db, `users/${currentUser.uid}/chatMessages`);
-      const q = query(chatMessagesRef, orderBy('timestamp', 'desc'), limit(MAX_CHAT_HISTORY_TO_FETCH));
-      const querySnapshot = await getDocs(q);
-      const fetchedMessages: { role: 'user' | 'model'; text: string; timestamp: Timestamp }[] = [];
-      querySnapshot.forEach((doc) => {
-        fetchedMessages.push(doc.data() as { role: 'user' | 'model'; text: string; timestamp: Timestamp });
-      });
-      
-      chatHistoryForAI = fetchedMessages.reverse().map(msg => ({
-        role: msg.role,
-        parts: [{ text: msg.text }],
-        isUser: msg.role === 'user',
-        isModel: msg.role === 'model',
-      }));
-
-    } catch (historyError) {
-      console.error("Error fetching chat history for AI (potentially due to Firestore unavailability):", historyError);
-      // Non-fatal error for AI context, proceed without history if fetching fails
-    }
-  }
-
-  const input: CyberLawChatbotInput = {
-    query: userQueryText,
-    userName: userName,
-    chatHistory: chatHistoryForAI.length > 0 ? chatHistoryForAI : undefined,
-  };
+  let chatHistoryForAI: AIChatMessage[] = [];
+  const userName: string | undefined = currentUser.displayName || currentUser.email?.split('@')[0] || undefined;
+  let newChatSessionForClient: ChatSession | undefined = undefined;
 
   try {
-    const result = await cyberLawChatbot(input);
+    if (!currentChatSessionId) {
+      const newSessionRef = doc(collection(db, `users/${currentUser.uid}/chatSessions`));
+      currentChatSessionId = newSessionRef.id;
+      const nowServerTimestamp = serverTimestamp();
+      const initialTitle = userQueryText.substring(0, 70) + (userQueryText.length > 70 ? "..." : "");
+      
+      const sessionDataToSave = {
+        title: initialTitle,
+        createdAt: nowServerTimestamp,
+        lastMessageAt: nowServerTimestamp,
+        userId: currentUser.uid,
+      };
+      await setDoc(newSessionRef, sessionDataToSave);
+      
+      newChatSessionForClient = {
+        id: currentChatSessionId,
+        title: initialTitle,
+        createdAt: new Date(), 
+        lastMessageAt: new Date(), 
+        userId: currentUser.uid,
+      };
+    }
 
-    if (currentUser) {
-      try {
-        const chatMessagesRef = collection(db, `users/${currentUser.uid}/chatMessages`);
-        await addDoc(chatMessagesRef, {
-          role: 'user',
-          text: userQueryText,
-          timestamp: serverTimestamp(),
+    if (currentChatSessionId) {
+      const messagesRef = collection(db, `users/${currentUser.uid}/chatSessions/${currentChatSessionId}/messages`);
+      const q = query(messagesRef, orderBy('timestamp', 'desc'), limit(MAX_CHAT_HISTORY_TO_FETCH));
+      const querySnapshot = await getDocs(q);
+      const fetchedMessages: AIChatMessage[] = [];
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        fetchedMessages.push({
+            role: data.role as 'user' | 'model',
+            parts: [{ text: data.text }],
+            isUser: data.role === 'user',
+            isModel: data.role === 'model',
         });
-        await addDoc(chatMessagesRef, {
-          role: 'model',
-          text: result.answer,
-          timestamp: serverTimestamp(),
-        });
-      } catch (saveError) {
-        console.error("Error saving chat message to Firestore (potentially due to Firestore unavailability or rules):", saveError);
-        // Non-fatal error for saving history, user still gets the AI response
+      });
+      chatHistoryForAI = fetchedMessages.reverse();
+    }
+
+    const aiInput: CyberLawChatbotInput = {
+      query: userQueryText,
+      userName: userName,
+      chatHistory: chatHistoryForAI.length > 0 ? chatHistoryForAI : undefined,
+    };
+
+    const result = await cyberLawChatbot(aiInput);
+
+    if (currentChatSessionId) {
+      const userMessageRef = doc(collection(db, `users/${currentUser.uid}/chatSessions/${currentChatSessionId}/messages`));
+      const modelMessageRef = doc(collection(db, `users/${currentUser.uid}/chatSessions/${currentChatSessionId}/messages`));
+      const sessionDocRef = doc(db, `users/${currentUser.uid}/chatSessions/${currentChatSessionId}`);
+      
+      const batch = writeBatch(db);
+      const nowServerTimestampForMessages = serverTimestamp();
+
+      batch.set(userMessageRef, {
+        role: 'user',
+        text: userQueryText,
+        timestamp: nowServerTimestampForMessages,
+      });
+      batch.set(modelMessageRef, {
+        role: 'model',
+        text: result.answer,
+        timestamp: nowServerTimestampForMessages,
+      });
+      batch.update(sessionDocRef, { lastMessageAt: nowServerTimestampForMessages });
+      await batch.commit();
+      
+      if (newChatSessionForClient) {
+        newChatSessionForClient.lastMessageAt = new Date(); 
       }
     }
-    return result;
+    
+    return { 
+        ...result, 
+        chatSessionId: currentChatSessionId, 
+        newChatSession: newChatSessionForClient 
+    };
+
   } catch (e) {
-    let errorMessage = "An unexpected error occurred while processing your request with the AI assistant.";
-    if (e instanceof Error) {
-      errorMessage = e.message;
-    } else if (typeof e === 'string') {
-      errorMessage = e;
-    } else {
-      try {
-        errorMessage = JSON.stringify(e);
-      } catch (stringifyError) {
-        // Fallback if stringify fails
-      }
-    }
-    console.error("Error in cyberLawChatbot flow processing:", e);
-    return { answer: '', error: errorMessage };
+    let errorMessage = "An unexpected error occurred with the AI assistant.";
+    if (e instanceof Error) errorMessage = e.message;
+    else if (typeof e === 'string') errorMessage = e;
+    else { try { errorMessage = JSON.stringify(e); } catch { /* ignore */ } }
+    console.error("Error in handleChatQuery:", e);
+    return { answer: '', error: errorMessage, chatSessionId: currentChatSessionId || undefined };
+  }
+}
+
+export async function getChatSessionsForUser(): Promise<{ sessions?: ChatSession[]; error?: string }> {
+  const currentUser = auth.currentUser;
+  if (!currentUser || !db) {
+    return { error: "User not authenticated or DB not available." };
+  }
+  try {
+    const sessionsRef = collection(db, `users/${currentUser.uid}/chatSessions`);
+    const q = query(sessionsRef, orderBy('lastMessageAt', 'desc'));
+    const querySnapshot = await getDocs(q);
+    const sessions: ChatSession[] = [];
+    querySnapshot.forEach((docSnap) => {
+      const data = docSnap.data();
+      sessions.push({
+        id: docSnap.id,
+        title: data.title,
+        createdAt: (data.createdAt as Timestamp)?.toDate() || new Date(0),
+        lastMessageAt: (data.lastMessageAt as Timestamp)?.toDate() || new Date(0),
+        userId: data.userId,
+      });
+    });
+    return { sessions };
+  } catch (error) {
+    console.error("Error fetching chat sessions:", error);
+    return { error: "Failed to fetch chat sessions." };
+  }
+}
+
+export async function getMessagesForChatSession(chatSessionId: string): Promise<{ messages?: MessageForClient[]; error?: string }> {
+  const currentUser = auth.currentUser;
+  if (!currentUser || !db) {
+    return { error: "User not authenticated or DB not available." };
+  }
+  if (!chatSessionId) {
+    return { error: "Chat session ID is required." };
+  }
+  try {
+    const messagesRef = collection(db, `users/${currentUser.uid}/chatSessions/${chatSessionId}/messages`);
+    const q = query(messagesRef, orderBy('timestamp', 'asc'));
+    const querySnapshot = await getDocs(q);
+    const messages: MessageForClient[] = [];
+    querySnapshot.forEach((docSnap) => {
+      const data = docSnap.data();
+      messages.push({
+        id: docSnap.id,
+        text: data.text,
+        role: data.role as 'user' | 'model',
+        timestamp: (data.timestamp as Timestamp)?.toDate() || new Date(0),
+      });
+    });
+    return { messages };
+  } catch (error) {
+    console.error(`Error fetching messages for session ${chatSessionId}:`, error);
+    return { error: `Failed to fetch messages for session ${chatSessionId}.` };
   }
 }

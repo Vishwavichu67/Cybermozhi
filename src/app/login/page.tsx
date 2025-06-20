@@ -76,7 +76,7 @@ export default function LoginPage() {
 
   return (
     <div className="flex items-center justify-center py-12 animate-in fade-in-0 zoom-in-95 duration-500 ease-out">
-      <Card className="w-full max-w-md shadow-xl">
+      <Card className="w-full max-w-md shadow-xl glassmorphic">
         <CardHeader className="text-center">
           <LogIn className="w-12 h-12 text-primary mx-auto mb-3 animate-in fade-in-0 scale-75 duration-700 ease-out delay-100" />
           <CardTitle className="text-2xl font-headline">Welcome Back!</CardTitle>
@@ -98,7 +98,12 @@ export default function LoginPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password">Password</Label>
+                <Link href="/forgot-password" passHref>
+                  <span className="text-xs text-primary hover:underline cursor-pointer">Forgot password?</span>
+                </Link>
+              </div>
               <div className="relative">
                 <Input
                   id="password"

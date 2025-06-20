@@ -31,7 +31,7 @@ export function ChatInterface({
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
-  const { user, isLoggedIn, loading: authLoading } = useAuth();
+  const { user, loading: authLoading } = useAuth(); // Use user directly
   
   const [currentInternalSessionId, setCurrentInternalSessionId] = useState<string | null>(initialChatSessionIdProp);
 
@@ -49,7 +49,6 @@ export function ChatInterface({
   }, []);
 
   useEffect(() => {
-    // Only auto-scroll if not loading history, to prevent jumping while history loads
     if (!isLoadingHistory) {
       scrollToBottom();
     }
@@ -57,9 +56,9 @@ export function ChatInterface({
 
   useEffect(() => {
     async function loadMessages() {
-      if (authLoading) return; // Wait for auth to resolve
+      if (authLoading) return;
 
-      if (isLoggedIn && user && currentInternalSessionId) {
+      if (user && currentInternalSessionId) { // Check user directly
         setIsLoadingHistory(true);
         setMessages([]); 
         try {
@@ -76,7 +75,6 @@ export function ChatInterface({
         } finally {
             setIsLoadingHistory(false);
             if (onMessagesLoaded) onMessagesLoaded();
-             // Ensure scroll to bottom after messages are loaded and history loading is false
             requestAnimationFrame(() => scrollToBottom());
         }
       } else {
@@ -86,11 +84,11 @@ export function ChatInterface({
       }
     }
     loadMessages();
-  }, [isLoggedIn, user, currentInternalSessionId, toast, onMessagesLoaded, authLoading, scrollToBottom]);
+  }, [user, currentInternalSessionId, toast, onMessagesLoaded, authLoading, scrollToBottom]);
 
   const handleSubmit = async (e?: FormEvent<HTMLFormElement>) => {
     if (e) e.preventDefault();
-    if (!input.trim() || isSendingMessage || authLoading || !isLoggedIn) return;
+    if (!input.trim() || isSendingMessage || authLoading || !user) return; // Check !user directly
 
     const userMessageText = input;
     setInput(''); 
@@ -113,7 +111,6 @@ export function ChatInterface({
 
       const result = await handleChatQuery(formData);
       
-      // Remove optimistic message, new messages (user + model) will be part of history or added below
       setMessages(prev => prev.filter(m => m.id !== optimisticUserMessage.id));
 
 
@@ -125,11 +122,10 @@ export function ChatInterface({
             role: 'model', 
             timestamp: new Date() 
         };
-        // Add back the user message along with the error message
         setMessages((prevMessages) => [...prevMessages, optimisticUserMessage, errorBotMessage]);
 
       } else {
-        const finalUserMessage: MessageForClient = { ...optimisticUserMessage, id: 'user-' + Date.now() }; // Give it a more final ID if needed
+        const finalUserMessage: MessageForClient = { ...optimisticUserMessage, id: 'user-' + Date.now() };
         const botMessage: MessageForClient = {
           id: 'model-' + Date.now() + Math.random().toString(16).slice(2), 
           text: result.answer || "Sorry, I couldn't process that.",
@@ -139,13 +135,12 @@ export function ChatInterface({
         setMessages((prevMessages) => [...prevMessages, finalUserMessage, botMessage]);
 
 
-        if (result.chatSessionId && !currentInternalSessionId && result.newChatSession) { // A new session was created
+        if (result.chatSessionId && !currentInternalSessionId && result.newChatSession) {
           setCurrentInternalSessionId(result.chatSessionId); 
           if (onSessionCreated) {
             onSessionCreated(result.newChatSession);
           }
         } else if (result.chatSessionId && currentInternalSessionId && result.chatSessionId !== currentInternalSessionId) {
-            // This case implies the backend decided to switch sessions, should be rare if UI drives session ID
             setCurrentInternalSessionId(result.chatSessionId);
         }
       }
@@ -200,7 +195,7 @@ export function ChatInterface({
               <div className="text-center py-10 text-muted-foreground h-full flex flex-col justify-center items-center">
                 <MessageCircle className="w-12 h-12 mx-auto mb-3 opacity-50" />
                 <p>{currentInternalSessionId ? "No messages in this chat yet. Send a message to start!" : "Start a new conversation!"}</p>
-                {!isLoggedIn && <p className="text-xs mt-1">(Login to save chat history)</p>}
+                {!user && <p className="text-xs mt-1">(Login to save chat history)</p>}
               </div>
             )}
             {!isLoadingHistory && messages.map((message) => (
@@ -243,7 +238,6 @@ export function ChatInterface({
                 )}
               </div>
             ))}
-            {/* This specific loading indicator is for when the AI is thinking AFTER a user message */}
             {isSendingMessage && !messages.find(m => m.role === 'model' && m.id.startsWith('optimistic-user-')) && (
               <div className="flex items-end gap-2.5 justify-start w-full mt-2">
                 <Avatar className="h-8 w-8 shadow-md flex-shrink-0">
@@ -267,13 +261,13 @@ export function ChatInterface({
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder={authLoading ? "Authenticating..." : (!isLoggedIn ? "Please log in to chat..." : "Ask CyberMozhi...")}
+                placeholder={authLoading ? "Authenticating..." : (!user ? "Please log in to chat..." : "Ask CyberMozhi...")} // Check !user
                 className="flex-grow resize-none focus-visible:ring-primary text-sm shadow-sm"
                 rows={1}
                 aria-label="Chat input"
-                disabled={isSendingMessage || authLoading || !isLoggedIn}
+                disabled={isSendingMessage || authLoading || !user} // Check !user
               />
-              <Button type="submit" size="icon" className="h-10 w-10 shadow-sm" disabled={isSendingMessage || authLoading || !isLoggedIn || !input.trim()} aria-label="Send message">
+              <Button type="submit" size="icon" className="h-10 w-10 shadow-sm" disabled={isSendingMessage || authLoading || !user || !input.trim()} aria-label="Send message">  {/* Check !user */}
                 {isSendingMessage ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
               </Button>
             </div>

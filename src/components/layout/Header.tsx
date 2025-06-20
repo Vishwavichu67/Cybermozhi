@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { MessageCircle, Gavel, BookOpen, Menu, X, LogIn, LogOut, Rocket, Loader2, Github, Linkedin, Twitter } from 'lucide-react';
+import { MessageCircle, Gavel, BookOpen, Menu, X, LogIn, LogOut, Rocket, Loader2, Github, Linkedin, Twitter, SquareArrowOutUpRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
 import { useState } from 'react';
@@ -66,15 +66,18 @@ export function Header() {
         if (isMobileMenuOpen) setIsMobileMenuOpen(false);
       }}
       className={cn(
-        "flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200",
+        "group flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 ease-out",
         pathname === href
-          ? "bg-primary/10 text-primary hover:bg-primary/20"
-          : "text-foreground/70 hover:text-foreground hover:bg-accent/50",
+          ? "bg-primary/10 text-primary" // Active state
+          : "text-foreground/70 hover:text-primary hover:bg-background/70", // Inactive state with hover effects
         "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background"
       )}
       aria-current={pathname === href ? "page" : undefined}
     >
-      <Icon className="h-5 w-5" />
+      <Icon className={cn(
+          "h-5 w-5 transition-transform duration-200 ease-out",
+          pathname !== href ? "group-hover:scale-110 group-hover:text-primary" : "text-primary"
+      )} />
       <span>{label}</span>
     </Link>
   );
@@ -101,13 +104,14 @@ export function Header() {
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <Link
           href="/"
-          className="flex items-center gap-2 text-xl font-headline font-semibold text-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background rounded-md p-1"
+          className="group flex items-center gap-2 text-xl font-headline font-semibold text-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background rounded-md p-1"
         >
           <Image
             src="/logo.png"
             alt="CyberMozhi Logo"
-            width={120} // Reduced width
-            height={32} // Reduced height to maintain aspect ratio (approx 150/40 -> 120/32)
+            width={120} 
+            height={32} 
+            className="transition-transform duration-300 ease-in-out group-hover:scale-105"
           />
         </Link>
 
@@ -182,14 +186,15 @@ export function Header() {
               <div className="flex items-center justify-between p-4 border-b">
                  <Link
                     href="/"
-                    className="flex items-center gap-2 text-lg font-headline font-semibold text-primary"
+                    className="group flex items-center gap-2 text-lg font-headline font-semibold text-primary"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                    <Image
                       src="/logo.png"
                       alt="CyberMozhi Logo"
-                      width={100} // Adjusted mobile logo size
-                      height={26} // Adjusted mobile logo size
+                      width={100}
+                      height={26} 
+                      className="transition-transform duration-300 ease-in-out group-hover:scale-105"
                     />
                 </Link>
                 <SheetClose asChild>

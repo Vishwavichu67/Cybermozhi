@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Send, User, Sparkles, Loader2, History, MessageCircle } from 'lucide-react'; // Added MessageCircle
+import { Send, User, Sparkles, Loader2, History, MessageCircle } from 'lucide-react';
 import { handleChatQuery } from '@/app/chatbot/actions';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent } from '@/components/ui/card';
@@ -70,7 +70,7 @@ export function ChatInterface() {
       });
       return () => unsubscribe();
     } else {
-      setMessages([]); // Clear messages for guest users or when logged out
+      setMessages([]); 
       setIsLoadingHistory(false);
     }
   }, [isLoggedIn, user, toast]);
@@ -80,16 +80,15 @@ export function ChatInterface() {
     if (!input.trim() || isLoading) return;
 
     const userMessageText = input;
-    setInput(''); // Clear input immediately
+    setInput(''); 
 
     const optimisticUserMessage: Message = {
-      id: Date.now().toString() + '-optimistic',
+      id: 'optimistic-user-' + Date.now().toString() + Math.random().toString(36).substring(2, 15), // More unique ID
       text: userMessageText,
       role: 'user',
       timestamp: new Date(),
     };
     setMessages(prev => [...prev, optimisticUserMessage]);
-
     setIsLoading(true);
 
     try {
@@ -98,49 +97,47 @@ export function ChatInterface() {
       const result = await handleChatQuery(formData);
 
       if (result.error) {
-        throw new Error(result.error);
-      }
-
-      // For logged-in users, onSnapshot handles UI updates for both user and AI messages from Firestore.
-      // For guest users, we need to manually add the AI's response.
-      if (!isLoggedIn) {
-        const botMessage: Message = {
-          id: (Date.now() + 1).toString(),
-          text: result.answer || "Sorry, I couldn't process that.",
-          role: 'model',
-          timestamp: new Date(),
-        };
-        setMessages((prev) => {
-            // Remove the optimistic user message IF it's still there (it should be) and add it back with the bot message.
-            // This ensures the user message is displayed even if Firestore ops were skipped for guests.
-            const updatedMessages = prev.filter(m => m.id !== optimisticUserMessage.id);
-            return [...updatedMessages, optimisticUserMessage, botMessage];
+        // Error from handleChatQuery (e.g., AI call failed or other error in action)
+        const errorMessage = result.error;
+        toast({
+          variant: 'destructive',
+          title: 'Chatbot Error',
+          description: errorMessage,
         });
-      }
-    } catch (error) {
-      console.error('Chatbot error:', error);
-      const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred.';
-      toast({
-        variant: 'destructive',
-        title: 'Chatbot Error',
-        description: errorMessage,
-      });
-      // For guests, if there's an error, show an error message from the bot
-      if (!isLoggedIn) {
         const errorBotMessage: Message = {
-          id: (Date.now() + 1).toString(),
+          id: 'optimistic-error-model-' + Date.now().toString(),
           text: `Sorry, I encountered an error: ${errorMessage}`,
           role: 'model',
           timestamp: new Date(),
         };
-         setMessages((prev) => {
-            const updatedMessages = prev.filter(m => m.id !== optimisticUserMessage.id);
-            return [...updatedMessages, optimisticUserMessage, errorBotMessage];
-        });
+        setMessages((prevMessages) => [...prevMessages, errorBotMessage]);
       } else {
-        // For logged-in users, remove the optimistic message if the AI call failed before saving.
-        setMessages(prev => prev.filter(m => m.id !== optimisticUserMessage.id));
+        // AI call was successful, result.answer has the response.
+        // Display it optimistically for everyone.
+        // Firestore onSnapshot will handle persistence and eventual consistency for logged-in users.
+        const botMessage: Message = {
+          id: 'optimistic-model-' + Date.now().toString(),
+          text: result.answer || "Sorry, I couldn't process that.",
+          role: 'model',
+          timestamp: new Date(),
+        };
+        setMessages((prevMessages) => [...prevMessages, botMessage]);
       }
+    } catch (error) { // This catches other unexpected client-side errors during handleSubmit
+      console.error('Chatbot handleSubmit generic error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred.';
+      toast({
+        variant: 'destructive',
+        title: 'Chatbot System Error',
+        description: errorMessage,
+      });
+      const systemErrorBotMessage: Message = {
+        id: 'optimistic-system-error-model-' + Date.now().toString(),
+        text: `Sorry, an unexpected system error occurred. Please try again.`,
+        role: 'model',
+        timestamp: new Date(),
+      };
+       setMessages((prev) => [...prev, systemErrorBotMessage]);
     } finally {
       setIsLoading(false);
     }

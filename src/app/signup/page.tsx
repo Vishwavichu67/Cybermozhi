@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, type FormEvent } from 'react';
+import { useState, type FormEvent, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -26,17 +26,18 @@ export default function SignupPage() {
   const { toast } = useToast();
   const { user, loading: authLoading } = useAuth();
 
-  if (authLoading) {
+  useEffect(() => {
+    if (!authLoading && user) {
+      router.push('/');
+    }
+  }, [user, authLoading, router]);
+
+  if (authLoading || user) {
       return (
         <div className="flex items-center justify-center min-h-[60vh]">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
       );
-  }
-
-  if (user) {
-    router.push('/'); // Redirect if already logged in
-    return null; // Render nothing while redirecting
   }
 
   const handleSignup = async (e: FormEvent) => {

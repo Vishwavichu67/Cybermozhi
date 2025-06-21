@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -9,7 +8,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { updateProfile } from 'firebase/auth';
-import { auth, db } from '@/lib/firebase';
+import { db } from '@/lib/firebase';
 import { useToast } from '@/hooks/use-toast';
 
 import { Button } from '@/components/ui/button';
@@ -34,7 +33,7 @@ export default function ProfilePage() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const form = useForm<ProfileFormValues>({
@@ -46,65 +45,66 @@ export default function ProfilePage() {
     },
   });
 
+  // Effect to redirect if not logged in
   useEffect(() => {
-    if (authLoading) return;
-    if (!user) {
+    if (!authLoading && !user) {
       router.push('/login');
-      return;
     }
+  }, [user, authLoading, router]);
+  
+  // Effect to fetch user data
+  useEffect(() => {
+    if (user) {
+      const fetchProfile = async () => {
+        const userDocRef = doc(db, 'users', user.uid);
+        try {
+          const userDoc = await getDoc(userDocRef);
 
-    const fetchProfile = async () => {
-      if (!user) return;
-      const userDocRef = doc(db, 'users', user.uid);
-      try {
-        const userDoc = await getDoc(userDocRef);
-
-        if (userDoc.exists()) {
-          const data = userDoc.data();
-          form.reset({
-            displayName: data.displayName || user.displayName || '',
-            age: data.age ? String(data.age) : '',
-            gender: data.gender || 'Prefer not to say',
-          });
-        } else {
-          form.reset({
-            displayName: user.displayName || user.email?.split('@')[0] || '',
-            age: '',
-            gender: 'Prefer not to say',
+          if (userDoc.exists()) {
+            const data = userDoc.data();
+            form.reset({
+              displayName: data.displayName || user.displayName || '',
+              age: data.age ? String(data.age) : '',
+              gender: data.gender || 'Prefer not to say',
+            });
+          } else {
+            // Pre-fill with Auth data if no Firestore doc exists yet
+            form.reset({
+              displayName: user.displayName || user.email?.split('@')[0] || '',
+              age: '',
+              gender: 'Prefer not to say',
+            });
+          }
+        } catch (err) {
+          console.error("Error fetching user profile:", err);
+          setError("Could not load your profile. Please try again later.");
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: "Failed to load profile data due to a permissions issue.",
           });
         }
-      } catch (err) {
-        console.error("Error fetching user profile:", err);
-        setError("Could not load your profile. Please try again later.");
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Failed to load your profile data due to a permissions issue.",
-        });
-      }
-    };
+      };
 
-    fetchProfile();
-    // We disable the exhaustive-deps rule because `form` and `toast` have stable identities
-    // and including them would cause unnecessary re-fetches.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, authLoading, router]);
+      fetchProfile();
+    }
+  }, [user, form, toast]);
+
 
   const onSubmit: SubmitHandler<ProfileFormValues> = async (data) => {
-    setIsLoading(true);
+    setIsSaving(true);
     setError(null);
     if (!user) {
       setError("You must be logged in to update your profile.");
-      setIsLoading(false);
+      setIsSaving(false);
       return;
     }
 
     try {
-      if (auth.currentUser) {
-         await updateProfile(auth.currentUser, {
-           displayName: data.displayName,
-         });
-      }
+      // The user object from useAuth() is the current authenticated user
+      await updateProfile(user, {
+        displayName: data.displayName,
+      });
 
       const ageAsNumber = data.age && data.age !== '' ? parseInt(data.age, 10) : null;
 
@@ -122,14 +122,18 @@ export default function ProfilePage() {
       });
     } catch (err: any) {
       console.error("Profile update error:", err);
-      setError("Failed to update profile. Please try again.");
+      let errorMessage = "Failed to update profile. Please try again.";
+      if (err.code === 'firestore/permission-denied') {
+          errorMessage = "You do not have permission to save this data. Please check your Firestore security rules.";
+      }
+      setError(errorMessage);
       toast({
         variant: 'destructive',
         title: 'Error',
-        description: 'Failed to update profile.',
+        description: errorMessage,
       });
     } finally {
-      setIsLoading(false);
+      setIsSaving(false);
     }
   };
 
@@ -220,8 +224,8 @@ export default function ProfilePage() {
                 </div>
               )}
 
-              <Button type="submit" className="w-full sm:w-auto text-base py-3 transition-all hover:shadow-lg" disabled={isLoading}>
-                {isLoading ? (
+              <Button type="submit" className="w-full sm:w-auto text-base py-3 transition-all hover:shadow-lg" disabled={isSaving}>
+                {isSaving ? (
                   <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                 ) : (
                   <Save className="mr-2 h-5 w-5" />

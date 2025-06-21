@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -21,7 +22,10 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 
 const profileSchema = z.object({
   displayName: z.string().min(2, { message: "Name must be at least 2 characters." }).max(50),
-  age: z.coerce.number().min(1, { message: "Please enter a valid age." }).optional().or(z.literal('')),
+  // Age is validated as a string that is either empty or a positive number.
+  age: z.string().refine(val => val === '' || (/^\d+$/.test(val) && parseInt(val, 10) > 0), {
+    message: "Please enter a valid positive number for age.",
+  }).optional(),
   gender: z.enum(["Male", "Female", "Other", "Prefer not to say"]).optional(),
 });
 
@@ -60,7 +64,8 @@ export default function ProfilePage() {
         const data = userDoc.data();
         form.reset({
           displayName: data.displayName || user.displayName || '',
-          age: data.age || '',
+          // Convert number from DB to string for the form input
+          age: data.age ? String(data.age) : '',
           gender: data.gender || 'Prefer not to say',
         });
       } else {
@@ -92,12 +97,15 @@ export default function ProfilePage() {
          });
       }
 
+      // Convert age string from form to number or null for Firestore
+      const ageAsNumber = data.age && data.age !== '' ? parseInt(data.age, 10) : null;
+
       // Update Firestore profile document
       const userDocRef = doc(db, 'users', user.uid);
       await setDoc(userDocRef, {
         displayName: data.displayName,
         email: user.email, // store email for reference
-        age: data.age || null,
+        age: ageAsNumber,
         gender: data.gender || null,
       }, { merge: true });
 

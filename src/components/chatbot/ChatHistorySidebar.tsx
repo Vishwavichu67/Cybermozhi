@@ -1,19 +1,27 @@
 
 "use client";
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { PlusCircle, MessageSquareText, Loader2, AlertCircle } from 'lucide-react';
-import { type ChatSession, getChatSessionsForUser } from '@/app/chatbot/actions';
 import { cn } from '@/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
+import { db } from '@/lib/firebase';
+import { collection, query, orderBy, onSnapshot, type Timestamp } from 'firebase/firestore';
+
+interface ChatSession {
+  id: string;
+  title: string;
+  createdAt: Timestamp;
+  lastMessageAt: Timestamp;
+  userId: string;
+}
 
 interface ChatHistorySidebarProps {
   currentChatSessionId: string | null;
   onSelectChatSession: (sessionId: string | null) => void;
   onNewChat: () => void;
-  newlyCreatedSession?: ChatSession;
   isUserLoggedIn: boolean;
   userId: string | null | undefined;
 }
@@ -22,7 +30,6 @@ export function ChatHistorySidebar({
   currentChatSessionId,
   onSelectChatSession,
   onNewChat,
-  newlyCreatedSession,
   isUserLoggedIn,
   userId
 }: ChatHistorySidebarProps) {
@@ -30,40 +37,39 @@ export function ChatHistorySidebar({
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchSessions = useCallback(async () => {
+  useEffect(() => {
     if (!isUserLoggedIn || !userId) {
-        setSessions([]);
-        setIsLoading(false);
-        return;
+      setSessions([]);
+      setIsLoading(false);
+      return;
     }
+    
     setIsLoading(true);
     setError(null);
-    const result = await getChatSessionsForUser(userId);
-    if (result.error) {
-      setError(result.error);
-    } else if (result.sessions) {
-      setSessions(result.sessions);
-    }
-    setIsLoading(false);
-  }, [isUserLoggedIn, userId]);
 
-  useEffect(() => {
-    fetchSessions();
-  }, [fetchSessions]);
+    const sessionsRef = collection(db, `users/${userId}/chatSessions`);
+    const q = query(sessionsRef, orderBy('lastMessageAt', 'desc'));
 
-  useEffect(() => {
-    if (newlyCreatedSession) {
-      setSessions(prevSessions => {
-        const existingSessionIndex = prevSessions.findIndex(s => s.id === newlyCreatedSession.id);
-        if (existingSessionIndex > -1) {
-          const updatedSessions = [...prevSessions];
-          updatedSessions[existingSessionIndex] = newlyCreatedSession;
-          return updatedSessions.sort((a, b) => new Date(b.lastMessageAt).getTime() - new Date(a.lastMessageAt).getTime());
-        }
-        return [newlyCreatedSession, ...prevSessions].sort((a, b) => new Date(b.lastMessageAt).getTime() - new Date(a.lastMessageAt).getTime());
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const fetchedSessions: ChatSession[] = [];
+      querySnapshot.forEach((docSnap) => {
+        fetchedSessions.push({
+          id: docSnap.id,
+          ...docSnap.data()
+        } as ChatSession);
       });
-    }
-  }, [newlyCreatedSession]);
+      setSessions(fetchedSessions);
+      if (isLoading) setIsLoading(false);
+    }, (err) => {
+      console.error("Error fetching chat sessions:", err);
+      setError("Failed to fetch chat history.");
+      setIsLoading(false);
+    });
+
+    // Cleanup subscription on component unmount
+    return () => unsubscribe();
+  }, [isUserLoggedIn, userId, isLoading]);
+
 
   const content = (
     <>
@@ -89,29 +95,31 @@ export function ChatHistorySidebar({
           <p className="text-xs text-muted-foreground text-center py-4">No chat history yet.</p>
         )}
         <div className="space-y-1">
-          {sessions.map((session) => (
-            <div key={session.id} className="group relative">
-              <Button
-                variant="ghost"
-                onClick={() => onSelectChatSession(session.id)}
-                className={cn(
-                  "w-full justify-start text-left h-auto py-2.5 px-2.5 text-sm truncate",
-                  currentChatSessionId === session.id ? 'bg-primary/10 text-primary' : 'hover:bg-muted/50'
-                )}
-                title={session.title}
-              >
-                <MessageSquareText className="mr-2.5 h-4 w-4 flex-shrink-0" />
-                <div className="flex-grow truncate">
-                  <p className="font-medium truncate text-sm">{session.title}</p>
-                  {session.lastMessageAt && (
-                    <p className="text-xs text-muted-foreground">
-                      {formatDistanceToNow(new Date(session.lastMessageAt), { addSuffix: true })}
-                    </p>
+          {sessions.map((session) => {
+             // Handle potential serverTimestamp object before rendering
+            const lastMessageDate = session.lastMessageAt?.toDate ? session.lastMessageAt.toDate() : new Date();
+            return (
+              <div key={session.id} className="group relative">
+                <Button
+                  variant="ghost"
+                  onClick={() => onSelectChatSession(session.id)}
+                  className={cn(
+                    "w-full justify-start text-left h-auto py-2.5 px-2.5 text-sm truncate",
+                    currentChatSessionId === session.id ? 'bg-primary/10 text-primary' : 'hover:bg-muted/50'
                   )}
-                </div>
-              </Button>
-            </div>
-          ))}
+                  title={session.title}
+                >
+                  <MessageSquareText className="mr-2.5 h-4 w-4 flex-shrink-0" />
+                  <div className="flex-grow truncate">
+                    <p className="font-medium truncate text-sm">{session.title}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {formatDistanceToNow(lastMessageDate, { addSuffix: true })}
+                    </p>
+                  </div>
+                </Button>
+              </div>
+            )
+          })}
         </div>
       </ScrollArea>
     </>
@@ -125,7 +133,6 @@ export function ChatHistorySidebar({
     );
   }
   
-  // The component passed into SheetContent is this one, so this return handles both mobile and desktop
   return (
     <div className="h-full w-full flex-shrink-0 flex-col border-r border-border/40 bg-background/80 p-3 flex">
       {content}

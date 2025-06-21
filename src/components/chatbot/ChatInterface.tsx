@@ -7,21 +7,39 @@ import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Send, User, Sparkles, Loader2, MessageCircle } from 'lucide-react';
-import { handleChatQuery, getMessagesForChatSession, type MessageForClient, type ChatSession } from '@/app/chatbot/actions';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
-import type { Timestamp } from 'firebase/firestore';
+import { getAIChatResponse } from '@/app/chatbot/actions';
+import { db } from '@/lib/firebase';
+import { 
+  collection, 
+  query, 
+  orderBy, 
+  onSnapshot, 
+  addDoc,
+  serverTimestamp,
+  doc,
+  writeBatch,
+  type Timestamp 
+} from 'firebase/firestore';
+
+interface MessageForClient {
+  id: string;
+  text: string;
+  role: 'user' | 'model';
+  timestamp: Timestamp; 
+}
 
 interface ChatInterfaceProps {
   chatSessionId: string | null;
-  onSessionCreated?: (session: ChatSession) => void;
+  onSessionCreated: (sessionId: string) => void;
   onMessagesLoaded?: () => void;
 }
 
 export function ChatInterface({ 
-  chatSessionId: initialChatSessionIdProp, 
+  chatSessionId,
   onSessionCreated,
   onMessagesLoaded 
 }: ChatInterfaceProps) {
@@ -33,15 +51,6 @@ export function ChatInterface({
   const { toast } = useToast();
   const { user, loading: authLoading } = useAuth();
   
-  const [currentInternalSessionId, setCurrentInternalSessionId] = useState<string | null>(initialChatSessionIdProp);
-
-  useEffect(() => {
-    if (initialChatSessionIdProp !== currentInternalSessionId) {
-      setCurrentInternalSessionId(initialChatSessionIdProp);
-      setMessages([]); 
-    }
-  }, [initialChatSessionIdProp, currentInternalSessionId]);
-  
   const scrollToBottom = useCallback(() => {
     setTimeout(() => {
       if (scrollAreaRef.current) {
@@ -51,117 +60,112 @@ export function ChatInterface({
   }, []);
 
   useEffect(() => {
-    if (!isLoadingHistory) {
       scrollToBottom();
-    }
-  }, [messages, isLoadingHistory, scrollToBottom]);
+  }, [messages, scrollToBottom]);
 
+  // Subscribe to messages for the current chat session
   useEffect(() => {
-    async function loadMessages() {
-      if (authLoading) return;
+    if (!user || authLoading) return;
 
-      if (user && currentInternalSessionId) {
-        setIsLoadingHistory(true);
-        setMessages([]); 
-        try {
-            const result = await getMessagesForChatSession(currentInternalSessionId, user.uid);
-            if (result.error) {
-              toast({ variant: "destructive", title: "Error loading chat", description: result.error });
-              setMessages([]);
-            } else if (result.messages) {
-              setMessages(result.messages);
-            }
-        } catch(e) {
-            toast({ variant: "destructive", title: "Error", description: "Failed to load messages."});
-            setMessages([]);
-        } finally {
-            setIsLoadingHistory(false);
-            if (onMessagesLoaded) onMessagesLoaded();
-            scrollToBottom();
-        }
-      } else {
-        setMessages([]); 
-        setIsLoadingHistory(false);
+    if (chatSessionId) {
+      setIsLoadingHistory(true);
+      const messagesRef = collection(db, `users/${user.uid}/chatSessions/${chatSessionId}/messages`);
+      const q = query(messagesRef, orderBy('timestamp', 'asc'));
+
+      const unsubscribe = onSnapshot(q, (querySnapshot) => {
+        const fetchedMessages: MessageForClient[] = [];
+        querySnapshot.forEach((docSnap) => {
+          fetchedMessages.push({
+            id: docSnap.id,
+            ...docSnap.data()
+          } as MessageForClient);
+        });
+        setMessages(fetchedMessages);
+        if (isLoadingHistory) setIsLoadingHistory(false);
         if (onMessagesLoaded) onMessagesLoaded();
-      }
+      }, (error) => {
+        console.error(`Error fetching messages for session ${chatSessionId}:`, error);
+        toast({ variant: "destructive", title: "Error", description: "Failed to load messages."});
+        setIsLoadingHistory(false);
+      });
+      return () => unsubscribe(); // Cleanup on session change or unmount
+    } else {
+      // It's a new chat, so clear messages and loading state
+      setMessages([]);
+      setIsLoadingHistory(false);
+      if (onMessagesLoaded) onMessagesLoaded();
     }
-    loadMessages();
-  }, [user, currentInternalSessionId, toast, onMessagesLoaded, authLoading, scrollToBottom]);
+  }, [user, chatSessionId, authLoading, onMessagesLoaded, isLoadingHistory, toast]);
+
 
   const handleSubmit = async (e?: FormEvent<HTMLFormElement>) => {
     if (e) e.preventDefault();
-    if (!input.trim() || isSendingMessage || authLoading || !user) return;
+    if (!input.trim() || isSendingMessage || !user) return;
 
     const userMessageText = input;
-    setInput(''); 
-
-    const optimisticUserMessage: MessageForClient = {
-      id: 'optimistic-user-' + Date.now(),
-      text: userMessageText,
-      role: 'user',
-      timestamp: new Date(),
-    };
-    setMessages(prev => [...prev, optimisticUserMessage]);
+    setInput('');
     setIsSendingMessage(true);
-    scrollToBottom();
-
+    
+    let currentSessionId = chatSessionId;
 
     try {
-      const formData = new FormData();
-      formData.append('query', userMessageText);
-      formData.append('chatSessionId', currentInternalSessionId || "null");
-      formData.append('userId', user.uid);
-      const userName = user.displayName || user.email?.split('@')[0] || 'User';
-      formData.append('userName', userName);
+      // 1. Create session and save user message if it's a new chat
+      if (!currentSessionId) {
+        const sessionsRef = collection(db, `users/${user.uid}/chatSessions`);
+        const newSessionRef = doc(sessionsRef);
+        const title = userMessageText.substring(0, 50) + (userMessageText.length > 50 ? "..." : "");
+        const now = serverTimestamp();
 
-      const result = await handleChatQuery(formData);
-      
-      setMessages(prev => prev.filter(m => m.id !== optimisticUserMessage.id));
+        const batch = writeBatch(db);
+        batch.set(newSessionRef, { title, createdAt: now, lastMessageAt: now, userId: user.uid });
+        const messagesRef = collection(newSessionRef, "messages");
+        batch.set(doc(messagesRef), { text: userMessageText, role: 'user', timestamp: now });
+        await batch.commit();
 
+        currentSessionId = newSessionRef.id;
+        onSessionCreated(currentSessionId); // Notify parent to update URL
+      } else {
+        // Just add the message to the existing session
+        const messagesRef = collection(db, `users/${user.uid}/chatSessions/${currentSessionId}/messages`);
+        await addDoc(messagesRef, { text: userMessageText, role: 'user', timestamp: serverTimestamp() });
+        const sessionRef = doc(db, `users/${user.uid}/chatSessions/${currentSessionId}`);
+        const batch = writeBatch(db);
+        batch.update(sessionRef, { lastMessageAt: serverTimestamp() });
+        await batch.commit();
+      }
 
+      // 2. Prepare context and get AI response
+      const chatHistoryForAI = messages.slice(-10).map(m => ({
+          role: m.role,
+          parts: [{ text: m.text }]
+      }));
+      const userName = user.displayName || user.email?.split('@')[0];
+
+      const result = await getAIChatResponse({
+          query: userMessageText,
+          userName: userName,
+          chatHistory: chatHistoryForAI,
+      });
+
+      // 3. Save AI response to Firestore
+      const aiMessageText = result.error ? `Sorry, an error occurred: ${result.error}` : result.answer;
       if (result.error) {
         toast({ variant: 'destructive', title: 'Chatbot Error', description: result.error });
-        const errorBotMessage: MessageForClient = { 
-            id: 'error-model-' + Date.now(), 
-            text: `Sorry, an error occurred: ${result.error}`, 
-            role: 'model', 
-            timestamp: new Date() 
-        };
-        setMessages((prevMessages) => [...prevMessages, optimisticUserMessage, errorBotMessage]);
-
-      } else {
-        const finalUserMessage: MessageForClient = { ...optimisticUserMessage, id: 'user-' + Date.now() };
-        const botMessage: MessageForClient = {
-          id: 'model-' + Date.now(), 
-          text: result.answer || "Sorry, I couldn't process that.",
-          role: 'model',
-          timestamp: new Date(),
-        };
-        setMessages((prevMessages) => [...prevMessages, finalUserMessage, botMessage]);
-
-        if (result.chatSessionId && !currentInternalSessionId && result.newChatSession) {
-          setCurrentInternalSessionId(result.chatSessionId); 
-          if (onSessionCreated) {
-            onSessionCreated(result.newChatSession);
-          }
-        } else if (result.chatSessionId && currentInternalSessionId && result.chatSessionId !== currentInternalSessionId) {
-            setCurrentInternalSessionId(result.chatSessionId);
-        }
       }
+
+      const messagesRef = collection(db, `users/${user.uid}/chatSessions/${currentSessionId}/messages`);
+      await addDoc(messagesRef, { text: aiMessageText, role: 'model', timestamp: serverTimestamp() });
+      const sessionRef = doc(db, `users/${user.uid}/chatSessions/${currentSessionId}`);
+      const batch = writeBatch(db);
+      batch.update(sessionRef, { lastMessageAt: serverTimestamp() });
+      await batch.commit();
+
     } catch (error) { 
-      console.error('Chatbot handleSubmit generic error:', error);
+      console.error('Chatbot handleSubmit error:', error);
       const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred.';
-      toast({ variant: 'destructive', title: 'Chatbot System Error', description: errorMessage });
-      const systemErrorBotMessage: MessageForClient = { 
-        id: 'system-error-model-' + Date.now(), 
-        text: `An unexpected system error occurred. Please try again.`, 
-        role: 'model', 
-        timestamp: new Date() 
-      };
-       setMessages((prev) => [...prev.filter(m => m.id !== optimisticUserMessage.id), optimisticUserMessage, systemErrorBotMessage]);
+      toast({ variant: 'destructive', title: 'Chat System Error', description: errorMessage });
     } finally {
       setIsSendingMessage(false);
-      scrollToBottom();
     }
   };
 
@@ -172,9 +176,9 @@ export function ChatInterface({
     }
   };
   
-  const getTimestampString = (timestamp: Date | Timestamp | undefined) => {
+  const getTimestampString = (timestamp: Timestamp | undefined) => {
     if (!timestamp) return '';
-    const date = timestamp instanceof Date ? timestamp : (timestamp as Timestamp).toDate();
+    const date = timestamp.toDate();
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
@@ -199,8 +203,7 @@ export function ChatInterface({
               {!isLoadingHistory && messages.length === 0 && (
                 <div className="text-center py-10 text-muted-foreground h-full flex flex-col justify-center items-center">
                   <MessageCircle className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                  <p>{currentInternalSessionId ? "No messages in this chat yet. Send a message to start!" : "Start a new conversation!"}</p>
-                  {!user && <p className="text-xs mt-1">(Login to save chat history)</p>}
+                  <p>{chatSessionId ? "No messages in this chat yet." : "Start a new conversation by sending a message!"}</p>
                 </div>
               )}
               {!isLoadingHistory && messages.map((message) => (
@@ -243,7 +246,7 @@ export function ChatInterface({
                   )}
                 </div>
               ))}
-              {isSendingMessage && !messages.some(m => m.id.startsWith('error-') || m.id.startsWith('model-')) && (
+              {isSendingMessage && (
                 <div className="flex items-end gap-2.5 justify-start w-full mt-2">
                   <Avatar className="h-8 w-8 shadow-md flex-shrink-0">
                     <AvatarFallback className="bg-primary text-primary-foreground">

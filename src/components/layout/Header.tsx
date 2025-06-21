@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { MessageCircle, Gavel, BookOpen, Menu, X, LogIn, LogOut, Rocket, Loader2, Github, Linkedin, Twitter, SquareArrowOutUpRight } from 'lucide-react';
+import { MessageCircle, Gavel, BookOpen, Menu, X, LogIn, LogOut, Rocket, Loader2, UserCog } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
 import { useState } from 'react';
@@ -82,18 +82,17 @@ export function Header() {
     </Link>
   );
 
-  const getInitials = (email?: string | null) => {
-    if (!email) return 'U';
-    const namePart = email.split('@')[0];
-    if (namePart) {
-        const parts = namePart.replace(/[^a-zA-Z0-9]/g, ' ').split(' ').filter(Boolean);
-        if (parts.length > 1) {
-            return (parts[0]?.[0] || '') + (parts[parts.length - 1]?.[0] || '');
-        }
-        if (parts.length === 1 && parts[0]?.length > 1) {
-             return (parts[0]?.[0] || '') + (parts[0]?.[1] || '');
-        }
-        return namePart[0]?.toUpperCase() || 'U';
+  const getInitials = (name?: string | null, email?: string | null) => {
+    if (name) {
+      const parts = name.split(' ').filter(Boolean);
+      if (parts.length > 1) {
+          return (parts[0]?.[0] || '') + (parts[parts.length - 1]?.[0] || '');
+      }
+      return name.slice(0, 2).toUpperCase();
+    }
+    if (email) {
+      const emailPart = email.split('@')[0];
+      return emailPart.slice(0, 2).toUpperCase();
     }
     return 'U';
   };
@@ -132,8 +131,8 @@ export function Header() {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-9 w-9 rounded-full p-0">
                   <Avatar className="h-9 w-9">
-                    <AvatarFallback className="bg-primary text-primary-foreground text-xs">
-                      {getInitials(user.email)}
+                    <AvatarFallback className="bg-primary text-primary-foreground text-xs font-semibold">
+                      {getInitials(user.displayName, user.email)}
                     </AvatarFallback>
                   </Avatar>
                 </Button>
@@ -149,6 +148,13 @@ export function Header() {
                     </p>
                   </div>
                 </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild className="cursor-pointer">
+                  <Link href="/profile">
+                    <UserCog className="mr-2 h-4 w-4" />
+                    <span>Profile</span>
+                  </Link>
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
                   <LogOut className="mr-2 h-4 w-4" />
@@ -214,8 +220,8 @@ export function Header() {
                 <div className="p-4 border-t">
                   <div className="flex items-center gap-3 mb-3">
                      <Avatar className="h-10 w-10">
-                       <AvatarFallback className="bg-primary text-primary-foreground">
-                         {getInitials(user.email)}
+                       <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
+                         {getInitials(user.displayName, user.email)}
                        </AvatarFallback>
                     </Avatar>
                     <div className="truncate">
@@ -227,9 +233,16 @@ export function Header() {
                       </p>
                     </div>
                   </div>
-                  <Button onClick={handleLogout} variant="outline" className="w-full transition-shadow hover:shadow-md">
-                    <LogOut className="mr-2 h-4 w-4" /> Logout
-                  </Button>
+                  <div className="space-y-2">
+                     <Button asChild variant="outline" className="w-full">
+                       <Link href="/profile" onClick={() => setIsMobileMenuOpen(false)}>
+                         <UserCog className="mr-2 h-4 w-4" /> Profile
+                       </Link>
+                     </Button>
+                    <Button onClick={handleLogout} variant="outline" className="w-full transition-shadow hover:shadow-md">
+                      <LogOut className="mr-2 h-4 w-4" /> Logout
+                    </Button>
+                  </div>
                 </div>
               )}
             </SheetContent>

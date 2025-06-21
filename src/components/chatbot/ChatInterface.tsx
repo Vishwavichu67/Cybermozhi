@@ -21,7 +21,8 @@ import {
   addDoc,
   serverTimestamp,
   doc,
-  writeBatch,
+  setDoc,
+  updateDoc,
   type Timestamp 
 } from 'firebase/firestore';
 
@@ -49,7 +50,7 @@ export function ChatInterface({
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
-  const { user, authLoading } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   
   const scrollToBottom = useCallback(() => {
     setTimeout(() => {
@@ -105,40 +106,45 @@ export function ChatInterface({
     const userMessageText = input;
     setInput('');
     setIsSendingMessage(true);
-    
-    let currentSessionId = chatSessionId;
+
+    let activeSessionId = chatSessionId;
 
     try {
-      // 1. Create session and save user message if it's a new chat
-      if (!currentSessionId) {
-        const sessionsRef = collection(db, `users/${user.uid}/chatSessions`);
-        const newSessionRef = doc(sessionsRef);
+      // Step 1: Ensure we have a session ID. Create one if it's a new chat.
+      if (!activeSessionId) {
+        const newSessionRef = doc(collection(db, `users/${user.uid}/chatSessions`));
         const title = userMessageText.substring(0, 50) + (userMessageText.length > 50 ? "..." : "");
-        const now = serverTimestamp();
-
-        const batch = writeBatch(db);
-        batch.set(newSessionRef, { title, createdAt: now, lastMessageAt: now, userId: user.uid });
-        const messagesRef = collection(newSessionRef, "messages");
-        batch.set(doc(messagesRef), { text: userMessageText, role: 'user', timestamp: now });
-        await batch.commit();
-
-        currentSessionId = newSessionRef.id;
-        onSessionCreated(currentSessionId); // Notify parent to update URL
-      } else {
-        // Just add the message to the existing session
-        const messagesRef = collection(db, `users/${user.uid}/chatSessions/${currentSessionId}/messages`);
-        await addDoc(messagesRef, { text: userMessageText, role: 'user', timestamp: serverTimestamp() });
-        const sessionRef = doc(db, `users/${user.uid}/chatSessions/${currentSessionId}`);
-        const batch = writeBatch(db);
-        batch.update(sessionRef, { lastMessageAt: serverTimestamp() });
-        await batch.commit();
+        
+        await setDoc(newSessionRef, { 
+          title, 
+          createdAt: serverTimestamp(), 
+          lastMessageAt: serverTimestamp(), 
+          userId: user.uid 
+        });
+        
+        activeSessionId = newSessionRef.id;
+        onSessionCreated(activeSessionId);
       }
+      
+      if (!activeSessionId) {
+        throw new Error("Could not create or find a chat session.");
+      }
+      
+      const sessionRef = doc(db, `users/${user.uid}/chatSessions`, activeSessionId);
+      const messagesRef = collection(sessionRef, 'messages');
 
-      // 2. Prepare context and get AI response
+      // Step 2: Save user message and update timestamp
+      await addDoc(messagesRef, { text: userMessageText, role: 'user', timestamp: serverTimestamp() });
+      await updateDoc(sessionRef, { lastMessageAt: serverTimestamp() });
+
+
+      // Step 3: Prepare context (including the new message) and call AI
       const chatHistoryForAI = messages.slice(-10).map(m => ({
           role: m.role,
           parts: [{ text: m.text }]
       }));
+      chatHistoryForAI.push({ role: 'user', parts: [{ text: userMessageText }] }); // Add current message for context
+
       const userName = user.displayName || user.email?.split('@')[0];
 
       const result = await getAIChatResponse({
@@ -147,18 +153,14 @@ export function ChatInterface({
           chatHistory: chatHistoryForAI,
       });
 
-      // 3. Save AI response to Firestore
+      // Step 4: Save AI response and update timestamp
       const aiMessageText = result.error ? `Sorry, an error occurred: ${result.error}` : result.answer;
       if (result.error) {
         toast({ variant: 'destructive', title: 'Chatbot Error', description: result.error });
       }
-
-      const messagesRef = collection(db, `users/${user.uid}/chatSessions/${currentSessionId}/messages`);
+      
       await addDoc(messagesRef, { text: aiMessageText, role: 'model', timestamp: serverTimestamp() });
-      const sessionRef = doc(db, `users/${user.uid}/chatSessions/${currentSessionId}`);
-      const batch = writeBatch(db);
-      batch.update(sessionRef, { lastMessageAt: serverTimestamp() });
-      await batch.commit();
+      await updateDoc(sessionRef, { lastMessageAt: serverTimestamp() });
 
     } catch (error) { 
       console.error('Chatbot handleSubmit error:', error);
@@ -168,6 +170,7 @@ export function ChatInterface({
       setIsSendingMessage(false);
     }
   };
+
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {

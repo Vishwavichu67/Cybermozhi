@@ -17,14 +17,12 @@ import {
   ArrowRight,
   Sparkles,
   LayoutDashboard,
-  AlertCircle,
   Lightbulb,
   ScrollText,
   FileLock,
   KeyRound,
   FileSignature,
   UserCircle2,
-  History,
   ShieldCheck,
   Network as NetworkIcon, // Renamed to avoid conflict with Tailwind's network
   ClipboardCheck
@@ -185,7 +183,7 @@ export default function HomePage() {
               Unlock CyberMozhi's Full Potential
             </h2>
             <p className="mt-4 max-w-2xl mx-auto text-lg text-foreground/80">
-              Create a free account or login to access personalized advice, save your learning progress and chat history, download FIR templates, take quizzes, and enjoy unlimited AI chatbot interactions.
+              Create a free account or login to get personalized advice from our AI and an enhanced user experience.
             </p>
             <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
               <Button asChild size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 shadow-md hover:shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105 animate-in fade-in-0 slide-in-from-bottom-4 duration-500 ease-out" style={{ animationDelay: '900ms' }}>
@@ -215,147 +213,13 @@ export default function HomePage() {
             Vanakkam, {user?.displayName || user?.email?.split('@')[0]}!
           </h1>
           <p className="mt-3 text-lg text-foreground/80">
-            Welcome back to your CyberMozhi dashboard. Let's continue your journey to digital safety and legal awareness.
+            Welcome back to CyberMozhi. Let's continue your journey to digital safety and legal awareness.
           </p>
         </div>
       </section>
 
-      {/* Conceptual Dashboard Section */}
-      <section className="w-full container px-4 md:px-6 animate-in fade-in-0 slide-in-from-bottom-8 duration-700 ease-out" style={{ animationDelay: '200ms' }}>
-        <div className="flex items-center gap-3 mb-8">
-          <LayoutDashboard className="w-8 h-8 text-primary" />
-          <h2 className="text-3xl font-headline font-bold text-primary">Your Dashboard</h2>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Card 1: Account Details (Conceptual) */}
-          <Card
-            className="shadow-lg hover:shadow-xl transition-transform duration-300 ease-out transform hover:scale-105 hover:rotate-y-1 animate-in fade-in-0 slide-in-from-bottom-4 duration-500 ease-out"
-            style={{ animationDelay: '300ms' }}
-          >
-            <CardHeader>
-              <div className="flex items-center gap-3">
-                <UserCircle2 className="w-7 h-7 text-primary" />
-                <CardTitle className="text-xl font-headline text-primary">Account Details</CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-foreground/70 mb-1">Manage your profile information like name, phone, gender, and date of birth.</p>
-              <p className="text-sm text-foreground/70">This helps personalize your CyberMozhi experience and the AI Chatbot's responses.</p>
-            </CardContent>
-            <div className="p-4 pt-0">
-              <Button asChild variant="outline" className="w-full transition-shadow hover:shadow-md">
-                <Link href="#"> {/* Placeholder for /profile or /account page */}
-                  View/Edit Profile <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-            </div>
-          </Card>
-
-          {/* Card 2: Chat History (Conceptual) */}
-          <Card
-            className="shadow-lg hover:shadow-xl transition-transform duration-300 ease-out transform hover:scale-105 hover:-rotate-y-1 animate-in fade-in-0 slide-in-from-bottom-4 duration-500 ease-out"
-            style={{ animationDelay: '400ms' }}
-          >
-            <CardHeader>
-              <div className="flex items-center gap-3">
-                <History className="w-7 h-7 text-primary" />
-                <CardTitle className="text-xl font-headline text-primary">Chat History</CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-foreground/70 mb-1">Revisit your previous conversations with CyberMozhi AI.</p>
-              <p className="text-sm text-foreground/70">Your chat history helps the AI provide better, contextual answers over time.</p>
-            </CardContent>
-             <div className="p-4 pt-0">
-              <Button asChild variant="outline" className="w-full transition-shadow hover:shadow-md">
-                <Link href="/chatbot">
-                  View Chat History <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-            </div>
-          </Card>
-
-          {/* Card 3: Saved FIR Drafts (Conceptual) */}
-          <Card
-            className="shadow-lg hover:shadow-xl transition-transform duration-300 ease-out transform hover:scale-105 hover:rotate-y-1 animate-in fade-in-0 slide-in-from-bottom-4 duration-500 ease-out"
-            style={{ animationDelay: '500ms' }}
-          >
-            <CardHeader>
-               <div className="flex items-center gap-3">
-                <ScrollText className="w-7 h-7 text-primary" />
-                <CardTitle className="text-xl font-headline text-primary">FIR Drafts</CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-foreground/70 mb-1">You have <span className="font-semibold">0 FIR drafts</span> in progress.</p>
-              <p className="text-sm text-foreground/70">Access and manage your saved complaint drafts (Feature Coming Soon).</p>
-            </CardContent>
-             <div className="p-4 pt-0">
-              <Button asChild variant="outline" className="w-full transition-shadow hover:shadow-md" disabled>
-                <Link href="#"> {/* Placeholder link for /fir-drafts */}
-                  Manage My Drafts <FileText className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-            </div>
-          </Card>
-
-          {/* Card 4: Quiz Progress (Conceptual) */}
-          <Card
-            className="shadow-lg hover:shadow-xl transition-transform duration-300 ease-out transform hover:scale-105 hover:-rotate-y-1 animate-in fade-in-0 slide-in-from-bottom-4 duration-500 ease-out"
-            style={{ animationDelay: '600ms' }}
-          >
-            <CardHeader>
-              <div className="flex items-center gap-3">
-                <ClipboardCheck className="w-7 h-7 text-primary" />
-                <CardTitle className="text-xl font-headline text-primary">Quiz Progress</CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-foreground/70 mb-1">Latest Quiz: <span className="font-semibold">No quizzes taken yet.</span></p>
-              <p className="text-sm text-foreground/70">Test your knowledge and earn badges! (Feature Coming Soon).</p>
-            </CardContent>
-             <div className="p-4 pt-0">
-              <Button asChild variant="outline" className="w-full transition-shadow hover:shadow-md" disabled>
-                <Link href="#"> {/* Placeholder link for /quizzes */}
-                  View All Quizzes <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-            </div>
-          </Card>
-
-           {/* Card 5: Suggested For You (Conceptual) */}
-          <Card
-            className="shadow-lg hover:shadow-xl transition-transform duration-300 ease-out transform hover:scale-105 hover:rotate-x-1 md:col-span-2 lg:col-span-3 animate-in fade-in-0 slide-in-from-bottom-4 duration-500 ease-out"
-            style={{ animationDelay: '700ms' }}
-          >
-            <CardHeader>
-              <div className="flex items-center gap-3">
-                <Lightbulb className="w-7 h-7 text-primary" />
-                <CardTitle className="text-xl font-headline text-primary">Suggested For You</CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-foreground/70 mb-2">Based on your interests, you might want to explore:</p>
-              <div className="flex flex-wrap gap-2">
-                <Badge variant="secondary" className="transition-transform hover:scale-110 cursor-pointer">Understanding Data Privacy</Badge>
-                <Badge variant="secondary" className="transition-transform hover:scale-110 cursor-pointer">Key IT Act Sections</Badge>
-                <Badge variant="secondary" className="transition-transform hover:scale-110 cursor-pointer">Reporting Cybercrime</Badge>
-              </div>
-              <p className="text-sm text-foreground/70 mt-3">Deepen your understanding of crucial legal and security aspects.</p>
-            </CardContent>
-            <div className="p-4 pt-0">
-              <Button asChild className="w-full transition-shadow hover:shadow-md">
-                <Link href="/law-summaries">
-                  Explore Topics <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-            </div>
-          </Card>
-        </div>
-      </section>
-
       {/* Quick Access to Core Features */}
-      <section className="w-full container px-4 md:px-6 py-10 animate-in fade-in-0 slide-in-from-bottom-8 duration-700 ease-out" style={{ animationDelay: '800ms' }}>
+      <section className="w-full container px-4 md:px-6 py-10 animate-in fade-in-0 slide-in-from-bottom-8 duration-700 ease-out" style={{ animationDelay: '200ms' }}>
          <h2 className="text-3xl font-headline font-bold tracking-tight text-center text-primary mb-12">
             Quick Access to Resources
           </h2>
@@ -364,7 +228,7 @@ export default function HomePage() {
               <Card
                 key={feature.title}
                 className="flex flex-col shadow-lg hover:shadow-xl transition-transform duration-300 ease-out transform hover:scale-105 hover:rotate-y-1 rounded-lg overflow-hidden animate-in fade-in-0 slide-in-from-bottom-4 duration-500 ease-out"
-                style={{ animationDelay: `${index * 100 + 900}ms` }}
+                style={{ animationDelay: `${index * 100 + 300}ms` }}
               >
                 <CardHeader className="bg-primary/5 p-6">
                   <div className="flex items-center gap-4">
@@ -391,14 +255,14 @@ export default function HomePage() {
 
 
       {/* Full AI Chatbot Access Section */}
-      <section className="w-full py-12 md:py-16 bg-accent/10 rounded-xl shadow-lg animate-in fade-in-0 slide-in-from-bottom-8 duration-700 ease-out" style={{ animationDelay: '1000ms' }}>
+      <section className="w-full py-12 md:py-16 bg-accent/10 rounded-xl shadow-lg animate-in fade-in-0 slide-in-from-bottom-8 duration-700 ease-out" style={{ animationDelay: '400ms' }}>
         <div className="container px-4 md:px-6 text-center">
           <MessageCircle className="w-12 h-12 text-accent mx-auto mb-6 animate-pulse delay-700" />
           <h2 className="text-3xl font-headline font-bold tracking-tight text-accent">
             Your AI Legal & Cyber Guide Awaits
           </h2>
           <p className="mt-4 max-w-2xl mx-auto text-lg text-foreground/80">
-            Leverage the full power of CyberMozhi's bilingual AI. Get detailed explanations on cyber laws, IT Act sections, penalties, attack mitigation, and guidance on filing complaints. The AI will also consider your chat history for a more personalized experience.
+            Leverage the full power of CyberMozhi's bilingual AI. Get detailed explanations on cyber laws, IT Act sections, penalties, attack mitigation, and guidance on filing complaints.
           </p>
           <div className="mt-8">
             <Button asChild size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 shadow-md hover:shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105">
@@ -411,11 +275,9 @@ export default function HomePage() {
       </section>
 
       {/* Slogan */}
-      <footer className="py-10 text-center animate-in fade-in-0 duration-700 ease-out" style={{ animationDelay: '1100ms' }}>
+      <footer className="py-10 text-center animate-in fade-in-0 duration-700 ease-out" style={{ animationDelay: '500ms' }}>
         <p className="text-xl font-semibold text-primary">CyberMozhi: Speak Law. Speak Secure. Speak Smart. 💬⚖️🌐</p>
       </footer>
     </div>
   );
 }
-
-    

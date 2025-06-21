@@ -59,7 +59,7 @@ export function ChatHistorySidebar({
         } as ChatSession);
       });
       setSessions(fetchedSessions);
-      if (isLoading) setIsLoading(false);
+      setIsLoading(false);
     }, (err) => {
       console.error("Error fetching chat sessions:", err);
       setError("Failed to fetch chat history.");
@@ -68,7 +68,7 @@ export function ChatHistorySidebar({
 
     // Cleanup subscription on component unmount
     return () => unsubscribe();
-  }, [isUserLoggedIn, userId, isLoading]);
+  }, [isUserLoggedIn, userId]);
 
 
   const content = (

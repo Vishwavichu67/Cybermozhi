@@ -49,7 +49,7 @@ export function ChatInterface({
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
-  const { user, loading: authLoading } = useAuth();
+  const { user, authLoading } = useAuth();
   
   const scrollToBottom = useCallback(() => {
     setTimeout(() => {
@@ -81,7 +81,7 @@ export function ChatInterface({
           } as MessageForClient);
         });
         setMessages(fetchedMessages);
-        if (isLoadingHistory) setIsLoadingHistory(false);
+        setIsLoadingHistory(false);
         if (onMessagesLoaded) onMessagesLoaded();
       }, (error) => {
         console.error(`Error fetching messages for session ${chatSessionId}:`, error);
@@ -95,7 +95,7 @@ export function ChatInterface({
       setIsLoadingHistory(false);
       if (onMessagesLoaded) onMessagesLoaded();
     }
-  }, [user, chatSessionId, authLoading, onMessagesLoaded, isLoadingHistory, toast]);
+  }, [user, chatSessionId, authLoading, onMessagesLoaded, toast]);
 
 
   const handleSubmit = async (e?: FormEvent<HTMLFormElement>) => {

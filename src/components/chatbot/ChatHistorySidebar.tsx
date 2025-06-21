@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState } from 'react';
@@ -64,7 +63,7 @@ export function ChatHistorySidebar({
       setIsLoading(false);
     }, (err) => {
       console.error("Error fetching chat sessions:", err);
-      setError("Failed to fetch chat history.");
+      setError("Failed to fetch chat sessions.");
       setIsLoading(false);
     });
 
@@ -98,8 +97,8 @@ export function ChatHistorySidebar({
         )}
         <div className="space-y-1">
           {sessions.map((session) => {
-             // Handle potential serverTimestamp object before rendering
-            const lastMessageDate = session.lastMessageAt?.toDate ? session.lastMessageAt.toDate() : new Date();
+             // Handle potential serverTimestamp object before rendering to avoid hydration mismatch
+            const lastMessageDate = session.lastMessageAt?.toDate ? session.lastMessageAt.toDate() : null;
             return (
               <div key={session.id} className="group relative">
                 <Button
@@ -115,7 +114,7 @@ export function ChatHistorySidebar({
                   <div className="flex-grow truncate">
                     <p className="font-medium truncate text-sm">{session.title}</p>
                     <p className="text-xs text-muted-foreground">
-                      {formatDistanceToNow(lastMessageDate, { addSuffix: true })}
+                      {lastMessageDate ? formatDistanceToNow(lastMessageDate, { addSuffix: true }) : 'Just now'}
                     </p>
                   </div>
                 </Button>

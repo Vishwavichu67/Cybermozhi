@@ -66,8 +66,6 @@ export default function ChatbotPage() {
       currentChatSessionId={currentChatSessionId}
       onSelectChatSession={handleSelectChatSession}
       onNewChat={handleNewChat}
-      isUserLoggedIn={isLoggedIn}
-      userId={user?.uid}
     />
   );
 

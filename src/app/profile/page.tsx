@@ -22,7 +22,6 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 
 const profileSchema = z.object({
   displayName: z.string().min(2, { message: "Name must be at least 2 characters." }).max(50),
-  // Age is validated as a string that is either empty or a positive number.
   age: z.string().refine(val => val === '' || (/^\d+$/.test(val) && parseInt(val, 10) > 0), {
     message: "Please enter a valid positive number for age.",
   }).optional(),
@@ -54,31 +53,42 @@ export default function ProfilePage() {
       return;
     }
 
-    // Fetch user profile from Firestore
     const fetchProfile = async () => {
       if (!user) return;
       const userDocRef = doc(db, 'users', user.uid);
-      const userDoc = await getDoc(userDocRef);
+      try {
+        const userDoc = await getDoc(userDocRef);
 
-      if (userDoc.exists()) {
-        const data = userDoc.data();
-        form.reset({
-          displayName: data.displayName || user.displayName || '',
-          // Convert number from DB to string for the form input
-          age: data.age ? String(data.age) : '',
-          gender: data.gender || 'Prefer not to say',
-        });
-      } else {
-        form.reset({
-          displayName: user.displayName || user.email?.split('@')[0] || '',
-          age: '',
-          gender: 'Prefer not to say',
+        if (userDoc.exists()) {
+          const data = userDoc.data();
+          form.reset({
+            displayName: data.displayName || user.displayName || '',
+            age: data.age ? String(data.age) : '',
+            gender: data.gender || 'Prefer not to say',
+          });
+        } else {
+          form.reset({
+            displayName: user.displayName || user.email?.split('@')[0] || '',
+            age: '',
+            gender: 'Prefer not to say',
+          });
+        }
+      } catch (err) {
+        console.error("Error fetching user profile:", err);
+        setError("Could not load your profile. Please try again later.");
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to load your profile data due to a permissions issue.",
         });
       }
     };
 
     fetchProfile();
-  }, [user, authLoading, router, form]);
+    // We disable the exhaustive-deps rule because `form` and `toast` have stable identities
+    // and including them would cause unnecessary re-fetches.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, authLoading, router]);
 
   const onSubmit: SubmitHandler<ProfileFormValues> = async (data) => {
     setIsLoading(true);
@@ -90,21 +100,18 @@ export default function ProfilePage() {
     }
 
     try {
-      // Update Firebase Auth profile
       if (auth.currentUser) {
          await updateProfile(auth.currentUser, {
            displayName: data.displayName,
          });
       }
 
-      // Convert age string from form to number or null for Firestore
       const ageAsNumber = data.age && data.age !== '' ? parseInt(data.age, 10) : null;
 
-      // Update Firestore profile document
       const userDocRef = doc(db, 'users', user.uid);
       await setDoc(userDocRef, {
         displayName: data.displayName,
-        email: user.email, // store email for reference
+        email: user.email,
         age: ageAsNumber,
         gender: data.gender || null,
       }, { merge: true });

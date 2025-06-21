@@ -76,6 +76,7 @@ export default function ChatbotPage() {
         onNewChat={handleNewChat}
         newlyCreatedSession={newlyCreatedSessionDetails}
         isUserLoggedIn={isLoggedIn}
+        userId={user?.uid}
       />
   );
 
@@ -97,9 +98,9 @@ export default function ChatbotPage() {
               </Sheet>
             </div>
             {/* Desktop Sidebar */}
-            <div className="hidden md:block md:w-72 md:flex-shrink-0 h-full">
+            <aside className="hidden md:block md:w-72 md:flex-shrink-0 h-full">
               {sidebar}
-            </div>
+            </aside>
           </>
         )}
       

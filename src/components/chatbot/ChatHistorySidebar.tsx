@@ -15,6 +15,7 @@ interface ChatHistorySidebarProps {
   onNewChat: () => void;
   newlyCreatedSession?: ChatSession;
   isUserLoggedIn: boolean;
+  userId: string | null | undefined;
 }
 
 export function ChatHistorySidebar({
@@ -22,28 +23,29 @@ export function ChatHistorySidebar({
   onSelectChatSession,
   onNewChat,
   newlyCreatedSession,
-  isUserLoggedIn
+  isUserLoggedIn,
+  userId
 }: ChatHistorySidebarProps) {
   const [sessions, setSessions] = useState<ChatSession[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchSessions = useCallback(async () => {
-    if (!isUserLoggedIn) {
+    if (!isUserLoggedIn || !userId) {
         setSessions([]);
         setIsLoading(false);
         return;
     }
     setIsLoading(true);
     setError(null);
-    const result = await getChatSessionsForUser();
+    const result = await getChatSessionsForUser(userId);
     if (result.error) {
       setError(result.error);
     } else if (result.sessions) {
       setSessions(result.sessions);
     }
     setIsLoading(false);
-  }, [isUserLoggedIn]);
+  }, [isUserLoggedIn, userId]);
 
   useEffect(() => {
     fetchSessions();
@@ -63,16 +65,8 @@ export function ChatHistorySidebar({
     }
   }, [newlyCreatedSession]);
 
-  if (!isUserLoggedIn && !isLoading) { // Don't show "login to see history" if it's still loading auth state
-    return (
-      <div className="h-full w-full md:w-72 flex flex-col border-r border-border/40 bg-background/80 p-3">
-        <p className="text-sm text-muted-foreground text-center py-4">Please log in to see chat history.</p>
-      </div>
-    );
-  }
-  
-  return (
-    <aside className="h-full w-full md:w-72 flex-shrink-0 flex-col border-r border-border/40 bg-background/80 p-3 hidden md:flex">
+  const content = (
+    <>
       <Button onClick={onNewChat} variant="outline" className="w-full mb-4 transition-shadow hover:shadow-md">
         <PlusCircle className="mr-2 h-5 w-5" />
         New Chat
@@ -120,6 +114,21 @@ export function ChatHistorySidebar({
           ))}
         </div>
       </ScrollArea>
-    </aside>
+    </>
+  );
+
+  if (!isUserLoggedIn && !isLoading) {
+    return (
+      <div className="h-full w-full flex flex-col border-r border-border/40 bg-background/80 p-3">
+        <p className="text-sm text-muted-foreground text-center py-4">Please log in to see chat history.</p>
+      </div>
+    );
+  }
+  
+  // The component passed into SheetContent is this one, so this return handles both mobile and desktop
+  return (
+    <div className="h-full w-full flex-shrink-0 flex-col border-r border-border/40 bg-background/80 p-3 flex">
+      {content}
+    </div>
   );
 }

@@ -1,13 +1,15 @@
 
 "use server";
 
-import { cyberLawChatbot, type CyberLawChatbotInput, type ChatMessage as AIChatMessage } from '@/ai/flows/cyber-law-chatbot';
+import { cyberLawChatbot, type CyberLawChatbotInput, type CyberLawChatbotOutput, type ChatMessage as AIChatMessage } from '@/ai/flows/cyber-law-chatbot';
 import { z } from 'zod';
-import { auth, db } from '@/lib/firebase';
+import { db } from '@/lib/firebase';
 import { collection, query, orderBy, limit, getDocs, serverTimestamp, Timestamp, doc, setDoc, writeBatch, updateDoc } from 'firebase/firestore';
 
 const ChatQueryInputSchema = z.object({
   query: z.string().min(1, "Query cannot be empty."),
+  userId: z.string().min(1, "User ID cannot be empty."),
+  userName: z.string().optional(),
 });
 
 const MAX_CHAT_HISTORY_TO_FETCH = 20; 
@@ -31,35 +33,39 @@ export interface MessageForClient {
 export async function handleChatQuery(
   formData: FormData
 ): Promise<CyberLawChatbotOutput & { error?: string; chatSessionId?: string; newChatSession?: ChatSession }> {
-  if (!auth || !db) {
-    console.error("Firebase auth or db not initialized.");
+  if (!db) {
+    console.error("Firebase db not initialized.");
     return { answer: '', error: "Chatbot service temporarily unavailable." };
   }
-
-  const currentUser = auth.currentUser;
-  if (!currentUser) {
-    return { answer: '', error: "User not authenticated. Please login." };
-  }
-
+  
   const rawQuery = formData.get('query') as string;
   const rawChatSessionId = formData.get('chatSessionId') as string | null;
-  
+  const userId = formData.get('userId') as string | null;
+  const userName = formData.get('userName') as string | undefined;
+
   let currentChatSessionId: string | null = (rawChatSessionId === "null" || !rawChatSessionId || rawChatSessionId === "undefined") ? null : rawChatSessionId;
 
-  const validatedFields = ChatQueryInputSchema.safeParse({ query: rawQuery });
+  const validatedFields = ChatQueryInputSchema.safeParse({ 
+      query: rawQuery, 
+      userId: userId, 
+      userName: userName 
+  });
 
   if (!validatedFields.success) {
-    return { answer: '', error: validatedFields.error.flatten().fieldErrors.query?.join(", ") || "Invalid input." };
+      if (!userId) {
+          return { answer: '', error: "User not authenticated. Please login." };
+      }
+      const errorMsg = validatedFields.error.flatten().fieldErrors.query?.join(", ") || validatedFields.error.flatten().fieldErrors.userId?.join(", ") || "Invalid input.";
+      return { answer: '', error: errorMsg };
   }
-  const userQueryText = validatedFields.data.query;
+  const { query: userQueryText, userId: currentUserId, userName: currentUserName } = validatedFields.data;
 
   let chatHistoryForAI: AIChatMessage[] = [];
-  const userName: string | undefined = currentUser.displayName || currentUser.email?.split('@')[0] || undefined;
   let newChatSessionForClient: ChatSession | undefined = undefined;
 
   try {
     if (!currentChatSessionId) {
-      const newSessionRef = doc(collection(db, `users/${currentUser.uid}/chatSessions`));
+      const newSessionRef = doc(collection(db, `users/${currentUserId}/chatSessions`));
       currentChatSessionId = newSessionRef.id;
       const nowServerTimestamp = serverTimestamp();
       const initialTitle = userQueryText.substring(0, 70) + (userQueryText.length > 70 ? "..." : "");
@@ -68,7 +74,7 @@ export async function handleChatQuery(
         title: initialTitle,
         createdAt: nowServerTimestamp,
         lastMessageAt: nowServerTimestamp,
-        userId: currentUser.uid,
+        userId: currentUserId,
       };
       await setDoc(newSessionRef, sessionDataToSave);
       
@@ -77,12 +83,12 @@ export async function handleChatQuery(
         title: initialTitle,
         createdAt: new Date(), 
         lastMessageAt: new Date(), 
-        userId: currentUser.uid,
+        userId: currentUserId,
       };
     }
 
     if (currentChatSessionId) {
-      const messagesRef = collection(db, `users/${currentUser.uid}/chatSessions/${currentChatSessionId}/messages`);
+      const messagesRef = collection(db, `users/${currentUserId}/chatSessions/${currentChatSessionId}/messages`);
       const q = query(messagesRef, orderBy('timestamp', 'desc'), limit(MAX_CHAT_HISTORY_TO_FETCH));
       const querySnapshot = await getDocs(q);
       const fetchedMessages: AIChatMessage[] = [];
@@ -100,16 +106,16 @@ export async function handleChatQuery(
 
     const aiInput: CyberLawChatbotInput = {
       query: userQueryText,
-      userName: userName,
+      userName: currentUserName,
       chatHistory: chatHistoryForAI.length > 0 ? chatHistoryForAI : undefined,
     };
 
     const result = await cyberLawChatbot(aiInput);
 
     if (currentChatSessionId) {
-      const userMessageRef = doc(collection(db, `users/${currentUser.uid}/chatSessions/${currentChatSessionId}/messages`));
-      const modelMessageRef = doc(collection(db, `users/${currentUser.uid}/chatSessions/${currentChatSessionId}/messages`));
-      const sessionDocRef = doc(db, `users/${currentUser.uid}/chatSessions/${currentChatSessionId}`);
+      const userMessageRef = doc(collection(db, `users/${currentUserId}/chatSessions/${currentChatSessionId}/messages`));
+      const modelMessageRef = doc(collection(db, `users/${currentUserId}/chatSessions/${currentChatSessionId}/messages`));
+      const sessionDocRef = doc(db, `users/${currentUserId}/chatSessions/${currentChatSessionId}`);
       
       const batch = writeBatch(db);
       const nowServerTimestampForMessages = serverTimestamp();
@@ -148,13 +154,12 @@ export async function handleChatQuery(
   }
 }
 
-export async function getChatSessionsForUser(): Promise<{ sessions?: ChatSession[]; error?: string }> {
-  const currentUser = auth.currentUser;
-  if (!currentUser || !db) {
+export async function getChatSessionsForUser(userId: string): Promise<{ sessions?: ChatSession[]; error?: string }> {
+  if (!userId || !db) {
     return { error: "User not authenticated or DB not available." };
   }
   try {
-    const sessionsRef = collection(db, `users/${currentUser.uid}/chatSessions`);
+    const sessionsRef = collection(db, `users/${userId}/chatSessions`);
     const q = query(sessionsRef, orderBy('lastMessageAt', 'desc'));
     const querySnapshot = await getDocs(q);
     const sessions: ChatSession[] = [];
@@ -175,16 +180,15 @@ export async function getChatSessionsForUser(): Promise<{ sessions?: ChatSession
   }
 }
 
-export async function getMessagesForChatSession(chatSessionId: string): Promise<{ messages?: MessageForClient[]; error?: string }> {
-  const currentUser = auth.currentUser;
-  if (!currentUser || !db) {
+export async function getMessagesForChatSession(chatSessionId: string, userId: string): Promise<{ messages?: MessageForClient[]; error?: string }> {
+  if (!userId || !db) {
     return { error: "User not authenticated or DB not available." };
   }
   if (!chatSessionId) {
     return { error: "Chat session ID is required." };
   }
   try {
-    const messagesRef = collection(db, `users/${currentUser.uid}/chatSessions/${chatSessionId}/messages`);
+    const messagesRef = collection(db, `users/${userId}/chatSessions/${chatSessionId}/messages`);
     const q = query(messagesRef, orderBy('timestamp', 'asc'));
     const querySnapshot = await getDocs(q);
     const messages: MessageForClient[] = [];

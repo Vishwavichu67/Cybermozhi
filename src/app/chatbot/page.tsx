@@ -52,6 +52,10 @@ export default function ChatbotPage() {
     }
   }, [router, currentChatSessionId]);
 
+  const onMessagesLoaded = useCallback(() => {
+    setIsChatContentLoading(false);
+  }, []);
+
 
   if (authLoading || isPageInitializing) {
     return (
@@ -113,7 +117,7 @@ export default function ChatbotPage() {
                 key={currentChatSessionId || 'new'} 
                 chatSessionId={currentChatSessionId}
                 onSessionCreated={handleChatSessionCreated}
-                onMessagesLoaded={() => setIsChatContentLoading(false)}
+                onMessagesLoaded={onMessagesLoaded}
               />
             )}
           </div>

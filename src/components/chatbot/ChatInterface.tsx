@@ -50,7 +50,7 @@ export function ChatInterface({
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
-  const { user, loading: authLoading } = useAuth();
+  const { user, authLoading } = useAuth();
   
   const scrollToBottom = useCallback(() => {
     setTimeout(() => {
@@ -66,7 +66,7 @@ export function ChatInterface({
 
   // Subscribe to messages for the current chat session
   useEffect(() => {
-    if (!user || authLoading) return;
+    if (!user) return;
 
     if (chatSessionId) {
       setIsLoadingHistory(true);
@@ -96,7 +96,7 @@ export function ChatInterface({
       setIsLoadingHistory(false);
       if (onMessagesLoaded) onMessagesLoaded();
     }
-  }, [user, chatSessionId, authLoading, onMessagesLoaded, toast]);
+  }, [user, chatSessionId, onMessagesLoaded, toast]);
 
 
   const handleSubmit = async (e?: FormEvent<HTMLFormElement>) => {

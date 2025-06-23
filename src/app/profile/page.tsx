@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -75,13 +76,17 @@ export default function ProfilePage() {
               gender: 'Prefer not to say',
             });
           }
-        } catch (err) {
+        } catch (err: any) {
           console.error("Error fetching user profile:", err);
-          setError("Could not load your profile. Please try again later.");
+          let errorMessage = "Could not load your profile data.";
+          if (err.code === 'permission-denied') {
+              errorMessage = "Permission Denied: Could not read your profile. Please check your Firestore security rules. They should allow a user to read their own document (e.g., 'allow read: if request.auth.uid == userId;').";
+          }
+          setError(errorMessage);
           toast({
             variant: "destructive",
-            title: "Error",
-            description: "Failed to load profile data due to a permissions issue.",
+            title: "Loading Error",
+            description: errorMessage,
           });
         }
       };
@@ -123,13 +128,13 @@ export default function ProfilePage() {
     } catch (err: any) {
       console.error("Profile update error:", err);
       let errorMessage = "Failed to update profile. Please try again.";
-      if (err.code === 'firestore/permission-denied') {
-          errorMessage = "You do not have permission to save this data. Please check your Firestore security rules.";
+      if (err.code === 'permission-denied') {
+          errorMessage = "Permission Denied: Could not save your profile. Please check your Firestore security rules. They should allow a user to write to their own document (e.g., 'allow write: if request.auth.uid == userId;').";
       }
       setError(errorMessage);
       toast({
         variant: 'destructive',
-        title: 'Error',
+        title: 'Save Error',
         description: errorMessage,
       });
     } finally {

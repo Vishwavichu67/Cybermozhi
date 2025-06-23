@@ -27,13 +27,14 @@ const CyberLawChatbotInputSchema = z.object({
     .describe('The user query about cyber law or cybersecurity in Tamil or English.'),
   userName: z.string().optional().describe('The name of the user, if known. Use for personalization if available.'),
   chatHistory: z.array(ChatMessageSchema).optional().describe('The previous turns in the current conversation. Use this to maintain context, avoid repetition, and provide more relevant follow-up answers.'),
-  // Placeholder for future enhancements:
-  // userId: z.string().optional().describe('The unique ID of the logged-in user, if available.'),
-  // userRole: z.enum(['student', 'professional', 'common_citizen', 'guest']).optional().describe('The role of the user, if known.'),
-  // userDetails: z.object({ 
-  //   gender: z.string().optional(), 
-  //   dob: z.string().optional() 
-  // }).optional().describe('Additional details about the user like gender or date of birth.'),
+  userDetails: z.object({ 
+    gender: z.string().optional(), 
+    age: z.number().nullable().optional(),
+    maritalStatus: z.string().optional(),
+    state: z.string().optional(),
+    city: z.string().optional(),
+    preferredLanguage: z.string().optional(),
+  }).optional().describe('Additional details about the user like gender, age, marital status, and location. Use this for personalization.'),
 });
 export type CyberLawChatbotInput = z.infer<typeof CyberLawChatbotInputSchema>;
 
@@ -85,7 +86,12 @@ Core Principles for Responding:
 
 4.  **Personalization & Context (Utilize provided userName, userDetails, and chatHistory):**
     *   **Chat History:** If previous conversation history ({{{chatHistory}}}) is available, use it to understand the ongoing context, avoid repetition, and provide more relevant follow-up answers. Refer to past user statements or bot answers if relevant.
-    *   **User Name & Details:** If user name ({{{userName}}}) is provided, use it to personalize greetings. If other user details like gender ({{{userDetails.gender}}}), date of birth ({{{userDetails.dob}}}), or role ({{{userRole}}}) were provided, subtly adapt your tone or examples if appropriate, without being intrusive. For instance, if the user is a student, examples might be more relatable to student life. Always prioritize clarity and the core query.
+    *   **User Profile Data:** Use the provided user details ({{{userDetails}}}) to tailor your responses.
+        *   **Greeting:** If a user name ({{{userName}}}) is provided, use it to personalize greetings.
+        *   **Location:** If the user has provided a state ({{{userDetails.state}}}) or city ({{{userDetails.city}}}) and their query is about legal procedures (like filing a complaint), make your guidance more specific. For example, mention that they should contact the state's cyber crime cell or local police, and if you know of specific resources for that state, you can mention them.
+        *   **Marital Status:** If the user has provided their marital status ({{{userDetails.maritalStatus}}}) and their query relates to family or domestic issues online (e.g., harassment by a spouse, divorce-related cyber issues), acknowledge this context subtly in your response to provide more relevant legal information or resources.
+        *   **Language:** If a preferred language ({{{userDetails.preferredLanguage}}}) is specified, try to lean towards that language in your response, while still respecting the language of the current query.
+        *   **General Tone:** Use other details like age ({{{userDetails.age}}}) and gender ({{{userDetails.gender}}}) to subtly adapt your tone or examples if appropriate, without being intrusive or making assumptions. For instance, if the user is young, examples might be more relatable to social media or student life.
     *   **Guest Users:** For guest users (or if no specific user data is available), provide general, helpful responses. You can mention that logging in unlocks more personalized features.
 
 5.  **Structure:**

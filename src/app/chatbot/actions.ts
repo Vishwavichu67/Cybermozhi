@@ -4,6 +4,8 @@
 import { cyberLawChatbot, type CyberLawChatbotInput, type ChatMessage as AIChatMessage } from '@/ai/flows/cyber-law-chatbot';
 import { z } from 'zod';
 import type { CyberLawChatbotOutput } from '@/ai/flows/cyber-law-chatbot';
+import { db } from '@/lib/firebase';
+import { doc, getDoc } from 'firebase/firestore';
 
 
 const ChatAIInputSchema = z.object({
@@ -13,16 +15,18 @@ const ChatAIInputSchema = z.object({
     role: z.enum(['user', 'model']),
     parts: z.array(z.object({ text: z.string() })),
   })).optional(),
+  userId: z.string(),
 });
 
 /**
  * Handles calling the Genkit AI flow to get a chatbot response.
- * This is a server-only action and does not interact with Firestore.
+ * This is a server-only action and now fetches user profile data from Firestore.
  */
 export async function getAIChatResponse(input: {
   query: string, 
   userName?: string, 
-  chatHistory?: AIChatMessage[]
+  chatHistory?: AIChatMessage[],
+  userId: string,
 }): Promise<CyberLawChatbotOutput & { error?: string }> {
 
   const validatedFields = ChatAIInputSchema.safeParse(input);
@@ -33,7 +37,30 @@ export async function getAIChatResponse(input: {
   }
 
   try {
-    const aiInput: CyberLawChatbotInput = validatedFields.data;
+    const { userId, ...restOfInput } = validatedFields.data;
+
+    let userDetails = {};
+    if (userId) {
+      const userDocRef = doc(db, 'users', userId);
+      const userDoc = await getDoc(userDocRef);
+      if (userDoc.exists()) {
+        const data = userDoc.data();
+        userDetails = {
+          gender: data.gender,
+          age: data.age,
+          maritalStatus: data.maritalStatus,
+          state: data.state,
+          city: data.city,
+          preferredLanguage: data.preferredLanguage,
+        };
+      }
+    }
+
+    const aiInput: CyberLawChatbotInput = {
+        ...restOfInput,
+        userDetails,
+    };
+    
     const result = await cyberLawChatbot(aiInput);
     return result;
   } catch (e) {

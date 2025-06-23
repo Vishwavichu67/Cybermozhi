@@ -65,6 +65,7 @@ export function ChatInterface() {
           query: userMessageText,
           userName: userName,
           chatHistory: chatHistoryForAI,
+          userId: user.uid,
       });
 
       const aiMessageText = result.error ? `Sorry, an error occurred: ${result.error}` : result.answer;

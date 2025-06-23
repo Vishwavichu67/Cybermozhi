@@ -93,7 +93,7 @@ export default function ProfilePage() {
 
       fetchProfile();
     }
-  }, [user, form, toast]);
+  }, [user, toast, form]);
 
 
   const onSubmit: SubmitHandler<ProfileFormValues> = async (data) => {
@@ -191,7 +191,7 @@ export default function ProfilePage() {
                     <FormItem>
                       <FormLabel>Age</FormLabel>
                       <FormControl>
-                         <Input type="number" placeholder="Your age" {...field} />
+                         <Input type="number" placeholder="Your age" {...field} min="1" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

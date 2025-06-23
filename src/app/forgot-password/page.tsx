@@ -63,11 +63,11 @@ export default function ForgotPasswordPage() {
       <Card className="w-full max-w-md shadow-xl glassmorphic">
         <CardHeader className="text-center">
           <MailQuestion className="w-12 h-12 text-primary mx-auto mb-3 animate-in fade-in-0 scale-75 duration-700 ease-out delay-100" />
-          <CardTitle className="text-2xl font-headline">Forgot Password?</CardTitle>
+          <CardTitle>Forgot Password?</CardTitle>
           <CardDescription>Enter your email address and we&apos;ll send you a link to reset your password.</CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handlePasswordReset} className="space-y-6">
+          <form onSubmit={handlePasswordReset} className="space-y-4 md:space-y-6">
             <div className="space-y-2">
               <Label htmlFor="email">Email Address</Label>
               <Input
@@ -115,4 +115,3 @@ export default function ForgotPasswordPage() {
     </div>
   );
 }
-

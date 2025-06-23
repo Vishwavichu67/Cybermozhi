@@ -71,7 +71,7 @@ export default function GlossaryPage() {
             />
           </div>
           <Tabs value={activeCategory} onValueChange={setActiveCategory} className="w-full sm:w-auto">
-            <TabsList className="grid w-full grid-cols-2 sm:grid-cols-none sm:inline-flex h-auto sm:h-10 flex-wrap sm:flex-nowrap">
+            <TabsList className="inline-flex h-auto flex-wrap items-center justify-center rounded-md bg-muted p-1 text-muted-foreground sm:h-10 sm:flex-nowrap">
               {categories.map(category => (
                 <TabsTrigger key={category} value={category} className="text-xs sm:text-sm px-2 py-1.5 sm:px-3 sm:py-1.5">
                   {category}
@@ -98,5 +98,3 @@ export default function GlossaryPage() {
     </div>
   );
 }
-
-    

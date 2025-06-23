@@ -96,11 +96,11 @@ export default function SignupPage() {
       <Card className="w-full max-w-md shadow-xl">
         <CardHeader className="text-center">
           <UserPlus className="w-12 h-12 text-primary mx-auto mb-3 animate-in fade-in-0 scale-75 duration-700 ease-out delay-100" />
-          <CardTitle className="text-2xl font-headline">Create an Account</CardTitle>
+          <CardTitle>Create an Account</CardTitle>
           <CardDescription>Join CyberMozhi to get started.</CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSignup} className="space-y-6">
+          <form onSubmit={handleSignup} className="space-y-4 md:space-y-6">
             <div className="space-y-2">
               <Label htmlFor="email">Email Address</Label>
               <Input
@@ -120,7 +120,7 @@ export default function SignupPage() {
                 <Input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
-                  placeholder="•••••••• (min. 6 characters)"
+                  placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required

@@ -80,11 +80,11 @@ export default function LoginPage() {
       <Card className="w-full max-w-md shadow-xl glassmorphic">
         <CardHeader className="text-center">
           <LogIn className="w-12 h-12 text-primary mx-auto mb-3 animate-in fade-in-0 scale-75 duration-700 ease-out delay-100" />
-          <CardTitle className="text-2xl font-headline">Welcome Back!</CardTitle>
+          <CardTitle>Welcome Back!</CardTitle>
           <CardDescription>Sign in to your CyberMozhi account.</CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleLogin} className="space-y-6">
+          <form onSubmit={handleLogin} className="space-y-4 md:space-y-6">
             <div className="space-y-2">
               <Label htmlFor="email">Email Address</Label>
               <Input

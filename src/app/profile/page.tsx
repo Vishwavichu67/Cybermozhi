@@ -19,6 +19,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Loader2, UserCog, AlertCircle, Save } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { countries } from '@/data/countries';
 
 const profileSchema = z.object({
   displayName: z.string().min(2, { message: "Name must be at least 2 characters." }).max(50),
@@ -27,9 +28,11 @@ const profileSchema = z.object({
   }).optional(),
   gender: z.enum(["Male", "Female", "Other", "Prefer not to say"]).optional(),
   preferredLanguage: z.enum(["Tamil", "English", "Both", "Not specified"]).optional(),
-  location: z.string().max(100, { message: "Location can't be more than 100 characters." }).optional(),
-  nationality: z.string().max(50, { message: "Nationality can't be more than 50 characters." }).optional(),
   maritalStatus: z.enum(["Single", "Married", "Divorced", "Widowed", "Prefer not to say"]).optional(),
+  country: z.string().optional(),
+  state: z.string().max(100).optional(),
+  city: z.string().max(100).optional(),
+  nationality: z.string().optional(),
 });
 
 type ProfileFormValues = z.infer<typeof profileSchema>;
@@ -48,9 +51,11 @@ export default function ProfilePage() {
       age: '',
       gender: 'Prefer not to say',
       preferredLanguage: 'Not specified',
-      location: '',
-      nationality: '',
       maritalStatus: 'Prefer not to say',
+      country: '',
+      state: '',
+      city: '',
+      nationality: '',
     },
   });
 
@@ -76,9 +81,11 @@ export default function ProfilePage() {
               age: data.age ? String(data.age) : '',
               gender: data.gender || 'Prefer not to say',
               preferredLanguage: data.preferredLanguage || 'Not specified',
-              location: data.location || '',
-              nationality: data.nationality || '',
               maritalStatus: data.maritalStatus || 'Prefer not to say',
+              country: data.country || '',
+              state: data.state || '',
+              city: data.city || '',
+              nationality: data.nationality || '',
             });
           } else {
             // Pre-fill with Auth data if no Firestore doc exists yet
@@ -87,9 +94,11 @@ export default function ProfilePage() {
               age: '',
               gender: 'Prefer not to say',
               preferredLanguage: 'Not specified',
-              location: '',
-              nationality: '',
               maritalStatus: 'Prefer not to say',
+              country: '',
+              state: '',
+              city: '',
+              nationality: '',
             });
           }
         } catch (err: any) {
@@ -136,9 +145,11 @@ export default function ProfilePage() {
         age: ageAsNumber,
         gender: data.gender || null,
         preferredLanguage: data.preferredLanguage || null,
-        location: data.location || null,
-        nationality: data.nationality || null,
         maritalStatus: data.maritalStatus || null,
+        country: data.country || null,
+        state: data.state || null,
+        city: data.city || null,
+        nationality: data.nationality || null,
       }, { merge: true });
 
       toast({
@@ -287,14 +298,54 @@ export default function ProfilePage() {
                     </FormItem>
                   )}
                 />
-                <FormField
+                 <FormField
                   control={form.control}
                   name="nationality"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Nationality</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select your nationality" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {countries.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="country"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Country</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select your country" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                           {countries.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                 <FormField
+                  control={form.control}
+                  name="state"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>State / Province</FormLabel>
                       <FormControl>
-                        <Input placeholder="e.g. Indian" {...field} />
+                        <Input placeholder="e.g. Tamil Nadu" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -302,12 +353,12 @@ export default function ProfilePage() {
                 />
                 <FormField
                   control={form.control}
-                  name="location"
+                  name="city"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Location (City, State)</FormLabel>
+                      <FormLabel>City</FormLabel>
                       <FormControl>
-                        <Input placeholder="e.g. Chennai, Tamil Nadu" {...field} />
+                        <Input placeholder="e.g. Chennai" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

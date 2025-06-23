@@ -1,11 +1,22 @@
 
-"use server";
+'use server';
 
-import { cyberLawChatbot, type CyberLawChatbotInput, type ChatMessage as AIChatMessage } from '@/ai/flows/cyber-law-chatbot';
+import {
+  cyberLawChatbot,
+  type ChatMessage as AIChatMessage,
+  type CyberLawChatbotInput,
+} from '@/ai/flows/cyber-law-chatbot';
 import { z } from 'zod';
 import type { CyberLawChatbotOutput } from '@/ai/flows/cyber-law-chatbot';
-import { db } from '@/lib/firebase';
-import { doc, getDoc } from 'firebase/firestore';
+
+const UserDetailsSchema = z.object({
+    gender: z.string().optional(),
+    age: z.number().nullable().optional(),
+    maritalStatus: z.string().optional(),
+    state: z.string().optional(),
+    city: z.string().optional(),
+    preferredLanguage: z.string().optional(),
+}).nullable().optional();
 
 
 const ChatAIInputSchema = z.object({
@@ -15,19 +26,14 @@ const ChatAIInputSchema = z.object({
     role: z.enum(['user', 'model']),
     parts: z.array(z.object({ text: z.string() })),
   })).optional(),
-  userId: z.string(),
+  userDetails: UserDetailsSchema,
 });
 
 /**
  * Handles calling the Genkit AI flow to get a chatbot response.
- * This is a server-only action and now fetches user profile data from Firestore.
+ * This is a server-only action and now receives user profile data from the client.
  */
-export async function getAIChatResponse(input: {
-  query: string, 
-  userName?: string, 
-  chatHistory?: AIChatMessage[],
-  userId: string,
-}): Promise<CyberLawChatbotOutput & { error?: string }> {
+export async function getAIChatResponse(input: z.infer<typeof ChatAIInputSchema>): Promise<CyberLawChatbotOutput & { error?: string }> {
 
   const validatedFields = ChatAIInputSchema.safeParse(input);
 
@@ -37,28 +43,8 @@ export async function getAIChatResponse(input: {
   }
 
   try {
-    const { userId, ...restOfInput } = validatedFields.data;
-
-    let userDetails = {};
-    if (userId) {
-      const userDocRef = doc(db, 'users', userId);
-      const userDoc = await getDoc(userDocRef);
-      if (userDoc.exists()) {
-        const data = userDoc.data();
-        userDetails = {
-          gender: data.gender,
-          age: data.age,
-          maritalStatus: data.maritalStatus,
-          state: data.state,
-          city: data.city,
-          preferredLanguage: data.preferredLanguage,
-        };
-      }
-    }
-
     const aiInput: CyberLawChatbotInput = {
-        ...restOfInput,
-        userDetails,
+        ...validatedFields.data,
     };
     
     const result = await cyberLawChatbot(aiInput);

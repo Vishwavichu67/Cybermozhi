@@ -13,12 +13,24 @@ import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { getAIChatResponse } from '@/app/chatbot/actions';
 import type { ChatMessage as AIChatMessage } from '@/ai/flows/cyber-law-chatbot';
+import { db } from '@/lib/firebase';
+import { doc, getDoc } from 'firebase/firestore';
 
-// Local message type, as we're no longer using Firestore types here.
+// Local message type
 interface Message {
   id: string;
   text: string;
   role: 'user' | 'model';
+}
+
+interface UserDetails {
+  displayName: string;
+  age?: number | null;
+  gender?: string;
+  preferredLanguage?: string;
+  maritalStatus?: string;
+  state?: string;
+  city?: string;
 }
 
 export function ChatInterface() {
@@ -28,7 +40,32 @@ export function ChatInterface() {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   const { user, loading: authLoading } = useAuth();
+  const [userDetails, setUserDetails] = useState<UserDetails | null>(null);
   
+  useEffect(() => {
+    async function fetchUserDetails() {
+      if (user) {
+        const userDocRef = doc(db, 'users', user.uid);
+        try {
+          const userDoc = await getDoc(userDocRef);
+          if (userDoc.exists()) {
+            setUserDetails(userDoc.data() as UserDetails);
+          }
+        } catch (err) {
+          console.error("Failed to fetch user details:", err);
+          toast({
+            variant: 'destructive',
+            title: 'Profile Error',
+            description: 'Could not load your profile details for personalization.'
+          });
+        }
+      } else {
+        setUserDetails(null);
+      }
+    }
+    fetchUserDetails();
+  }, [user, toast]);
+
   const scrollToBottom = useCallback(() => {
     setTimeout(() => {
       if (scrollAreaRef.current) {
@@ -65,7 +102,7 @@ export function ChatInterface() {
           query: userMessageText,
           userName: userName,
           chatHistory: chatHistoryForAI,
-          userId: user.uid,
+          userDetails: userDetails,
       });
 
       const aiMessageText = result.error ? `Sorry, an error occurred: ${result.error}` : result.answer;

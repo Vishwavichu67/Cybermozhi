@@ -26,6 +26,10 @@ const profileSchema = z.object({
     message: "Please enter a valid positive number for age.",
   }).optional(),
   gender: z.enum(["Male", "Female", "Other", "Prefer not to say"]).optional(),
+  preferredLanguage: z.enum(["Tamil", "English", "Both", "Not specified"]).optional(),
+  location: z.string().max(100, { message: "Location can't be more than 100 characters." }).optional(),
+  nationality: z.string().max(50, { message: "Nationality can't be more than 50 characters." }).optional(),
+  maritalStatus: z.enum(["Single", "Married", "Divorced", "Widowed", "Prefer not to say"]).optional(),
 });
 
 type ProfileFormValues = z.infer<typeof profileSchema>;
@@ -43,6 +47,10 @@ export default function ProfilePage() {
       displayName: '',
       age: '',
       gender: 'Prefer not to say',
+      preferredLanguage: 'Not specified',
+      location: '',
+      nationality: '',
+      maritalStatus: 'Prefer not to say',
     },
   });
 
@@ -67,6 +75,10 @@ export default function ProfilePage() {
               displayName: data.displayName || user.displayName || '',
               age: data.age ? String(data.age) : '',
               gender: data.gender || 'Prefer not to say',
+              preferredLanguage: data.preferredLanguage || 'Not specified',
+              location: data.location || '',
+              nationality: data.nationality || '',
+              maritalStatus: data.maritalStatus || 'Prefer not to say',
             });
           } else {
             // Pre-fill with Auth data if no Firestore doc exists yet
@@ -74,6 +86,10 @@ export default function ProfilePage() {
               displayName: user.displayName || user.email?.split('@')[0] || '',
               age: '',
               gender: 'Prefer not to say',
+              preferredLanguage: 'Not specified',
+              location: '',
+              nationality: '',
+              maritalStatus: 'Prefer not to say',
             });
           }
         } catch (err: any) {
@@ -119,6 +135,10 @@ export default function ProfilePage() {
         email: user.email,
         age: ageAsNumber,
         gender: data.gender || null,
+        preferredLanguage: data.preferredLanguage || null,
+        location: data.location || null,
+        nationality: data.nationality || null,
+        maritalStatus: data.maritalStatus || null,
       }, { merge: true });
 
       toast({
@@ -216,6 +236,79 @@ export default function ProfilePage() {
                           <SelectItem value="Prefer not to say">Prefer not to say</SelectItem>
                         </SelectContent>
                       </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="preferredLanguage"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Preferred Language</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select your language" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="Tamil">Tamil</SelectItem>
+                          <SelectItem value="English">English</SelectItem>
+                          <SelectItem value="Both">Both</SelectItem>
+                          <SelectItem value="Not specified">Not specified</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="maritalStatus"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Marital Status</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select your marital status" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="Single">Single</SelectItem>
+                          <SelectItem value="Married">Married</SelectItem>
+                          <SelectItem value="Divorced">Divorced</SelectItem>
+                          <SelectItem value="Widowed">Widowed</SelectItem>
+                          <SelectItem value="Prefer not to say">Prefer not to say</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="nationality"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Nationality</FormLabel>
+                      <FormControl>
+                        <Input placeholder="e.g. Indian" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="location"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Location (City, State)</FormLabel>
+                      <FormControl>
+                        <Input placeholder="e.g. Chennai, Tamil Nadu" {...field} />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}

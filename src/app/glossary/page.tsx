@@ -9,6 +9,10 @@ import { BookOpen, Search } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 function GlossaryItemCard({ termItem, delay = 0 }: { termItem: GlossaryTerm, delay?: number }) {
+  const parts = termItem.definition.split(' Example: ');
+  const mainDefinition = parts[0];
+  const example = parts.length > 1 ? parts.slice(1).join(' Example: ') : null;
+
   return (
     <Card
       className="shadow-md hover:shadow-lg transition-transform duration-300 ease-out transform hover:scale-105 hover:-rotate-y-1 rounded-lg overflow-hidden flex flex-col h-full animate-in fade-in-0 slide-in-from-bottom-4 duration-500 ease-out"
@@ -22,7 +26,12 @@ function GlossaryItemCard({ termItem, delay = 0 }: { termItem: GlossaryTerm, del
       </CardHeader>
       <CardContent className="p-4 flex-grow">
         <CardDescription className="text-sm text-foreground/80 leading-relaxed">
-          {termItem.definition}
+          {mainDefinition}
+          {example && (
+            <span className="block mt-2">
+              <strong className="text-primary font-semibold">Example:</strong> {example}
+            </span>
+          )}
         </CardDescription>
       </CardContent>
     </Card>

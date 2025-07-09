@@ -161,12 +161,7 @@ const cyberLawChatbotFlow = ai.defineFlow(
     outputSchema: CyberLawChatbotOutputSchema,
   },
   async (input: CyberLawChatbotInput): Promise<CyberLawChatbotOutput> => {
-    // This is the key fix: ensure userDetails is not null, so template access doesn't fail.
-    const safeInput = {
-      ...input,
-      userDetails: input.userDetails || undefined,
-    };
-    const {output} = await prompt(safeInput);
+    const {output} = await prompt(input);
 
     if (!output) {
       console.error('Cyber law chatbot: AI did not return the expected output structure.');

@@ -44,8 +44,11 @@ export async function getAIChatResponse(input: z.infer<typeof ChatAIInputSchema>
   }
 
   try {
+    // The key fix: if userDetails is null (which it can be from the client),
+    // convert it to undefined before passing it to the Genkit flow, which expects an object or undefined.
     const aiInput: CyberLawChatbotInput = {
-        ...validatedFields.data,
+      ...validatedFields.data,
+      userDetails: validatedFields.data.userDetails || undefined,
     };
     
     const result = await cyberLawChatbot(aiInput);

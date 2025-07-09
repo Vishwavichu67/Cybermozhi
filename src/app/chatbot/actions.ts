@@ -55,9 +55,19 @@ export async function getAIChatResponse(input: z.infer<typeof ChatAIInputSchema>
     return result;
   } catch (e) {
     let errorMessage = "An unexpected error occurred with the AI assistant.";
-    if (e instanceof Error) errorMessage = e.message;
-    else if (typeof e === 'string') errorMessage = e;
-    else { try { errorMessage = JSON.stringify(e); } catch { /* ignore */ } }
+    if (e instanceof Error) {
+      if (e.message.includes('429') || e.message.toLowerCase().includes('exceeded your current quota')) {
+        errorMessage = "Our AI assistant is currently experiencing a high volume of requests and has reached its daily limit. Please try again tomorrow. We appreciate your patience!";
+      } else {
+        errorMessage = e.message;
+      }
+    } else if (typeof e === 'string') {
+      errorMessage = e;
+    } else {
+      try {
+        errorMessage = JSON.stringify(e);
+      } catch { /* ignore */ }
+    }
     console.error("Error in getAIChatResponse:", e);
     return { answer: '', error: errorMessage };
   }

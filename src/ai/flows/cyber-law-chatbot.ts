@@ -35,6 +35,7 @@ const CyberLawChatbotInputSchema = z.object({
     city: z.string().optional(),
     preferredLanguage: z.string().optional(),
   }).optional().describe('Additional details about the user like gender, age, marital status, and location. Use this for personalization.'),
+  isProfileIncomplete: z.boolean().optional().describe('True if the user has a new or incomplete profile. Use this to gently prompt them to complete it for a better experience.'),
 });
 export type CyberLawChatbotInput = z.infer<typeof CyberLawChatbotInputSchema>;
 
@@ -87,14 +88,16 @@ Core Principles for Responding:
     *   **Legal Disclaimer:** Implicitly or explicitly remind users that your information is for educational and guidance purposes and does not constitute formal legal advice. For specific legal issues, consulting a qualified legal professional is recommended. (e.g., "Remember, this information is for educational purposes. For specific legal advice, please consult a legal professional.")
 
 4.  **Personalization & Context (Utilize provided userName, userDetails, and chatHistory):**
+    *   **New/Incomplete Profiles:** {{#if isProfileIncomplete}}As part of your main response, gently encourage the user to complete their profile for more personalized advice. Include a markdown link like this: "For more tailored guidance, consider completing your [profile settings](/profile)." This should be a friendly suggestion, not a requirement.{{/if}}
     *   **Chat History:** If previous conversation history ({{{chatHistory}}}) is available, use it to understand the ongoing context, avoid repetition, and provide more relevant follow-up answers. Refer to past user statements or bot answers if relevant.
-    *   **User Profile Data:** Use the provided user details ({{{userDetails}}}) to tailor your responses.
+    *   **User Profile Data:** {{#if userDetails}}Use the provided user details to tailor your responses.
         *   **Greeting:** If a user name ({{{userName}}}) is provided, use it to personalize greetings.
         *   **Location:** If the user has provided a state ({{{userDetails.state}}}) or city ({{{userDetails.city}}}) and their query is about legal procedures (like filing a complaint), make your guidance more specific. For example, mention that they should contact the state's cyber crime cell or local police, and if you know of specific resources for that state, you can mention them.
         *   **Marital Status:** If the user has provided their marital status ({{{userDetails.maritalStatus}}}) and their query relates to family or domestic issues online (e.g., harassment by a spouse, divorce-related cyber issues), acknowledge this context subtly in your response to provide more relevant legal information or resources.
         *   **Language:** If a preferred language ({{{userDetails.preferredLanguage}}}) is specified, try to lean towards that language in your response, while still respecting the language of the current query.
         *   **General Tone:** Use other details like age ({{{userDetails.age}}}) and gender ({{{userDetails.gender}}}) to subtly adapt your tone or examples if appropriate, without being intrusive or making assumptions. For instance, if the user is young, examples might be more relatable to social media or student life.
-    *   **Guest Users:** For guest users (or if no specific user data is available), provide general, helpful responses. You can mention that logging in unlocks more personalized features.
+    {{/if}}
+    *   **Guest Users:** For guest users (or if no userDetails are available), provide general, helpful responses.
 
 5.  **Structure & Formatting (Very Important):**
     *   **Use Markdown:** Structure your entire response using Markdown for clarity and readability. Your output will be rendered as markdown, so use it effectively.
@@ -158,7 +161,12 @@ const cyberLawChatbotFlow = ai.defineFlow(
     outputSchema: CyberLawChatbotOutputSchema,
   },
   async (input: CyberLawChatbotInput): Promise<CyberLawChatbotOutput> => {
-    const {output} = await prompt(input);
+    // This is the key fix: ensure userDetails is not null, so template access doesn't fail.
+    const safeInput = {
+      ...input,
+      userDetails: input.userDetails || undefined,
+    };
+    const {output} = await prompt(safeInput);
 
     if (!output) {
       console.error('Cyber law chatbot: AI did not return the expected output structure.');

@@ -27,6 +27,7 @@ const ChatAIInputSchema = z.object({
     parts: z.array(z.object({ text: z.string() })),
   })).optional(),
   userDetails: UserDetailsSchema,
+  isProfileIncomplete: z.boolean().optional(),
 });
 
 /**

@@ -45,6 +45,7 @@ export function ChatInterface() {
   const { toast } = useToast();
   const { user, loading: authLoading } = useAuth();
   const [userDetails, setUserDetails] = useState<UserDetails | null>(null);
+  const [isProfileIncomplete, setIsProfileIncomplete] = useState(false);
   
   useEffect(() => {
     async function fetchUserDetails() {
@@ -53,7 +54,18 @@ export function ChatInterface() {
         try {
           const userDoc = await getDoc(userDocRef);
           if (userDoc.exists()) {
-            setUserDetails(userDoc.data() as UserDetails);
+            const data = userDoc.data();
+            setUserDetails(data as UserDetails);
+            // Profile is considered incomplete for personalization if key demographic data is missing.
+            if (!data.state && !data.maritalStatus && !data.age) {
+               setIsProfileIncomplete(true);
+            } else {
+               setIsProfileIncomplete(false);
+            }
+          } else {
+            // New user, doc doesn't exist yet
+            setUserDetails(null); 
+            setIsProfileIncomplete(true);
           }
         } catch (err) {
           console.error("Failed to fetch user details:", err);
@@ -62,9 +74,13 @@ export function ChatInterface() {
             title: 'Profile Error',
             description: 'Could not load your profile details for personalization.'
           });
+          // Still allow chat, but mark profile as incomplete
+          setUserDetails(null);
+          setIsProfileIncomplete(true);
         }
       } else {
         setUserDetails(null);
+        setIsProfileIncomplete(false);
       }
     }
     fetchUserDetails();
@@ -107,6 +123,7 @@ export function ChatInterface() {
           userName: userName,
           chatHistory: chatHistoryForAI,
           userDetails: userDetails,
+          isProfileIncomplete: isProfileIncomplete,
       });
 
       const aiMessageText = result.error ? `Sorry, an error occurred: ${result.error}` : result.answer;

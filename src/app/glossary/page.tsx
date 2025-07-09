@@ -49,10 +49,10 @@ export default function GlossaryPage() {
 
   return (
     <div className="flex flex-col items-center w-full">
-      <header className="mb-10 text-center animate-in fade-in-0 slide-in-from-top-12 duration-700 ease-out">
+      <header className="mb-8 sm:mb-10 text-center animate-in fade-in-0 slide-in-from-top-12 duration-700 ease-out">
         <BookOpen className="w-16 h-16 text-primary mx-auto mb-4" />
-        <h1 className="text-4xl font-headline font-bold text-primary">Cyber Glossary</h1>
-        <p className="mt-2 text-lg text-foreground/70 max-w-2xl mx-auto">
+        <h1 className="text-3xl sm:text-4xl font-headline font-bold text-primary">Cyber Glossary</h1>
+        <p className="mt-2 text-md sm:text-lg text-foreground/70 max-w-2xl mx-auto">
           A comprehensive list of cybersecurity and cyber law terms, explained in simple language.
         </p>
       </header>

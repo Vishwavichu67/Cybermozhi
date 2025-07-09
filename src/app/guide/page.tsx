@@ -69,8 +69,8 @@ export default function GuidePage() {
     <div className="flex flex-col items-center w-full">
       <header className="mb-10 text-center animate-in fade-in-0 slide-in-from-top-12 duration-700 ease-out">
         <Rocket className="w-16 h-16 text-primary mx-auto mb-4" />
-        <h1 className="text-4xl font-headline font-bold text-primary">Site Guide</h1>
-        <p className="mt-2 text-lg text-foreground/70 max-w-2xl mx-auto">
+        <h1 className="text-3xl sm:text-4xl font-headline font-bold text-primary">Site Guide</h1>
+        <p className="mt-2 text-md sm:text-lg text-foreground/70 max-w-2xl mx-auto">
           Learn how to effectively use CyberMozhi to navigate the world of cyber laws and cybersecurity.
         </p>
       </header>
@@ -112,7 +112,7 @@ export default function GuidePage() {
         <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 mb-6">
           <UserCircle className="w-16 h-16 sm:w-20 sm:h-20 text-accent flex-shrink-0 border-2 border-accent/30 rounded-full p-1" />
           <div className="text-center sm:text-left">
-            <h2 className="text-3xl font-headline font-bold text-accent">Meet the Creator</h2>
+            <h2 className="text-2xl sm:text-3xl font-headline font-bold text-accent">Meet the Creator</h2>
             <p className="text-xl font-semibold text-primary mt-1">Vishwa</p>
           </div>
         </div>
@@ -158,7 +158,7 @@ export default function GuidePage() {
         <div className="flex items-start gap-4">
           <AlertTriangle className="w-10 h-10 text-destructive flex-shrink-0 mt-1" />
           <div>
-            <h2 className="text-2xl font-headline font-semibold text-destructive">Important Disclaimer</h2>
+            <h2 className="text-xl sm:text-2xl font-headline font-semibold text-destructive">Important Disclaimer</h2>
             <p className="text-foreground/70 mt-2 leading-relaxed">
               The information provided on CyberMozhi is for general informational and educational purposes only, and does not constitute legal advice. While we strive to keep the information up-to-date and correct, we make no representations or warranties of any kind, express or implied, about the completeness, accuracy, reliability, suitability, or availability with respect to the website or the information, products, services, or related graphics contained on the website for any purpose. Any reliance you place on such information is therefore strictly at your own risk.
             </p>

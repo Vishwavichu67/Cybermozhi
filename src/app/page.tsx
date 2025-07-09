@@ -75,19 +75,19 @@ export default function HomePage() {
   // Guest User View
   if (!isLoggedIn) {
     return (
-      <div className="flex flex-col items-center space-y-16">
+      <div className="flex flex-col items-center space-y-12 md:space-y-16">
         {/* Hero Section for Guests */}
-        <section className="relative w-full py-12 md:py-20 lg:py-28 bg-gradient-to-br from-primary/10 via-background to-accent/10 rounded-xl shadow-lg text-center animate-in fade-in-0 slide-in-from-top-12 duration-700 ease-out overflow-hidden">
+        <section className="relative w-full py-16 sm:py-20 md:py-24 lg:py-28 bg-gradient-to-br from-primary/10 via-background to-accent/10 rounded-xl shadow-lg text-center animate-in fade-in-0 slide-in-from-top-12 duration-700 ease-out overflow-hidden">
           
           <ShieldCheck className="absolute -top-5 -left-5 h-24 w-24 text-primary/10 animate-float-up-down opacity-70" style={{ animationDuration: '5s', animationDelay: '0.2s' }} />
           <NetworkIcon className="absolute -bottom-8 -right-8 h-32 w-32 text-accent/10 animate-float-left-right opacity-60" style={{ animationDuration: '6s', animationDelay: '0.5s' }} />
 
           <div className="container px-4 md:px-6 relative z-10">
             <Sparkles className="w-16 h-16 md:w-20 md:h-20 text-primary mx-auto mb-6 animate-pulse delay-300" />
-            <h1 className="text-3xl font-headline font-bold tracking-tight sm:text-4xl md:text-5xl text-primary">
+            <h1 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl text-primary font-headline">
               Welcome to CyberMozhi! வணக்கம்!
             </h1>
-            <p className="mt-6 text-lg md:text-xl text-foreground/80 max-w-3xl mx-auto">
+            <p className="mt-4 text-md sm:text-lg md:text-xl text-foreground/80 max-w-3xl mx-auto">
               Your AI-powered bilingual (Tamil & English) assistant for understanding Indian cyber laws, online threats, cybersecurity best practices, and legal remedies.
             </p>
             <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
@@ -107,7 +107,7 @@ export default function HomePage() {
 
         {/* What You Can Learn Section */}
         <section className="w-full container px-4 md:px-6 animate-in fade-in-0 slide-in-from-bottom-8 duration-700 ease-out" style={{ animationDelay: '400ms' }}>
-          <h2 className="text-3xl font-headline font-bold tracking-tight text-center text-primary mb-12">
+          <h2 className="text-2xl font-bold tracking-tight sm:text-3xl text-center text-primary mb-12 font-headline">
             Discover Key Cyber Topics
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -141,7 +141,7 @@ export default function HomePage() {
         {/* Core Features Section for Guests */}
         <section className="w-full py-12 md:py-16 bg-background animate-in fade-in-0 slide-in-from-bottom-8 duration-700 ease-out" style={{ animationDelay: '600ms' }}>
           <div className="container px-4 md:px-6">
-            <h2 className="text-3xl font-headline font-bold tracking-tight text-center text-primary mb-12">
+            <h2 className="text-2xl font-bold tracking-tight sm:text-3xl text-center text-primary mb-12 font-headline">
               Explore Our Resources
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -179,10 +179,10 @@ export default function HomePage() {
         <section className="w-full py-12 md:py-20 bg-accent/10 rounded-xl shadow-lg text-center animate-in fade-in-0 slide-in-from-bottom-8 duration-700 ease-out" style={{ animationDelay: '800ms' }}>
           <div className="container px-4 md:px-6">
             <LogIn className="w-12 h-12 text-accent mx-auto mb-6 animate-pulse delay-500" />
-            <h2 className="text-3xl font-headline font-bold tracking-tight text-accent mb-4">
+            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-accent mb-4 font-headline">
               Unlock CyberMozhi's Full Potential
             </h2>
-            <p className="mt-4 max-w-2xl mx-auto text-lg text-foreground/80">
+            <p className="mt-4 max-w-2xl mx-auto text-md sm:text-lg text-foreground/80">
               Create a free account or login to get personalized advice from our AI and an enhanced user experience.
             </p>
             <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
@@ -209,10 +209,10 @@ export default function HomePage() {
       {/* Personalized Greeting */}
       <section className="w-full py-10 text-center bg-gradient-to-r from-primary/10 to-accent/10 rounded-xl shadow-md animate-in fade-in-0 slide-in-from-top-12 duration-700 ease-out">
         <div className="container px-4 md:px-6">
-          <h1 className="text-3xl sm:text-4xl font-headline font-bold text-primary">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-headline font-bold text-primary">
             Vanakkam, {user?.displayName || user?.email?.split('@')[0]}!
           </h1>
-          <p className="mt-3 text-lg text-foreground/80">
+          <p className="mt-3 text-md sm:text-lg text-foreground/80">
             Welcome back to CyberMozhi. Let's continue your journey to digital safety and legal awareness.
           </p>
         </div>
@@ -220,7 +220,7 @@ export default function HomePage() {
 
       {/* Quick Access to Core Features */}
       <section className="w-full container px-4 md:px-6 py-10 animate-in fade-in-0 slide-in-from-bottom-8 duration-700 ease-out" style={{ animationDelay: '200ms' }}>
-         <h2 className="text-3xl font-headline font-bold tracking-tight text-center text-primary mb-12">
+         <h2 className="text-2xl sm:text-3xl font-headline font-bold tracking-tight text-center text-primary mb-12">
             Quick Access to Resources
           </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -258,10 +258,10 @@ export default function HomePage() {
       <section className="w-full py-12 md:py-16 bg-accent/10 rounded-xl shadow-lg animate-in fade-in-0 slide-in-from-bottom-8 duration-700 ease-out" style={{ animationDelay: '400ms' }}>
         <div className="container px-4 md:px-6 text-center">
           <MessageCircle className="w-12 h-12 text-accent mx-auto mb-6 animate-pulse delay-700" />
-          <h2 className="text-3xl font-headline font-bold tracking-tight text-accent">
+          <h2 className="text-2xl sm:text-3xl font-headline font-bold tracking-tight text-accent">
             Your AI Legal & Cyber Guide Awaits
           </h2>
-          <p className="mt-4 max-w-2xl mx-auto text-lg text-foreground/80">
+          <p className="mt-4 max-w-2xl mx-auto text-md sm:text-lg text-foreground/80">
             Leverage the full power of CyberMozhi's bilingual AI. Get detailed explanations on cyber laws, IT Act sections, penalties, attack mitigation, and guidance on filing complaints.
           </p>
           <div className="mt-8">
@@ -276,7 +276,7 @@ export default function HomePage() {
 
       {/* Slogan */}
       <footer className="py-10 text-center animate-in fade-in-0 duration-700 ease-out" style={{ animationDelay: '500ms' }}>
-        <p className="text-xl font-semibold text-primary">CyberMozhi: Speak Law. Speak Secure. Speak Smart. 💬⚖️🌐</p>
+        <p className="text-lg sm:text-xl font-semibold text-primary">CyberMozhi: Speak Law. Speak Secure. Speak Smart. 💬⚖️🌐</p>
       </footer>
     </div>
   );

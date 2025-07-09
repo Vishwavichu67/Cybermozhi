@@ -101,8 +101,8 @@ export default function LawSummariesPage() {
     <div className="flex flex-col items-center w-full">
       <header className="mb-10 text-center animate-in fade-in-0 slide-in-from-top-12 duration-700 ease-out">
         <Gavel className="w-16 h-16 text-primary mx-auto mb-4" />
-        <h1 className="text-4xl font-headline font-bold text-primary">Indian Cyber Law Summaries</h1>
-        <p className="mt-2 text-lg text-foreground/70 max-w-2xl mx-auto">
+        <h1 className="text-3xl sm:text-4xl font-headline font-bold text-primary">Indian Cyber Law Summaries</h1>
+        <p className="mt-2 text-md sm:text-lg text-foreground/70 max-w-2xl mx-auto">
           Understand key sections of Indian cyber laws and related policies. This information is for educational purposes and not legal advice.
         </p>
       </header>
@@ -117,7 +117,7 @@ export default function LawSummariesPage() {
             className="w-full max-w-4xl mb-12 animate-in fade-in-0 slide-in-from-bottom-8 duration-700 ease-out"
             style={{ animationDelay: `${catIndex * 150 + 200}ms` }}
           >
-            <h2 className="text-2xl font-headline font-semibold text-primary mb-6 pb-2 border-b-2 border-primary/30 flex items-center gap-2">
+            <h2 className="text-xl sm:text-2xl font-headline font-semibold text-primary mb-6 pb-2 border-b-2 border-primary/30 flex items-center gap-2">
               {category.icon && <category.icon className="w-6 h-6 text-primary" />}
               {category.title}
             </h2>

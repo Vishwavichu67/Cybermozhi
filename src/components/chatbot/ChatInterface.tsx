@@ -15,6 +15,10 @@ import { getAIChatResponse } from '@/app/chatbot/actions';
 import type { ChatMessage as AIChatMessage } from '@/ai/flows/cyber-law-chatbot';
 import { db } from '@/lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
+
 
 // Local message type
 interface Message {
@@ -173,7 +177,20 @@ export function ChatInterface() {
                         : 'bg-card border border-border/50 text-card-foreground rounded-bl-none'
                     )}
                   >
-                    <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.text}</p>
+                    {message.role === 'user' ? (
+                       <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.text}</p>
+                    ) : (
+                      <ReactMarkdown
+                        className="prose prose-sm dark:prose-invert max-w-none break-words"
+                        remarkPlugins={[remarkGfm]}
+                        rehypePlugins={[rehypeRaw]}
+                        components={{
+                          p: ({node, ...props}) => <p className="mb-2 last:mb-0" {...props} />,
+                        }}
+                      >
+                        {message.text}
+                      </ReactMarkdown>
+                    )}
                   </div>
                   {message.role === 'user' && (
                     <Avatar className="h-8 w-8 shadow-md flex-shrink-0">

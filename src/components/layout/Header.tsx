@@ -1,4 +1,3 @@
-
 "use client";
 
 import Link from 'next/link';
@@ -189,7 +188,7 @@ export function Header() {
               </Button>
             </SheetTrigger>
             <SheetContent side="right" className="w-full max-w-xs p-0 bg-background flex flex-col">
-              <div className="flex items-center justify-between p-4 border-b">
+              <div className="flex items-center p-4 border-b">
                  <Link
                     href="/"
                     className="group flex items-center gap-2 text-lg font-headline font-semibold text-primary"
@@ -203,11 +202,6 @@ export function Header() {
                       className="transition-transform duration-300 ease-in-out group-hover:scale-105"
                     />
                 </Link>
-                <SheetClose asChild>
-                   <Button variant="ghost" size="icon" aria-label="Close menu">
-                      <X className="h-6 w-6" />
-                    </Button>
-                </SheetClose>
               </div>
 
               <nav className="flex-grow p-4 space-y-2">

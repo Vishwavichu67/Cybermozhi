@@ -1551,6 +1551,9 @@ video {
 .h-svh {
   height: 100svh;
 }
+.h-screen {
+  height: 100vh;
+}
 .max-h-24 {
   max-height: 6rem;
 }
@@ -1655,6 +1658,9 @@ video {
 }
 .w-full {
   width: 100%;
+}
+.w-screen {
+  width: 100vw;
 }
 .min-w-0 {
   min-width: 0px;
@@ -2278,6 +2284,9 @@ video {
 }
 .pt-3 {
   padding-top: 0.75rem;
+}
+.pt-16 {
+  padding-top: 4rem;
 }
 .text-left {
   text-align: left;

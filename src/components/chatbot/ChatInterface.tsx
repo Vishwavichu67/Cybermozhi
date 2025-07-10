@@ -166,7 +166,7 @@ export function ChatInterface() {
 
   return (
     <div className="flex flex-col h-full w-full bg-background">
-      <header className="flex items-center p-3 border-b border-border/40 bg-background/95 backdrop-blur-sm sticky top-0 z-10">
+      <header className="flex-shrink-0 flex items-center p-3 border-b border-border/40 bg-background/95 backdrop-blur-sm z-10">
          <Button variant="ghost" size="icon" className="mr-2" asChild>
             <Link href="/">
                 <ArrowLeft className="h-5 w-5" />
@@ -183,106 +183,108 @@ export function ChatInterface() {
         </div>
       </header>
 
-      <main ref={scrollAreaRef} className="flex-1 overflow-y-auto p-4 md:px-6 space-y-4">
-        <AnimatePresence>
-            {messages.length === 0 && !isSendingMessage && (
-                <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="flex flex-col items-center justify-center text-center text-muted-foreground h-full"
-                >
-                    <MessageCircle className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                    <h2 className="text-xl font-semibold text-foreground">Start a Conversation</h2>
-                    <p className="max-w-xs">Ask me anything about Indian cyber law or cybersecurity. I'm here to help!</p>
-                </motion.div>
-            )}
-            {messages.map((message) => (
-                <motion.div
-                    key={message.id}
-                    layout
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    transition={{ duration: 0.3, ease: "easeOut" }}
-                    className={cn(
-                        "flex items-end gap-2.5 w-full",
-                        message.role === 'user' ? 'justify-end' : 'justify-start'
-                    )}
-                >
-                    {message.role === 'model' && (
-                        <Avatar className="h-8 w-8 shadow-sm flex-shrink-0 self-start">
-                            <AvatarFallback className="bg-primary text-primary-foreground">
-                                <Sparkles className="h-4 w-4" />
-                            </AvatarFallback>
-                        </Avatar>
-                    )}
-                     <div
+      <main ref={scrollAreaRef} className="flex-1 overflow-y-auto">
+        <div className="p-4 md:px-6 space-y-4">
+            <AnimatePresence>
+                {messages.length === 0 && !isSendingMessage && (
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="flex flex-col items-center justify-center text-center text-muted-foreground h-full pt-16"
+                    >
+                        <MessageCircle className="w-16 h-16 mx-auto mb-4 opacity-50" />
+                        <h2 className="text-xl font-semibold text-foreground">Start a Conversation</h2>
+                        <p className="max-w-xs">Ask me anything about Indian cyber law or cybersecurity. I'm here to help!</p>
+                    </motion.div>
+                )}
+                {messages.map((message) => (
+                    <motion.div
+                        key={message.id}
+                        layout
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        transition={{ duration: 0.3, ease: "easeOut" }}
                         className={cn(
-                        "flex flex-col max-w-[80%] md:max-w-[65%]",
-                        message.role === 'user' ? 'items-end' : 'items-start'
+                            "flex items-end gap-2.5 w-full",
+                            message.role === 'user' ? 'justify-end' : 'justify-start'
                         )}
                     >
-                        <div
+                        {message.role === 'model' && (
+                            <Avatar className="h-8 w-8 shadow-sm flex-shrink-0 self-start">
+                                <AvatarFallback className="bg-primary text-primary-foreground">
+                                    <Sparkles className="h-4 w-4" />
+                                </AvatarFallback>
+                            </Avatar>
+                        )}
+                         <div
                             className={cn(
-                                "p-3 rounded-2xl shadow-sm",
-                                message.role === 'user'
-                                ? 'bg-primary text-primary-foreground rounded-br-lg'
-                                : 'bg-card border border-border/50 text-card-foreground rounded-bl-lg'
+                            "flex flex-col max-w-[80%] md:max-w-[65%]",
+                            message.role === 'user' ? 'items-end' : 'items-start'
                             )}
                         >
-                             {message.role === 'user' ? (
-                                <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.text}</p>
-                            ) : (
-                                <ReactMarkdown
-                                    className="prose prose-sm dark:prose-invert max-w-none break-words"
-                                    remarkPlugins={[remarkGfm]}
-                                    rehypePlugins={[rehypeRaw]}
-                                    components={{
-                                        p: ({node, ...props}) => <p className="mb-2 last:mb-0" {...props} />,
-                                        a: ({node, ...props}) => <a className="text-primary hover:underline" {...props} />,
-                                        strong: ({node, ...props}) => <strong className="text-primary font-bold" {...props} />
-                                    }}
-                                >
-                                    {message.text}
-                                </ReactMarkdown>
-                            )}
+                            <div
+                                className={cn(
+                                    "p-3 rounded-2xl shadow-sm",
+                                    message.role === 'user'
+                                    ? 'bg-primary text-primary-foreground rounded-br-lg'
+                                    : 'bg-card border border-border/50 text-card-foreground rounded-bl-lg'
+                                )}
+                            >
+                                 {message.role === 'user' ? (
+                                    <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.text}</p>
+                                ) : (
+                                    <ReactMarkdown
+                                        className="prose prose-sm dark:prose-invert max-w-none break-words"
+                                        remarkPlugins={[remarkGfm]}
+                                        rehypePlugins={[rehypeRaw]}
+                                        components={{
+                                            p: ({node, ...props}) => <p className="mb-2 last:mb-0" {...props} />,
+                                            a: ({node, ...props}) => <a className="text-primary hover:underline" target="_blank" rel="noopener noreferrer" {...props} />,
+                                            strong: ({node, ...props}) => <strong className="text-primary font-bold" {...props} />
+                                        }}
+                                    >
+                                        {message.text}
+                                    </ReactMarkdown>
+                                )}
+                            </div>
+                            <span className="text-xs text-muted-foreground mt-1.5 px-1">{message.timestamp}</span>
                         </div>
-                        <span className="text-xs text-muted-foreground mt-1.5 px-1">{message.timestamp}</span>
-                    </div>
 
-                    {message.role === 'user' && (
-                        <Avatar className="h-8 w-8 shadow-sm flex-shrink-0 self-start">
-                            <AvatarFallback className="bg-accent text-accent-foreground">
-                                <User className="h-4 w-4" />
-                            </AvatarFallback>
-                        </Avatar>
-                    )}
-                </motion.div>
-            ))}
-            {isSendingMessage && (
-                 <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="flex items-end gap-2.5 justify-start w-full"
-                >
-                  <Avatar className="h-8 w-8 shadow-sm flex-shrink-0 self-start">
-                    <AvatarFallback className="bg-primary text-primary-foreground">
-                      <Sparkles className="h-4 w-4" />
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="max-w-[70%] p-3 rounded-2xl shadow-sm bg-card border border-border/50 text-card-foreground rounded-bl-lg">
-                    <div className="flex items-center space-x-1.5">
-                      <span className="h-1.5 w-1.5 bg-muted-foreground rounded-full animate-pulse" style={{animationDelay: '0s'}}></span>
-                      <span className="h-1.5 w-1.5 bg-muted-foreground rounded-full animate-pulse" style={{animationDelay: '0.2s'}}></span>
-                      <span className="h-1.5 w-1.5 bg-muted-foreground rounded-full animate-pulse" style={{animationDelay: '0.4s'}}></span>
-                    </div>
-                  </div>
-                </motion.div>
-            )}
-        </AnimatePresence>
+                        {message.role === 'user' && (
+                            <Avatar className="h-8 w-8 shadow-sm flex-shrink-0 self-start">
+                                <AvatarFallback className="bg-accent text-accent-foreground">
+                                    <User className="h-4 w-4" />
+                                </AvatarFallback>
+                            </Avatar>
+                        )}
+                    </motion.div>
+                ))}
+                {isSendingMessage && (
+                     <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="flex items-end gap-2.5 justify-start w-full"
+                    >
+                      <Avatar className="h-8 w-8 shadow-sm flex-shrink-0 self-start">
+                        <AvatarFallback className="bg-primary text-primary-foreground">
+                          <Sparkles className="h-4 w-4" />
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="max-w-[70%] p-3 rounded-2xl shadow-sm bg-card border border-border/50 text-card-foreground rounded-bl-lg">
+                        <div className="flex items-center space-x-1.5">
+                          <span className="h-1.5 w-1.5 bg-muted-foreground rounded-full animate-pulse" style={{animationDelay: '0s'}}></span>
+                          <span className="h-1.5 w-1.5 bg-muted-foreground rounded-full animate-pulse" style={{animationDelay: '0.2s'}}></span>
+                          <span className="h-1.5 w-1.5 bg-muted-foreground rounded-full animate-pulse" style={{animationDelay: '0.4s'}}></span>
+                        </div>
+                      </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
       </main>
 
-      <footer className="p-3 sm:p-4 border-t border-border/40 bg-background/95 sticky bottom-0 z-10">
+      <footer className="flex-shrink-0 p-3 sm:p-4 border-t border-border/40 bg-background/95 z-10">
         <form onSubmit={handleSubmit} className="flex items-center gap-2">
             <Textarea
                 value={input}

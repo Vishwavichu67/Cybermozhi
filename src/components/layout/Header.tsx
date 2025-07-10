@@ -1,10 +1,11 @@
+
 "use client";
 
 import Link from 'next/link';
 import Image from 'next/image';
 import { MessageCircle, Gavel, BookOpen, Menu, X, LogIn, LogOut, Rocket, Loader2, UserCog } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
@@ -26,7 +27,7 @@ import { ThemeToggle } from './ThemeToggle';
 
 const navItems = [
   { href: '/', label: 'Home', icon: Rocket },
-  { href: '/chatbot', label: 'AI Chatbot', icon: MessageCircle },
+  { href: '/chat', label: 'AI Chatbot', icon: MessageCircle },
   { href: '/law-summaries', label: 'Law Summaries', icon: Gavel },
   { href: '/glossary', label: 'Cyber Glossary', icon: BookOpen },
   { href: '/guide', label: 'Site Guide', icon: Rocket },
@@ -188,7 +189,8 @@ export function Header() {
               </Button>
             </SheetTrigger>
             <SheetContent side="right" className="w-full max-w-xs p-0 bg-background flex flex-col">
-              <div className="flex items-center p-4 border-b">
+              <SheetHeader className="p-4 border-b">
+                 <SheetTitle className="sr-only">Mobile Menu</SheetTitle>
                  <Link
                     href="/"
                     className="group flex items-center gap-2 text-lg font-headline font-semibold text-primary"
@@ -202,7 +204,7 @@ export function Header() {
                       className="transition-transform duration-300 ease-in-out group-hover:scale-105"
                     />
                 </Link>
-              </div>
+              </SheetHeader>
 
               <nav className="flex-grow p-4 space-y-2">
                 {navItems.map((item) => (

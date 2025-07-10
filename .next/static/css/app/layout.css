@@ -1251,6 +1251,9 @@ video {
 .invisible {
   visibility: hidden;
 }
+.static {
+  position: static;
+}
 .fixed {
   position: fixed;
 }
@@ -1451,6 +1454,9 @@ video {
 .mt-auto {
   margin-top: auto;
 }
+.mt-\[3px\] {
+  margin-top: 3px;
+}
 .block {
   display: block;
 }
@@ -1553,6 +1559,9 @@ video {
 }
 .h-screen {
   height: 100vh;
+}
+.h-\[calc\(100vh-10rem\)\] {
+  height: calc(100vh - 10rem);
 }
 .max-h-24 {
   max-height: 6rem;
@@ -1970,6 +1979,14 @@ video {
 }
 .rounded-xl {
   border-radius: 0.75rem;
+}
+.rounded-b-xl {
+  border-bottom-right-radius: 0.75rem;
+  border-bottom-left-radius: 0.75rem;
+}
+.rounded-t-xl {
+  border-top-left-radius: 0.75rem;
+  border-top-right-radius: 0.75rem;
 }
 .rounded-bl-lg {
   border-bottom-left-radius: var(--radius);

@@ -40,7 +40,7 @@ const coreFeatures = [
     icon: MessageCircle,
     title: "AI Chatbot Assistant",
     description: "Get instant, bilingual (Tamil & English) answers to your cyber law and security questions. Understand complex terms and mitigation techniques.",
-    link: "/chatbot",
+    link: "/chat",
     linkText: "Ask AI Now",
   },
   {
@@ -92,7 +92,7 @@ export default function HomePage() {
             </p>
             <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
               <Button asChild size="lg" className="shadow-md hover:shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105 animate-in fade-in-0 slide-in-from-bottom-4 duration-500 ease-out" style={{ animationDelay: '200ms' }}>
-                <Link href="/chatbot">
+                <Link href="/chat">
                   Try AI Chatbot (Limited Access) <MessageCircle className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
@@ -266,7 +266,7 @@ export default function HomePage() {
           </p>
           <div className="mt-8">
             <Button asChild size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 shadow-md hover:shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105">
-              <Link href="/chatbot">
+              <Link href="/chat">
                 Chat with CyberMozhi AI <Sparkles className="ml-2 h-5 w-5" />
               </Link>
             </Button>

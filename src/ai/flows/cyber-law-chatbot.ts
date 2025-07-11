@@ -54,6 +54,7 @@ const prompt = ai.definePrompt({
   name: 'cyberLawChatbotPrompt',
   input: {schema: CyberLawChatbotInputSchema},
   output: {schema: CyberLawChatbotOutputSchema},
+  model: 'googleai/gemini-1.5-flash-latest',
   prompt: `You are CyberMozhi, an AI-powered bilingual assistant that educates users about cybersecurity and Indian cyber laws, both in Tamil and English.
 Your role is to serve both anonymous (guest) and authenticated (logged-in) users by guiding them through the CyberMozhi platform, offering them helpful, secure, and personalized content.
 
@@ -163,12 +164,18 @@ const cyberLawChatbotFlow = ai.defineFlow(
     outputSchema: CyberLawChatbotOutputSchema,
   },
   async (input: CyberLawChatbotInput): Promise<CyberLawChatbotOutput> => {
-    const {output} = await prompt(input);
-
-    if (!output) {
-      console.error('Cyber law chatbot: AI did not return the expected output structure.');
-      throw new Error('The AI failed to generate a response in the expected format. Please try rephrasing your query.');
+    try {
+      const {output} = await prompt(input);
+      if (!output) {
+        throw new Error(
+          'The AI returned an empty response. This may be due to the safety policy.'
+        );
+      }
+      return output;
+    } catch (e: any) {
+      console.error('Error in cyberLawChatbotFlow:', e);
+      // Re-throw the error to be caught by the server action
+      throw new Error(`An error occurred while processing your request in the AI flow: ${e.message}`);
     }
-    return output;
   }
 );

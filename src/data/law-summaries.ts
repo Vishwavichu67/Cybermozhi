@@ -8,7 +8,7 @@ import {
   ClipboardList, FileLock2, Landmark, Scale, Siren,
   Copyright as CopyrightIcon, // Renamed to avoid conflict
   RadioTower, ShoppingCart, ReceiptIndianRupee, IdCard, Construction, Frown, 
-  VideoOff, UserCog, Gamepad2, GlobeLock, ShieldAlert
+  VideoOff, UserCog, Gamepad2, GlobeLock, ShieldAlert, User, CheckSquare
 } from 'lucide-react';
 
 export type LawSummary = {
@@ -290,13 +290,35 @@ export const lawSummaries: LawSummary[] = [
   },
   {
     id: '25',
-    title: 'Digital Personal Data Protection Act, 2023 (DPDP Act)',
-    act: 'DPDP Act, 2023',
-    section: 'Various Sections',
-    summary: 'India’s comprehensive law on personal data protection, similar to GDPR. Focuses on user consent, data principal rights, and obligations of data fiduciaries.',
-    details: 'The DPDP Act applies to the processing of digital personal data within India. It establishes the Data Protection Board of India for enforcement and imposes significant penalties for non-compliance, such as data breaches or misuse of personal data.',
-    penalty: 'Significant financial penalties, up to ₹250 crore for certain breaches.',
+    title: 'DPDP Act: Core Principles & Application',
+    act: 'Digital Personal Data Protection Act, 2023',
+    section: 'Chapters 1-2',
+    summary: 'India’s dedicated law on personal data protection. It applies to the processing of digital personal data within India, and also outside India if related to offering goods or services to individuals in India.',
+    details: 'The DPDP Act is built on principles like Lawfulness, Fairness, Transparency, Purpose Limitation, Data Minimisation, Accuracy, Storage Limitation, and Accountability. It establishes the rights of Data Principals (individuals) and the obligations of Data Fiduciaries (entities processing data).',
+    penalty: 'Penalties for non-compliance are significant, decided by the Data Protection Board of India.',
     icon: FileLock2,
+    category: 'Data Protection & Privacy',
+  },
+  {
+    id: '41',
+    title: 'DPDP Act: Consent & User Rights',
+    act: 'Digital Personal Data Protection Act, 2023',
+    section: 'Sections 6-13',
+    summary: 'Consent must be free, specific, informed, and unambiguous. Users (Data Principals) have the right to access, correct, erase their data, and nominate someone to exercise these rights in case of death or incapacity.',
+    details: 'A key feature is the "Consent Manager" framework, an interoperable platform to help individuals give, manage, and withdraw their consent. Users also have the Right to Grievance Redressal, allowing them to complain to the Data Fiduciary before approaching the Board.',
+    penalty: 'Penalties up to ₹200 crore for failure to fulfill obligations for children. ₹10,000 fine for a user filing a false or frivolous complaint.',
+    icon: User,
+    category: 'Data Protection & Privacy',
+  },
+  {
+    id: '42',
+    title: 'DPDP Act: Obligations of Companies (Data Fiduciaries)',
+    act: 'Digital Personal Data Protection Act, 2023',
+    section: 'Sections 4-10',
+    summary: 'Companies (Data Fiduciaries) must ensure data accuracy, implement security safeguards to prevent breaches, and erase personal data once the purpose for which it was collected is met.',
+    details: 'In case of a personal data breach, the company must notify both the Data Protection Board of India and the affected individuals. They are also responsible for the actions of their data processors (third-party vendors). Special, more stringent obligations apply when processing children\'s data.',
+    penalty: 'Penalties up to ₹250 crore for failure to take reasonable security safeguards to prevent data breaches.',
+    icon: CheckSquare,
     category: 'Data Protection & Privacy',
   },
   {
@@ -345,12 +367,12 @@ export const lawSummaries: LawSummary[] = [
   },
   {
     id: '30',
-    title: 'Digital Piracy & Illegal Content Sharing',
+    title: 'Infringement of Copyright (Digital Piracy)',
     act: 'Copyright Act, 1957',
-    section: 'Relevant Sections',
-    summary: 'Protects original literary, dramatic, musical, artistic works, cinematograph films, and sound recordings from unauthorized copying, distribution, and online sharing.',
-    details: 'The Act has been amended to address digital piracy. It provides civil and criminal remedies against copyright infringement, including online piracy of software, movies, music, etc.',
-    penalty: 'Imprisonment, fines, and damages for infringement.',
+    section: 'Sections 51, 63, 63A, 65A, 65B',
+    summary: 'Protects original literary, dramatic, musical, artistic works, films, and sound recordings. Making or distributing unauthorized copies (piracy) online is a criminal offense.',
+    details: 'The Act criminalizes the use of infringing copies of computer programs, films, and music. It also criminalizes the circumvention of technical protection measures (like DRM) and tampering with rights management information embedded in digital works. This is the primary law against digital piracy of software, movies, music, etc.',
+    penalty: 'For most copyright infringements (Sec 63): Imprisonment for at least six months up to three years, and a fine of at least ₹50,000 up to ₹2 lakh. For repeat offenders (Sec 63A), penalties are higher.',
     icon: CopyrightIcon,
     category: 'General & Consumer Rights',
   },

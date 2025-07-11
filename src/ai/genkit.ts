@@ -5,10 +5,9 @@ config(); // Load environment variables from .env file
 import {genkit} from 'genkit';
 import {googleAI} from '@genkit-ai/googleai';
 
-// Initialize Genkit with the default plugin.
-// The API key can be set in the .env file with GEMINI_API_KEY.
-// The rotation logic will be handled inside the specific flows that need it.
-genkit.config({
+// Initialize Genkit by passing the configuration object directly.
+// The API key is read automatically from the GEMINI_API_KEY environment variable.
+const ai = genkit({
   plugins: [
     googleAI(),
   ],
@@ -17,4 +16,4 @@ genkit.config({
 });
 
 // Export the configured genkit object.
-export {genkit as ai};
+export {ai};

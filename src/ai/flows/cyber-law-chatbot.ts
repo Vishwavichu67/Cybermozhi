@@ -11,6 +11,8 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
+import {googleAI} from '@genkit-ai/googleai';
+
 
 const ChatMessageSchema = z.object({
   role: z.enum(['user', 'model']),
@@ -27,8 +29,8 @@ const CyberLawChatbotInputSchema = z.object({
     .describe('The user query about cyber law or cybersecurity in Tamil or English.'),
   userName: z.string().optional().describe('The name of the user, if known. Use for personalization if available.'),
   chatHistory: z.array(ChatMessageSchema).optional().describe('The previous turns in the current conversation. Use this to maintain context, avoid repetition, and provide more relevant follow-up answers.'),
-  userDetails: z.object({ 
-    gender: z.string().optional(), 
+  userDetails: z.object({
+    gender: z.string().optional(),
     age: z.number().nullable().optional(),
     maritalStatus: z.string().optional(),
     state: z.string().optional(),
@@ -164,18 +166,50 @@ const cyberLawChatbotFlow = ai.defineFlow(
     outputSchema: CyberLawChatbotOutputSchema,
   },
   async (input: CyberLawChatbotInput): Promise<CyberLawChatbotOutput> => {
-    try {
-      const {output} = await prompt(input);
-      if (!output) {
-        throw new Error(
-          'The AI returned an empty response. This may be due to the safety policy.'
-        );
-      }
-      return output;
-    } catch (e: any) {
-      console.error('Error in cyberLawChatbotFlow:', e);
-      // Re-throw the error to be caught by the server action
-      throw new Error(`An error occurred while processing your request in the AI flow: ${e.message}`);
+    // API Key Rotation Logic
+    const apiKeys = (process.env.GEMINI_API_KEYS || process.env.GEMINI_API_KEY || '')
+      .split(',')
+      .map(k => k.trim())
+      .filter(Boolean);
+
+    if (apiKeys.length === 0) {
+      throw new Error('No Gemini API key found. Please set GEMINI_API_KEYS or GEMINI_API_KEY in your .env file.');
     }
+
+    let lastError: any;
+
+    for (const apiKey of apiKeys) {
+      try {
+        const { output } = await prompt(input, {
+          // Temporarily override the plugin for this specific call with a new instance
+          plugins: [googleAI({ apiKey })],
+        });
+
+        if (!output) {
+          throw new Error('The AI returned an empty response. This may be due to the safety policy.');
+        }
+        return output; // Success, return the result immediately
+      } catch (e: any) {
+        lastError = e;
+        const errorMessage = e.message?.toLowerCase() || '';
+        // Check for quota-related errors to decide whether to rotate the key
+        if (
+          errorMessage.includes('quota') ||
+          errorMessage.includes('429') ||
+          errorMessage.includes('resource has been exhausted')
+        ) {
+          console.warn(`API key ending in ...${apiKey.slice(-4)} failed with a quota error. Trying next key.`);
+          continue; // Try the next key
+        } else {
+          // For other errors (like invalid API key, safety settings, etc.), fail fast
+          console.error('An unrecoverable error occurred in cyberLawChatbotFlow:', e);
+          throw new Error(`An error occurred while processing your request: ${e.message}`);
+        }
+      }
+    }
+
+    // If all keys have failed
+    console.error('All Gemini API keys have failed with quota errors.', lastError);
+    throw new Error('All available API keys have reached their quota limit. Please try again later.');
   }
 );

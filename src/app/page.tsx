@@ -24,9 +24,14 @@ import {
   FileSignature,
   UserCircle2,
   ShieldCheck,
-  Network as NetworkIcon, // Renamed to avoid conflict with Tailwind's network
-  ClipboardCheck
+  Network as NetworkIcon,
+  ClipboardCheck,
+  Scale,
+  BrainCircuit
 } from "lucide-react";
+import { lawSummaries } from "@/data/law-summaries";
+import { glossaryTerms } from "@/data/glossary-terms";
+import { useMemo } from "react";
 
 const sampleTopics = [
   { name: "Phishing Attacks", icon: UserPlus, description: "Learn to identify and avoid deceptive emails and messages.", link: "/glossary#1" },
@@ -63,6 +68,20 @@ const coreFeatures = [
 export default function HomePage() {
   const { user, isLoggedIn, loading: authLoading } = useAuth();
 
+  const { termOfTheDay, lawOfTheDay } = useMemo(() => {
+    // Use the current date to get a consistent "random" item for the entire day.
+    // This avoids hydration mismatches between server and client.
+    const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000);
+    
+    const termIndex = dayOfYear % glossaryTerms.length;
+    const lawIndex = dayOfYear % lawSummaries.length;
+    
+    return {
+      termOfTheDay: glossaryTerms[termIndex],
+      lawOfTheDay: lawSummaries[lawIndex]
+    };
+  }, []);
+
   if (authLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[70vh]">
@@ -71,6 +90,58 @@ export default function HomePage() {
       </div>
     );
   }
+
+  // Common "Of the Day" section
+  const OfTheDaySection = () => (
+    <section className="w-full container px-4 md:px-6 animate-in fade-in-0 slide-in-from-bottom-8 duration-700 ease-out" style={{ animationDelay: '400ms' }}>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {lawOfTheDay && (
+           <Card className="shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:scale-105 hover:-rotate-y-1 rounded-lg flex flex-col">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-3 text-lg sm:text-xl font-headline text-primary">
+                  <Scale className="w-7 h-7" />
+                  Law of the Day
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="flex-grow">
+                 <h3 className="font-semibold text-foreground">{lawOfTheDay.title}</h3>
+                 <p className="text-sm text-muted-foreground mt-1">{lawOfTheDay.act} - {lawOfTheDay.section}</p>
+                 <p className="text-sm text-foreground/80 mt-2 line-clamp-3">{lawOfTheDay.summary}</p>
+              </CardContent>
+              <div className="p-4 pt-0">
+                <Button asChild variant="link" className="text-primary p-0 h-auto hover:text-accent text-sm">
+                  <Link href={`/law-summaries#${lawOfTheDay.id}`}>
+                    Read Full Summary <ArrowRight className="ml-1 h-4 w-4" />
+                  </Link>
+                </Button>
+              </div>
+            </Card>
+        )}
+        {termOfTheDay && (
+           <Card className="shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:scale-105 hover:rotate-y-1 rounded-lg flex flex-col">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-3 text-lg sm:text-xl font-headline text-accent">
+                  <BrainCircuit className="w-7 h-7" />
+                  Term of the Day
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="flex-grow">
+                 <h3 className="font-semibold text-foreground">{termOfTheDay.term}</h3>
+                 <p className="text-sm text-muted-foreground mt-1">{termOfTheDay.category}</p>
+                 <p className="text-sm text-foreground/80 mt-2 line-clamp-3">{termOfTheDay.definition.split(' Example: ')[0]}</p>
+              </CardContent>
+              <div className="p-4 pt-0">
+                 <Button asChild variant="link" className="text-accent p-0 h-auto hover:text-primary text-sm">
+                  <Link href={`/glossary#${termOfTheDay.id}`}>
+                    Learn More <ArrowRight className="ml-1 h-4 w-4" />
+                  </Link>
+                </Button>
+              </div>
+            </Card>
+        )}
+      </div>
+    </section>
+  );
 
   // Guest User View
   if (!isLoggedIn) {
@@ -106,38 +177,8 @@ export default function HomePage() {
         </section>
 
         {/* What You Can Learn Section */}
-        <section className="w-full container px-4 md:px-6 animate-in fade-in-0 slide-in-from-bottom-8 duration-700 ease-out" style={{ animationDelay: '400ms' }}>
-          <h2 className="text-2xl font-bold tracking-tight sm:text-3xl text-center text-primary mb-12 font-headline">
-            Discover Key Cyber Topics
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {sampleTopics.map((topic, index) => (
-              <Card
-                key={topic.name}
-                className="shadow-lg hover:shadow-xl transition-transform duration-300 ease-out transform hover:scale-105 hover:-rotate-y-2 rounded-lg flex flex-col animate-in fade-in-0 slide-in-from-bottom-4 duration-500 ease-out"
-                style={{ animationDelay: `${index * 100 + 500}ms` }}
-              >
-                <CardHeader className="pb-3">
-                  <div className="flex items-center gap-3">
-                    <topic.icon className="w-8 h-8 text-accent flex-shrink-0" />
-                    <CardTitle className="text-lg font-headline text-accent">{topic.name}</CardTitle>
-                  </div>
-                </CardHeader>
-                <CardContent className="flex-grow">
-                  <p className="text-sm text-foreground/70">{topic.description}</p>
-                </CardContent>
-                <div className="p-4 pt-0">
-                  <Button asChild variant="link" className="text-primary p-0 h-auto hover:text-accent text-sm transition-colors duration-200">
-                    <Link href={topic.link}>
-                      Learn More <ArrowRight className="ml-1 h-4 w-4" />
-                    </Link>
-                  </Button>
-                </div>
-              </Card>
-            ))}
-          </div>
-        </section>
-
+        <OfTheDaySection />
+        
         {/* Core Features Section for Guests */}
         <section className="w-full py-12 md:py-16 bg-background animate-in fade-in-0 slide-in-from-bottom-8 duration-700 ease-out" style={{ animationDelay: '600ms' }}>
           <div className="container px-4 md:px-6">
@@ -217,6 +258,9 @@ export default function HomePage() {
           </p>
         </div>
       </section>
+
+      {/* Of the Day section for logged-in users */}
+      <OfTheDaySection />
 
       {/* Quick Access to Core Features */}
       <section className="w-full container px-4 md:px-6 py-10 animate-in fade-in-0 slide-in-from-bottom-8 duration-700 ease-out" style={{ animationDelay: '200ms' }}>

@@ -1,8 +1,10 @@
+
 import {config} from 'dotenv';
 config(); // Load environment variables from .env file
 
 import {genkit} from 'genkit';
 import {googleAI} from '@genkit-ai/googleai';
+import type {GenerateRequest, GenerateResponse} from 'genkit';
 
 // Get keys from environment. Fallback to a single key if the new variable isn't set.
 const apiKeys = (
@@ -29,26 +31,32 @@ function getNextApiKey(): string | undefined {
   return apiKeys[keyIndex];
 }
 
+const originalGenerate = genkit.generate;
+
 async function generateWithRotation(
-  ...args: Parameters<typeof genkit.generate>
-) {
+  request: GenerateRequest
+): Promise<GenerateResponse> {
   let lastError: any;
+
+  if (apiKeys.length === 0) {
+     throw new Error('No API keys available. Please set GEMINI_API_KEYS in your .env file.');
+  }
 
   for (let i = 0; i < apiKeys.length; i++) {
     const apiKey = getNextApiKey();
     if (!apiKey) {
-      throw new Error('No API keys available.');
+      continue; // Should not happen if apiKeys.length > 0, but for safety
     }
 
     try {
-      const result = await genkit.generate({
-        ...args[0],
+      // Temporarily override plugins for this specific call
+      const result = await originalGenerate({
+        ...request,
         plugins: [googleAI({apiKey})], // Pass the current key
       });
       return result;
     } catch (e: any) {
       lastError = e;
-      // Check for quota-related errors
       const errorMessage = e.message?.toLowerCase() || '';
       if (
         errorMessage.includes('quota') ||
@@ -70,12 +78,9 @@ async function generateWithRotation(
   throw new Error('All available API keys have reached their quota limit. Please try again later.');
 }
 
-// Custom AI object that intercepts generate calls
-export const ai = {
-  ...genkit,
-  generate: generateWithRotation,
-  defineFlow: genkit.defineFlow,
-  definePrompt: genkit.definePrompt,
-  defineTool: genkit.defineTool,
-  defineSchema: genkit.defineSchema,
-};
+
+// Monkey-patch the original genkit's generate function
+genkit.generate = generateWithRotation;
+
+// Export the now-patched genkit object as `ai` to maintain consistency in other files.
+export {genkit as ai};

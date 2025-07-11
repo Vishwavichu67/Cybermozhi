@@ -103,7 +103,7 @@ export function Header() {
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <Link
           href="/"
-          className="group flex items-center gap-2 text-xl font-headline font-semibold text-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background rounded-md p-1"
+          className="group flex items-center gap-2"
         >
           <Image
             src="/logo.png"
@@ -193,7 +193,7 @@ export function Header() {
                  <SheetTitle className="sr-only">Mobile Menu</SheetTitle>
                  <Link
                     href="/"
-                    className="group flex items-center gap-2 text-lg font-headline font-semibold text-primary"
+                    className="group flex items-center gap-2"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                    <Image

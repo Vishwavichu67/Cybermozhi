@@ -56,12 +56,7 @@ export async function getAIChatResponse(input: z.infer<typeof ChatAIInputSchema>
   } catch (e) {
     let errorMessage = "An unexpected error occurred with the AI assistant.";
     if (e instanceof Error) {
-      const lowerCaseError = e.message.toLowerCase();
-      if (lowerCaseError.includes('429') || lowerCaseError.includes('exceeded your current quota') || lowerCaseError.includes('503') || lowerCaseError.includes('overloaded')) {
-        errorMessage = "Our AI assistant is currently experiencing a high volume of requests. Please try again in a few moments. We appreciate your patience!";
-      } else {
         errorMessage = e.message;
-      }
     } else if (typeof e === 'string') {
       errorMessage = e;
     } else {

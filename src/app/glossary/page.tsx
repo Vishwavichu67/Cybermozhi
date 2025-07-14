@@ -15,6 +15,7 @@ function GlossaryItemCard({ termItem, delay = 0 }: { termItem: GlossaryTerm, del
 
   return (
     <Card
+      id={termItem.id}
       className="shadow-md hover:shadow-lg transition-transform duration-300 ease-out transform hover:scale-105 hover:-rotate-y-1 rounded-lg overflow-hidden flex flex-col h-full animate-in fade-in-0 slide-in-from-bottom-4 duration-500 ease-out"
       style={{ animationDelay: `${delay}ms` }}
     >

@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 function LawSummaryCard({ summaryItem, delay = 0 }: { summaryItem: LawSummary, delay?: number }) {
   return (
     <Card
+      id={summaryItem.id}
       className="w-full shadow-lg hover:shadow-xl transition-transform duration-300 ease-in-out transform hover:scale-105 hover:-rotate-x-1 rounded-lg overflow-hidden flex flex-col h-full animate-in fade-in-0 slide-in-from-bottom-4 duration-500 ease-out"
       style={{ animationDelay: `${delay}ms` }}
     >
@@ -156,5 +157,3 @@ export default function LawSummariesPage() {
     </div>
   );
 }
-
-    

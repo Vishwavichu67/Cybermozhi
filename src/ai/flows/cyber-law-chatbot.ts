@@ -55,7 +55,7 @@ const prompt = ai.definePrompt({
   name: 'cyberLawChatbotPrompt',
   input: {schema: CyberLawChatbotInputSchema},
   output: {schema: CyberLawChatbotOutputSchema},
-  model: 'googleai/gemini-pro',
+  model: 'googleai/gemini-1.5-flash-latest',
   prompt: `You are CyberMozhi, an AI-powered bilingual assistant that educates users about cybersecurity and Indian cyber laws, both in Tamil and English.
 Your role is to serve both anonymous (guest) and authenticated (logged-in) users by guiding them through the CyberMozhi platform, offering them helpful, secure, and personalized content.
 
@@ -177,17 +177,15 @@ const cyberLawChatbotFlow = ai.defineFlow(
       console.error("Error in cyberLawChatbotFlow:", e);
       let errorMessage = "Sorry, I encountered an issue while processing your request. This could be a temporary problem with the AI service. Please try again in a moment.";
       if (e instanceof Error) {
-        // You can check for specific error messages if needed
         if (e.message.includes("503") || e.message.includes("overloaded")) {
           errorMessage = "The AI assistant is currently experiencing high traffic and is temporarily unavailable. Please try again shortly.";
+        } else if (e.message.includes("404") || e.message.includes("Not Found")) {
+            errorMessage = "The configured AI model could not be found. Please contact support.";
         } else {
           errorMessage = `An unexpected error occurred: ${e.message}`;
         }
       }
-      // Return a structured error response that the client can display
       return { answer: errorMessage };
     }
   }
 );
-
-    

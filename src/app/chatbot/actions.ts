@@ -51,20 +51,20 @@ export async function getAIChatResponse(input: z.infer<typeof ChatAIInputSchema>
       userDetails: validatedFields.data.userDetails || undefined,
     };
     
+    // The cyberLawChatbot flow now handles its own errors and will return an answer with an error message.
     const result = await cyberLawChatbot(aiInput);
     return result;
   } catch (e) {
-    let errorMessage = "An unexpected error occurred with the AI assistant.";
+    // This outer catch block now serves as a last resort for unexpected system-level errors.
+    let errorMessage = "An unexpected system error occurred.";
     if (e instanceof Error) {
         errorMessage = e.message;
     } else if (typeof e === 'string') {
       errorMessage = e;
-    } else {
-      try {
-        errorMessage = JSON.stringify(e);
-      } catch { /* ignore */ }
     }
-    console.error("Error in getAIChatResponse:", e);
+    console.error("Critical Error in getAIChatResponse:", e);
     return { answer: '', error: errorMessage };
   }
 }
+
+    

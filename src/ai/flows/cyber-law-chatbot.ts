@@ -11,41 +11,16 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
+import { legalDocumentGeneratorTool } from './document-generator';
+import {
+  ChatMessageSchema,
+  CyberLawChatbotInputSchema,
+  CyberLawChatbotOutputSchema,
+  type ChatMessage,
+  type CyberLawChatbotInput,
+  type CyberLawChatbotOutput
+} from './types';
 
-
-const ChatMessageSchema = z.object({
-  role: z.enum(['user', 'model']),
-  parts: z.array(z.object({text: z.string()})),
-  isUser: z.boolean().optional().describe("True if the role is 'user'"),
-  isModel: z.boolean().optional().describe("True if the role is 'model'"),
-});
-export type ChatMessage = z.infer<typeof ChatMessageSchema>;
-
-
-const CyberLawChatbotInputSchema = z.object({
-  query: z
-    .string()
-    .describe('The user query about cyber law or cybersecurity in Tamil or English.'),
-  userName: z.string().optional().describe('The name of the user, if known. Use for personalization if available.'),
-  chatHistory: z.array(ChatMessageSchema).optional().describe('The previous turns in the current conversation. Use this to maintain context, avoid repetition, and provide more relevant follow-up answers.'),
-  userDetails: z.object({
-    gender: z.string().optional(),
-    age: z.number().nullable().optional(),
-    maritalStatus: z.string().optional(),
-    state: z.string().optional(),
-    city: z.string().optional(),
-    preferredLanguage: z.string().optional(),
-  }).optional().describe('Additional details about the user like gender, age, marital status, and location. Use this for personalization.'),
-  isProfileIncomplete: z.boolean().optional().describe('True if the user has a new or incomplete profile. Use this to gently prompt them to complete it for a better experience.'),
-});
-export type CyberLawChatbotInput = z.infer<typeof CyberLawChatbotInputSchema>;
-
-const CyberLawChatbotOutputSchema = z.object({
-  answer: z
-    .string()
-    .describe('The chatbot response providing a layman-friendly explanation and mitigation techniques in Tamil and/or English.'),
-});
-export type CyberLawChatbotOutput = z.infer<typeof CyberLawChatbotOutputSchema>;
 
 export async function cyberLawChatbot(input: CyberLawChatbotInput): Promise<CyberLawChatbotOutput> {
   return cyberLawChatbotFlow(input);
@@ -56,6 +31,7 @@ const prompt = ai.definePrompt({
   input: {schema: CyberLawChatbotInputSchema},
   output: {schema: CyberLawChatbotOutputSchema},
   model: 'googleai/gemini-1.5-flash-latest',
+  tools: [legalDocumentGeneratorTool],
   prompt: `You are CyberMozhi, an AI-powered bilingual assistant that educates users about cybersecurity and Indian cyber laws, both in Tamil and English.
 Your role is to serve both anonymous (guest) and authenticated (logged-in) users by guiding them through the CyberMozhi platform, offering them helpful, secure, and personalized content.
 
@@ -86,6 +62,7 @@ Core Principles for Responding:
     *   **Guidance on Complaint Filing & External Links:**
         *   **Actionable Links:** When providing resources, *always* use full, clickable Markdown links. For example, instead of just mentioning 'cybercrime.gov.in', write it as '[National Cyber Crime Reporting Portal](https://cybercrime.gov.in/)'. Provide direct links to relevant legal acts or official government resources whenever possible.
         *   **FIR/Complaint Template:** If a user asks how to file a complaint or an FIR, provide a clear, structured template using Markdown. This template should guide the user on what information to include, such as personal details, incident description, evidence available, etc. Explain each section of the template.
+    *   **Document Generation:** If a user expresses a need to draft a legal document like an FIR, a complaint letter, or a takedown notice, **use the legalDocumentGeneratorTool**. You MUST gather all necessary information from the user first (e.g., "Could you please describe the incident in detail so I can draft the FIR for you?"). Pass the user's details (userName, userContact) to the tool for pre-filling. The tool will return a complete markdown document. Present this document directly to the user in your response.
     *   **Explain IT Act Sections & Penalties:** Clearly state the relevant section numbers and the prescribed penalties.
     *   **Glossary Terms & Attack Types:** Define terms and explain attack mechanisms simply.
     *   **Mitigation Techniques:** Offer practical, actionable advice for prevention and response.
@@ -182,7 +159,14 @@ const cyberLawChatbotFlow = ai.defineFlow(
   },
   async (input: CyberLawChatbotInput): Promise<CyberLawChatbotOutput> => {
     try {
-      const { output } = await prompt(input);
+      // Augment the user details for the tool
+      const augmentedInput = {
+        ...input,
+        incidentDetails: input.query, // Pass the query as incident details for the tool
+        userContact: input.userContact,
+      };
+
+      const { output } = await prompt(augmentedInput);
 
       if (!output) {
         throw new Error('The AI returned an empty response. This may be due to the safety policy.');

@@ -3,10 +3,13 @@
 
 import {
   cyberLawChatbot,
+} from '@/ai/flows/cyber-law-chatbot';
+import {
   type CyberLawChatbotInput,
   type CyberLawChatbotOutput,
-  type ChatMessage as AIChatMessage,
-} from '@/ai/flows/cyber-law-chatbot';
+} from '@/ai/flows/types';
+import { generateChatTitle } from '@/ai/flows/chat-title-generator';
+
 import { z } from 'zod';
 import {
   Timestamp,
@@ -26,6 +29,7 @@ const UserDetailsSchema = z.object({
 const ChatAIInputSchema = z.object({
   query: z.string(),
   userName: z.string().optional(),
+  userContact: z.string().optional(),
   chatHistory: z.array(z.object({
     role: z.enum(['user', 'model']),
     parts: z.array(z.object({ text: z.string() })),
@@ -47,7 +51,7 @@ export async function getAIChatResponse(
     throw new Error('Invalid input for getAIChatResponse');
   }
 
-  const { query, userName, chatHistory, userDetails, isProfileIncomplete, userId } = validatedFields.data;
+  const { query, userName, userContact, chatHistory, userDetails, isProfileIncomplete, userId } = validatedFields.data;
   let { chatSessionId } = validatedFields.data;
 
   // Save the user's message
@@ -60,9 +64,12 @@ export async function getAIChatResponse(
   try {
     // If it's a new chat, create a session first
     if (!chatSessionId) {
-      const firstMessageSummary = query.substring(0, 40) + (query.length > 40 ? '...' : '');
+      // Generate a title using the new AI flow
+      const titleResponse = await generateChatTitle({ query });
+      const newTitle = titleResponse.title;
+
       const sessionRef = await db.collection(`users/${userId}/chatSessions`).add({
-        title: firstMessageSummary,
+        title: newTitle,
         userId: userId,
         createdAt: Timestamp.now(),
         lastMessageAt: Timestamp.now(),
@@ -82,6 +89,7 @@ export async function getAIChatResponse(
     const aiInput: CyberLawChatbotInput = {
       query,
       userName,
+      userContact,
       chatHistory,
       userDetails: userDetails || undefined,
       isProfileIncomplete,

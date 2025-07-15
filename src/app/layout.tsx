@@ -26,13 +26,16 @@ export default function RootLayout({
   const isChatPage = pathname === '/chat';
 
   return (
-    <html lang="en" suppressHydrationWarning className={inter.variable}>
+    <html lang="en" suppressHydrationWarning className={cn(inter.variable)}>
       <head>
         <title>CyberMozhi</title>
         <meta name="description" content="Your one-stop cybersecurity knowledge center and virtual legal advisor for Indian netizens." />
-        <link rel="icon" href="/logo.png" />
+        <link rel="icon" href="/favicon.png" />
       </head>
-      <body className="font-body antialiased flex flex-col min-h-screen bg-background">
+      <body className={cn(
+        "min-h-screen bg-background font-body antialiased flex flex-col",
+        isChatPage && "h-screen overflow-hidden"
+      )}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -40,16 +43,14 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <AuthProvider>
-            <div className="flex flex-col min-h-screen">
-              <Header />
-              <main className={cn(
-                "flex-grow w-full flex flex-col items-center",
-                isChatPage ? "justify-center px-2 sm:px-4 py-4" : "container mx-auto px-4 py-8"
-              )}>
-                {children}
-              </main>
-              <Footer />
-            </div>
+            <Header />
+            <main className={cn(
+              "flex-grow w-full flex flex-col items-center",
+               isChatPage ? "flex-1 overflow-hidden" : "container mx-auto px-4 py-8"
+            )}>
+              {children}
+            </main>
+            {!isChatPage && <Footer />}
             <Toaster />
           </AuthProvider>
         </ThemeProvider>

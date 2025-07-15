@@ -3,12 +3,11 @@
 
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { PlusCircle, MessageSquareText, Loader2, AlertCircle, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
 import { db } from '@/lib/firebase';
-import { collection, query, orderBy, onSnapshot, type Timestamp, doc, deleteDoc, writeBatch } from 'firebase/firestore';
+import { collection, query, orderBy, onSnapshot, type Timestamp, doc, deleteDoc } from 'firebase/firestore';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   AlertDialog,
@@ -22,6 +21,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useToast } from '@/hooks/use-toast';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 
 interface ChatSession {
@@ -118,92 +118,100 @@ export function ChatHistorySidebar({
     }
   };
 
-
-  const content = (
-    <>
-      <Button onClick={onNewChat} variant="outline" className="w-full mb-4 transition-shadow hover:shadow-md">
-        <PlusCircle className="mr-2 h-5 w-5" />
-        New Chat
-      </Button>
-      <h3 className="text-xs font-semibold text-muted-foreground mb-2 px-1 uppercase tracking-wider">History</h3>
-      <ScrollArea className="flex-grow pr-2 -mr-2">
-        {isLoading && (
-          <div className="flex flex-col items-center justify-center py-4 space-y-2">
-            {[...Array(5)].map((_, i) => (
-              <div key={i} className="h-12 w-full bg-muted/50 rounded animate-pulse"></div>
-            ))}
-          </div>
-        )}
-        {error && (
-          <div className="text-destructive text-sm p-2 flex items-center rounded bg-destructive/10 border border-destructive/20">
-            <AlertCircle className="h-4 w-4 mr-2 shrink-0" /> <span className="flex-grow">{error}</span>
-          </div>
-        )}
-        {!isLoading && !error && sessions.length === 0 && user && (
-          <p className="text-xs text-muted-foreground text-center py-4">No chat history yet.</p>
-        )}
-        <div className="space-y-1">
-          {sessions.map((session) => {
-            const lastMessageDate = session.lastMessageAt?.toDate ? session.lastMessageAt.toDate() : null;
-            return (
-              <div key={session.id} className="group relative">
-                <Button
-                  variant="ghost"
-                  onClick={() => onSelectChatSession(session.id)}
-                  className={cn(
-                    "w-full justify-start text-left h-auto py-2.5 px-2.5 text-sm truncate",
-                    currentChatSessionId === session.id ? 'bg-primary/10 text-primary' : 'hover:bg-muted/50'
-                  )}
-                  title={session.title}
-                >
-                  <MessageSquareText className="mr-2.5 h-4 w-4 flex-shrink-0" />
-                  <div className="flex-grow truncate">
-                    <p className="font-medium truncate text-sm">{session.title}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {lastMessageDate ? formatDistanceToNow(lastMessageDate, { addSuffix: true }) : 'Just now'}
-                    </p>
-                  </div>
-                </Button>
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button variant="ghost" size="icon" className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Trash2 className="h-4 w-4 text-muted-foreground" />
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        This will permanently delete this chat session. This action cannot be undone.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction onClick={() => handleDeleteSession(session.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                        Delete
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              </div>
-            )
-          })}
+  const renderHistoryList = () => {
+    if (isLoading) {
+      return (
+        <div className="flex flex-col items-center justify-center p-4 space-y-2">
+          {[...Array(5)].map((_, i) => (
+            <div key={i} className="h-12 w-full bg-muted/50 rounded animate-pulse"></div>
+          ))}
         </div>
-      </ScrollArea>
-    </>
-  );
+      );
+    }
+    if (error) {
+      return (
+        <div className="text-destructive text-sm p-2 flex items-center rounded bg-destructive/10 border border-destructive/20 m-4">
+          <AlertCircle className="h-4 w-4 mr-2 shrink-0" /> <span className="flex-grow">{error}</span>
+        </div>
+      );
+    }
+    if (sessions.length === 0 && user) {
+      return (
+        <p className="text-sm text-muted-foreground text-center py-4 px-2">No chat history yet.</p>
+      );
+    }
+    return (
+      <div className="space-y-1 p-2">
+        {sessions.map((session) => {
+          const lastMessageDate = session.lastMessageAt?.toDate ? session.lastMessageAt.toDate() : null;
+          return (
+            <div key={session.id} className="group relative">
+              <Button
+                variant="ghost"
+                onClick={() => onSelectChatSession(session.id)}
+                className={cn(
+                  "w-full justify-start text-left h-auto py-2.5 px-3 text-sm truncate",
+                  currentChatSessionId === session.id ? 'bg-primary/10 text-primary' : 'hover:bg-muted/50'
+                )}
+                title={session.title}
+              >
+                <MessageSquareText className="mr-2.5 h-4 w-4 flex-shrink-0" />
+                <div className="flex-grow truncate">
+                  <p className="font-medium truncate">{session.title}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {lastMessageDate ? formatDistanceToNow(lastMessageDate, { addSuffix: true }) : 'Just now'}
+                  </p>
+                </div>
+              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="ghost" size="icon" className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Trash2 className="h-4 w-4 text-muted-foreground" />
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This will permanently delete this chat session. This action cannot be undone.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={() => handleDeleteSession(session.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                      Delete
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
+          )
+        })}
+      </div>
+    );
+  };
 
   if (!user) {
     return (
-      <div className="h-full w-full flex flex-col border-r border-border/40 bg-background/80 p-3">
-        <p className="text-sm text-muted-foreground text-center py-4">Please log in to see and save chat history.</p>
-      </div>
+        <div className="flex h-full w-full items-center justify-center p-4">
+            <p className="text-sm text-center text-muted-foreground">
+                Please log in to see and save chat history.
+            </p>
+        </div>
     );
   }
   
   return (
-    <div className="h-full w-full flex-shrink-0 flex-col border-r border-border/40 bg-background/80 p-3 flex">
-      {content}
+    <div className="flex flex-col h-full pt-8">
+      <div className="p-4 border-b border-border/40">
+        <Button onClick={onNewChat} variant="outline" className="w-full transition-shadow hover:shadow-md">
+            <PlusCircle className="mr-2 h-5 w-5" />
+            New Chat
+        </Button>
+      </div>
+      <ScrollArea className="flex-1">
+        {renderHistoryList()}
+      </ScrollArea>
     </div>
   );
 }

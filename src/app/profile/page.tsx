@@ -22,9 +22,9 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 
 const profileSchema = z.object({
   displayName: z.string().min(2, { message: "Name must be at least 2 characters." }).max(50),
-  age: z.string().refine(val => val === '' || (/^\d+$/.test(val) && parseInt(val, 10) > 0), {
-    message: "Please enter a valid positive number for age.",
-  }).optional(),
+  age: z.string().refine(val => val === '' || (/^\d+$/.test(val) && parseInt(val, 10) > 0 && parseInt(val, 10) < 120), {
+    message: "Please enter a valid age.",
+  }).optional().transform(val => val ? Number(val) : null),
   gender: z.enum(["Male", "Female", "Other", "Prefer not to say"]).optional(),
   preferredLanguage: z.enum(["Tamil", "English", "Both", "Not specified"]).optional(),
   maritalStatus: z.enum(["Single", "Married", "Divorced", "Widowed", "Prefer not to say"]).optional(),
@@ -39,13 +39,14 @@ export default function ProfilePage() {
   const router = useRouter();
   const { toast } = useToast();
   const [isSaving, setIsSaving] = useState(false);
+  const [isFetching, setIsFetching] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
       displayName: '',
-      age: '',
+      age: null,
       gender: 'Prefer not to say',
       preferredLanguage: 'Not specified',
       maritalStatus: 'Prefer not to say',
@@ -65,6 +66,7 @@ export default function ProfilePage() {
   useEffect(() => {
     if (user) {
       const fetchProfile = async () => {
+        setIsFetching(true);
         const userDocRef = doc(db, 'users', user.uid);
         try {
           const userDoc = await getDoc(userDocRef);
@@ -73,7 +75,7 @@ export default function ProfilePage() {
             const data = userDoc.data();
             form.reset({
               displayName: data.displayName || user.displayName || '',
-              age: data.age ? String(data.age) : '',
+              age: data.age || null,
               gender: data.gender || 'Prefer not to say',
               preferredLanguage: data.preferredLanguage || 'Not specified',
               maritalStatus: data.maritalStatus || 'Prefer not to say',
@@ -84,7 +86,7 @@ export default function ProfilePage() {
             // Pre-fill with Auth data if no Firestore doc exists yet
             form.reset({
               displayName: user.displayName || user.email?.split('@')[0] || '',
-              age: '',
+              age: null,
               gender: 'Prefer not to say',
               preferredLanguage: 'Not specified',
               maritalStatus: 'Prefer not to say',
@@ -95,7 +97,7 @@ export default function ProfilePage() {
         } catch (err: any) {
           console.error("Error fetching user profile:", err);
           let errorMessage = "Could not load your profile data.";
-          if (err.code === 'permission-denied') {
+           if (err.code === 'permission-denied') {
               errorMessage = "Permission Denied: Could not read your profile. Please check your Firestore security rules. They should allow a user to read their own document (e.g., 'allow read: if request.auth.uid == userId;').";
           }
           setError(errorMessage);
@@ -104,6 +106,8 @@ export default function ProfilePage() {
             title: "Loading Error",
             description: errorMessage,
           });
+        } finally {
+            setIsFetching(false);
         }
       };
 
@@ -127,18 +131,16 @@ export default function ProfilePage() {
         displayName: data.displayName,
       });
 
-      const ageAsNumber = data.age && data.age !== '' ? parseInt(data.age, 10) : null;
-
       const userDocRef = doc(db, 'users', user.uid);
       await setDoc(userDocRef, {
         displayName: data.displayName,
         email: user.email,
-        age: ageAsNumber,
-        gender: data.gender || null,
-        preferredLanguage: data.preferredLanguage || null,
-        maritalStatus: data.maritalStatus || null,
-        state: data.state || null,
-        city: data.city || null,
+        age: data.age,
+        gender: data.gender,
+        preferredLanguage: data.preferredLanguage,
+        maritalStatus: data.maritalStatus,
+        state: data.state,
+        city: data.city,
       }, { merge: true });
 
       toast({
@@ -162,7 +164,7 @@ export default function ProfilePage() {
     }
   };
 
-  if (authLoading || !user) {
+  if (authLoading || !user || isFetching) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
@@ -171,14 +173,14 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="flex items-center justify-center py-12 animate-in fade-in-0 zoom-in-95 duration-500 ease-out">
+    <div className="flex items-center justify-center w-full py-12 animate-in fade-in-0 zoom-in-95 duration-500 ease-out">
       <Card className="w-full max-w-2xl shadow-xl">
         <CardHeader>
           <div className="flex items-center gap-4">
             <UserCog className="w-10 h-10 text-primary" />
             <div>
               <CardTitle className="text-2xl font-headline">Your Profile</CardTitle>
-              <CardDescription>View and edit your personal information.</CardDescription>
+              <CardDescription>This information helps personalize your experience.</CardDescription>
             </div>
           </div>
         </CardHeader>
@@ -211,7 +213,7 @@ export default function ProfilePage() {
                     <FormItem>
                       <FormLabel>Age</FormLabel>
                       <FormControl>
-                         <Input type="number" placeholder="Your age" {...field} min="1" />
+                         <Input type="number" placeholder="Your age" {...field} value={field.value ?? ''} onChange={e => field.onChange(e.target.value)} min="1" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -223,7 +225,7 @@ export default function ProfilePage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Gender</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
+                      <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Select your gender" />
@@ -246,7 +248,7 @@ export default function ProfilePage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Preferred Language</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
+                      <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Select your language" />
@@ -269,7 +271,7 @@ export default function ProfilePage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Marital Status</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
+                      <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Select your marital status" />
@@ -294,7 +296,7 @@ export default function ProfilePage() {
                     <FormItem>
                       <FormLabel>State / Province</FormLabel>
                       <FormControl>
-                        <Input placeholder="e.g. Tamil Nadu" {...field} />
+                        <Input placeholder="e.g. Tamil Nadu" {...field} value={field.value ?? ''} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -307,7 +309,7 @@ export default function ProfilePage() {
                     <FormItem>
                       <FormLabel>City</FormLabel>
                       <FormControl>
-                        <Input placeholder="e.g. Chennai" {...field} />
+                        <Input placeholder="e.g. Chennai" {...field} value={field.value ?? ''} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

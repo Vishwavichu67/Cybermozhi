@@ -13,32 +13,31 @@ interface AuthContextType {
   isLoggedIn: boolean;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType>({
+    user: null,
+    loading: true,
+    isLoggedIn: false,
+});
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [authStillLoading, setAuthStillLoading] = useState(true);
-  const [isClientSide, setIsClientSide] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setIsClientSide(true);
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
-      setAuthStillLoading(false);
+      setLoading(false);
     });
     return () => unsubscribe();
   }, []);
 
   const isLoggedIn = !!user;
 
-  // Show SplashScreen if not client-side yet (for SSR/hydration consistency) OR if auth is still loading.
-  if (!isClientSide || authStillLoading) {
-    return <SplashScreen />;
-  }
-
+  const value = { user, loading, isLoggedIn };
+  
   return (
-    <AuthContext.Provider value={{ user, loading: authStillLoading, isLoggedIn }}>
-      {children}
+    <AuthContext.Provider value={value}>
+      {loading ? <SplashScreen /> : children}
     </AuthContext.Provider>
   );
 };

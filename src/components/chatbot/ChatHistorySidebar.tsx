@@ -4,12 +4,25 @@
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { PlusCircle, MessageSquareText, Loader2, AlertCircle } from 'lucide-react';
+import { PlusCircle, MessageSquareText, Loader2, AlertCircle, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
 import { db } from '@/lib/firebase';
-import { collection, query, orderBy, onSnapshot, type Timestamp } from 'firebase/firestore';
+import { collection, query, orderBy, onSnapshot, type Timestamp, doc, deleteDoc, writeBatch } from 'firebase/firestore';
 import { useAuth } from '@/contexts/AuthContext';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { useToast } from '@/hooks/use-toast';
+
 
 interface ChatSession {
   id: string;
@@ -31,6 +44,7 @@ export function ChatHistorySidebar({
   onNewChat,
 }: ChatHistorySidebarProps) {
   const { user } = useAuth();
+  const { toast } = useToast();
   const [sessions, setSessions] = useState<ChatSession[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -60,13 +74,49 @@ export function ChatHistorySidebar({
       setIsLoading(false);
     }, (err) => {
       console.error("Error fetching chat sessions:", err);
-      setError("Failed to fetch chat sessions.");
+      let errorMessage = "Failed to fetch chat sessions.";
+      if (err.code === 'permission-denied') {
+        errorMessage = "Permission Denied: Could not read chat history. Please check your Firestore security rules.";
+      }
+      setError(errorMessage);
       setIsLoading(false);
     });
 
     // Cleanup subscription on component unmount
     return () => unsubscribe();
   }, [user]);
+
+  const handleDeleteSession = async (sessionId: string) => {
+    if (!user) return;
+    try {
+      // It's not possible to delete a subcollection directly from the client.
+      // A cloud function is the recommended way. For client-side, we delete the session doc.
+      // The messages will become orphaned but inaccessible from the app.
+      await deleteDoc(doc(db, `users/${user.uid}/chatSessions`, sessionId));
+      
+      toast({
+        title: "Chat Deleted",
+        description: "The chat session has been removed.",
+      });
+
+      // If the deleted chat was the active one, start a new chat.
+      if (currentChatSessionId === sessionId) {
+        onNewChat();
+      }
+
+    } catch (err: any) {
+       console.error("Error deleting chat session:", err);
+       let errorMessage = "Could not delete chat session.";
+       if (err.code === 'permission-denied') {
+          errorMessage = "Permission Denied: Could not delete this chat. Please check your Firestore security rules.";
+       }
+       toast({
+         variant: 'destructive',
+         title: 'Error',
+         description: errorMessage,
+       });
+    }
+  };
 
 
   const content = (
@@ -76,7 +126,7 @@ export function ChatHistorySidebar({
         New Chat
       </Button>
       <h3 className="text-xs font-semibold text-muted-foreground mb-2 px-1 uppercase tracking-wider">History</h3>
-      <ScrollArea className="flex-grow">
+      <ScrollArea className="flex-grow pr-2 -mr-2">
         {isLoading && (
           <div className="flex flex-col items-center justify-center py-4 space-y-2">
             {[...Array(5)].map((_, i) => (
@@ -94,7 +144,6 @@ export function ChatHistorySidebar({
         )}
         <div className="space-y-1">
           {sessions.map((session) => {
-             // Handle potential serverTimestamp object before rendering to avoid hydration mismatch
             const lastMessageDate = session.lastMessageAt?.toDate ? session.lastMessageAt.toDate() : null;
             return (
               <div key={session.id} className="group relative">
@@ -115,6 +164,27 @@ export function ChatHistorySidebar({
                     </p>
                   </div>
                 </Button>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="ghost" size="icon" className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Trash2 className="h-4 w-4 text-muted-foreground" />
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This will permanently delete this chat session. This action cannot be undone.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction onClick={() => handleDeleteSession(session.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                        Delete
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </div>
             )
           })}
@@ -126,7 +196,7 @@ export function ChatHistorySidebar({
   if (!user) {
     return (
       <div className="h-full w-full flex flex-col border-r border-border/40 bg-background/80 p-3">
-        <p className="text-sm text-muted-foreground text-center py-4">Please log in to see chat history.</p>
+        <p className="text-sm text-muted-foreground text-center py-4">Please log in to see and save chat history.</p>
       </div>
     );
   }

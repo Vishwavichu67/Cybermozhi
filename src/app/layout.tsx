@@ -1,7 +1,6 @@
 
 'use client';
 
-import type { Metadata } from 'next';
 import './globals.css';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
@@ -10,13 +9,13 @@ import { AuthProvider } from '@/contexts/AuthContext';
 import { ThemeProvider } from '@/components/layout/ThemeProvider';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
+import { Inter } from 'next/font/google';
 
-// Note: Metadata is usually static in the root layout.
-// For dynamic titles, you'd use the `generateMetadata` function in page.tsx files.
-// export const metadata: Metadata = {
-//   title: 'CyberMozhi',
-//   description: 'Your one-stop cybersecurity knowledge center and virtual legal advisor for Indian netizens.',
-// };
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-inter',
+});
 
 export default function RootLayout({
   children,
@@ -27,16 +26,13 @@ export default function RootLayout({
   const isChatPage = pathname === '/chat';
 
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning className={inter.variable}>
       <head>
         <title>CyberMozhi</title>
         <meta name="description" content="Your one-stop cybersecurity knowledge center and virtual legal advisor for Indian netizens." />
-        <link rel="icon" href="/favicon.png" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+        <link rel="icon" href="/logo.png" />
       </head>
-      <body className="font-body antialiased flex flex-col min-h-screen">
+      <body className="font-body antialiased flex flex-col min-h-screen bg-background">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -44,15 +40,16 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <AuthProvider>
-            <Header />
-            <main className={cn(
-              "flex-grow",
-              // Apply container styles only if it's NOT the chat page
-              !isChatPage && "container mx-auto px-4 py-8"
-            )}>
-              {children}
-            </main>
-            <Footer />
+            <div className="flex flex-col min-h-screen">
+              <Header />
+              <main className={cn(
+                "flex-grow w-full flex flex-col items-center",
+                isChatPage ? "justify-center px-2 sm:px-4 py-4" : "container mx-auto px-4 py-8"
+              )}>
+                {children}
+              </main>
+              <Footer />
+            </div>
             <Toaster />
           </AuthProvider>
         </ThemeProvider>

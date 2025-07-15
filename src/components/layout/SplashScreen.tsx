@@ -10,12 +10,12 @@ export function SplashScreen() {
         <Image
           src="/logo.png"
           alt="CyberMozhi Loading..."
-          width={200} // Adjusted size for splash screen
-          height={53}  // Adjusted size for splash screen (maintaining aspect ratio of 120/32 -> 200/53.33)
+          width={150}
+          height={150}
           priority // Ensures logo loads quickly for splash
+          className="rounded-full"
         />
       </div>
     </div>
   );
 }
-

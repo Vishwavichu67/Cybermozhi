@@ -9,17 +9,9 @@ import {
 } from '@/ai/flows/cyber-law-chatbot';
 import { z } from 'zod';
 import {
-  getFirestore,
-  doc,
-  collection,
-  addDoc,
-  serverTimestamp,
-  updateDoc,
-  getDoc,
-} from 'firebase/firestore';
-import { app } from '@/lib/firebase-admin'; // Use admin SDK on server
-
-const db = getFirestore(app);
+  Timestamp,
+} from 'firebase-admin/firestore';
+import { db } from '@/lib/firebase-admin'; // Use admin SDK on server
 
 const UserDetailsSchema = z.object({
   gender: z.string().optional(),
@@ -62,27 +54,27 @@ export async function getAIChatResponse(
   const userMessage = {
     role: 'user',
     text: query,
-    timestamp: serverTimestamp(),
+    timestamp: Timestamp.now(),
   };
 
   try {
     // If it's a new chat, create a session first
     if (!chatSessionId) {
       const firstMessageSummary = query.substring(0, 40) + (query.length > 40 ? '...' : '');
-      const sessionRef = await addDoc(collection(db, `users/${userId}/chatSessions`), {
+      const sessionRef = await db.collection(`users/${userId}/chatSessions`).add({
         title: firstMessageSummary,
         userId: userId,
-        createdAt: serverTimestamp(),
-        lastMessageAt: serverTimestamp(),
+        createdAt: Timestamp.now(),
+        lastMessageAt: Timestamp.now(),
       });
       chatSessionId = sessionRef.id;
       // Add the first message to this new session
-      await addDoc(collection(db, `users/${userId}/chatSessions/${chatSessionId}/messages`), userMessage);
+      await db.collection(`users/${userId}/chatSessions/${chatSessionId}/messages`).add(userMessage);
     } else {
       // Just add the message to the existing session
-      await addDoc(collection(db, `users/${userId}/chatSessions/${chatSessionId}/messages`), userMessage);
-      await updateDoc(doc(db, `users/${userId}/chatSessions/${chatSessionId}`), {
-        lastMessageAt: serverTimestamp(),
+      await db.collection(`users/${userId}/chatSessions/${chatSessionId}/messages`).add(userMessage);
+      await db.doc(`users/${userId}/chatSessions/${chatSessionId}`).update({
+        lastMessageAt: Timestamp.now(),
       });
     }
 
@@ -102,9 +94,9 @@ export async function getAIChatResponse(
     const aiResponse = {
       role: 'model',
       text: result.answer,
-      timestamp: serverTimestamp(),
+      timestamp: Timestamp.now(),
     };
-    await addDoc(collection(db, `users/${userId}/chatSessions/${chatSessionId}/messages`), aiResponse);
+    await db.collection(`users/${userId}/chatSessions/${chatSessionId}/messages`).add(aiResponse);
 
     return {
       output: result,

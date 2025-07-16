@@ -29,9 +29,10 @@ import {
   Scale,
   BrainCircuit
 } from "lucide-react";
-import { lawSummaries } from "@/data/law-summaries";
-import { glossaryTerms } from "@/data/glossary-terms";
-import { useMemo } from "react";
+import { lawSummaries, type LawSummary } from "@/data/law-summaries";
+import { glossaryTerms, type GlossaryTerm } from "@/data/glossary-terms";
+import { useState, useEffect } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const sampleTopics = [
   { name: "Phishing Attacks", icon: UserPlus, description: "Learn to identify and avoid deceptive emails and messages.", link: "/glossary#1" },
@@ -67,19 +68,21 @@ const coreFeatures = [
 
 export default function HomePage() {
   const { user, isLoggedIn, loading: authLoading } = useAuth();
+  
+  const [termOfTheDay, setTermOfTheDay] = useState<GlossaryTerm | null>(null);
+  const [lawOfTheDay, setLawOfTheDay] = useState<LawSummary | null>(null);
+  const [isDailyContentLoaded, setIsDailyContentLoaded] = useState(false);
 
-  const { termOfTheDay, lawOfTheDay } = useMemo(() => {
-    // Use the current date to get a consistent "random" item for the entire day.
-    // This avoids hydration mismatches between server and client.
+  useEffect(() => {
+    // This logic now runs only on the client, after hydration
     const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000);
     
     const termIndex = dayOfYear % glossaryTerms.length;
     const lawIndex = dayOfYear % lawSummaries.length;
     
-    return {
-      termOfTheDay: glossaryTerms[termIndex],
-      lawOfTheDay: lawSummaries[lawIndex]
-    };
+    setTermOfTheDay(glossaryTerms[termIndex]);
+    setLawOfTheDay(lawSummaries[lawIndex]);
+    setIsDailyContentLoaded(true);
   }, []);
 
   if (authLoading) {
@@ -95,49 +98,58 @@ export default function HomePage() {
   const OfTheDaySection = () => (
     <section className="w-full container px-4 md:px-6 animate-in fade-in-0 slide-in-from-bottom-8 duration-700 ease-out" style={{ animationDelay: '400ms' }}>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {lawOfTheDay && (
-           <Card className="shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:scale-105 hover:-rotate-y-1 rounded-lg flex flex-col">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-3 text-lg sm:text-xl font-headline text-primary">
-                  <Scale className="w-7 h-7" />
-                  Law of the Day
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="flex-grow">
-                 <h3 className="font-semibold text-foreground">{lawOfTheDay.title}</h3>
-                 <p className="text-sm text-muted-foreground mt-1">{lawOfTheDay.act} - {lawOfTheDay.section}</p>
-                 <p className="text-sm text-foreground/80 mt-2 line-clamp-3">{lawOfTheDay.summary}</p>
-              </CardContent>
-              <div className="p-4 pt-0">
-                <Button asChild variant="link" className="text-primary p-0 h-auto hover:text-accent text-sm">
-                  <Link href={`/law-summaries#${lawOfTheDay.id}`}>
-                    Read Full Summary <ArrowRight className="ml-1 h-4 w-4" />
-                  </Link>
-                </Button>
-              </div>
-            </Card>
-        )}
-        {termOfTheDay && (
-           <Card className="shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:scale-105 hover:rotate-y-1 rounded-lg flex flex-col">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-3 text-lg sm:text-xl font-headline text-accent">
-                  <BrainCircuit className="w-7 h-7" />
-                  Term of the Day
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="flex-grow">
-                 <h3 className="font-semibold text-foreground">{termOfTheDay.term}</h3>
-                 <p className="text-sm text-muted-foreground mt-1">{termOfTheDay.category}</p>
-                 <p className="text-sm text-foreground/80 mt-2 line-clamp-3">{termOfTheDay.definition.split(' Example: ')[0]}</p>
-              </CardContent>
-              <div className="p-4 pt-0">
-                 <Button asChild variant="link" className="text-accent p-0 h-auto hover:text-primary text-sm">
-                  <Link href={`/glossary#${termOfTheDay.id}`}>
-                    Learn More <ArrowRight className="ml-1 h-4 w-4" />
-                  </Link>
-                </Button>
-              </div>
-            </Card>
+        {!isDailyContentLoaded ? (
+          <>
+            <Card className="shadow-lg rounded-lg flex flex-col p-4"><Skeleton className="h-32 w-full" /></Card>
+            <Card className="shadow-lg rounded-lg flex flex-col p-4"><Skeleton className="h-32 w-full" /></Card>
+          </>
+        ) : (
+          <>
+            {lawOfTheDay && (
+              <Card className="shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:scale-105 hover:-rotate-y-1 rounded-lg flex flex-col">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-3 text-lg sm:text-xl font-headline text-primary">
+                      <Scale className="w-7 h-7" />
+                      Law of the Day
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="flex-grow">
+                    <h3 className="font-semibold text-foreground">{lawOfTheDay.title}</h3>
+                    <p className="text-sm text-muted-foreground mt-1">{lawOfTheDay.act} - {lawOfTheDay.section}</p>
+                    <p className="text-sm text-foreground/80 mt-2 line-clamp-3">{lawOfTheDay.summary}</p>
+                  </CardContent>
+                  <div className="p-4 pt-0">
+                    <Button asChild variant="link" className="text-primary p-0 h-auto hover:text-accent text-sm">
+                      <Link href={`/law-summaries#${lawOfTheDay.id}`}>
+                        Read Full Summary <ArrowRight className="ml-1 h-4 w-4" />
+                      </Link>
+                    </Button>
+                  </div>
+                </Card>
+            )}
+            {termOfTheDay && (
+              <Card className="shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:scale-105 hover:rotate-y-1 rounded-lg flex flex-col">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-3 text-lg sm:text-xl font-headline text-accent">
+                      <BrainCircuit className="w-7 h-7" />
+                      Term of the Day
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="flex-grow">
+                    <h3 className="font-semibold text-foreground">{termOfTheDay.term}</h3>
+                    <p className="text-sm text-muted-foreground mt-1">{termOfTheDay.category}</p>
+                    <p className="text-sm text-foreground/80 mt-2 line-clamp-3">{termOfTheDay.definition.split(' Example: ')[0]}</p>
+                  </CardContent>
+                  <div className="p-4 pt-0">
+                    <Button asChild variant="link" className="text-accent p-0 h-auto hover:text-primary text-sm">
+                      <Link href={`/glossary#${termOfTheDay.id}`}>
+                        Learn More <ArrowRight className="ml-1 h-4 w-4" />
+                      </Link>
+                    </Button>
+                  </div>
+                </Card>
+            )}
+          </>
         )}
       </div>
     </section>

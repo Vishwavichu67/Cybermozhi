@@ -1,50 +1,5 @@
 {
-  "node": {
-    "401ea6400e1ddd8c9ec9d1620da6a3710b7c43cd06": {
-      "workers": {
-        "app/chat/page": {
-          "moduleId": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22%2Fhome%2Fuser%2Fstudio%2Fsrc%2Fapp%2Fchatbot%2Factions.ts%22%2C%5B%7B%22id%22%3A%22401ea6400e1ddd8c9ec9d1620da6a3710b7c43cd06%22%2C%22exportedName%22%3A%22getAIChatResponse%22%7D%5D%5D%5D&__client_imported__=true!",
-          "async": true
-        }
-      },
-      "layer": {
-        "app/chat/page": "action-browser"
-      }
-    },
-    "40eeab4d403ee7e3f02436796f5711e3832e0d0cb9": {
-      "workers": {
-        "app/document-generator/page": {
-          "moduleId": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22%2Fhome%2Fuser%2Fstudio%2Fsrc%2Fai%2Fflows%2Fdocument-generator.ts%22%2C%5B%7B%22id%22%3A%2240eeab4d403ee7e3f02436796f5711e3832e0d0cb9%22%2C%22exportedName%22%3A%22generateLegalDocument%22%7D%2C%7B%22id%22%3A%227f3bcac84173df84c4363d9bf190ca1e280edd44c0%22%2C%22exportedName%22%3A%22LegalDocumentOutputSchema%22%7D%2C%7B%22id%22%3A%227f809a7619a5835474f23c113506f13559f9cd5be3%22%2C%22exportedName%22%3A%22LegalDocumentInputSchema%22%7D%5D%5D%5D&__client_imported__=true!",
-          "async": false
-        }
-      },
-      "layer": {
-        "app/document-generator/page": "action-browser"
-      }
-    },
-    "7f3bcac84173df84c4363d9bf190ca1e280edd44c0": {
-      "workers": {
-        "app/document-generator/page": {
-          "moduleId": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22%2Fhome%2Fuser%2Fstudio%2Fsrc%2Fai%2Fflows%2Fdocument-generator.ts%22%2C%5B%7B%22id%22%3A%2240eeab4d403ee7e3f02436796f5711e3832e0d0cb9%22%2C%22exportedName%22%3A%22generateLegalDocument%22%7D%2C%7B%22id%22%3A%227f3bcac84173df84c4363d9bf190ca1e280edd44c0%22%2C%22exportedName%22%3A%22LegalDocumentOutputSchema%22%7D%2C%7B%22id%22%3A%227f809a7619a5835474f23c113506f13559f9cd5be3%22%2C%22exportedName%22%3A%22LegalDocumentInputSchema%22%7D%5D%5D%5D&__client_imported__=true!",
-          "async": false
-        }
-      },
-      "layer": {
-        "app/document-generator/page": "action-browser"
-      }
-    },
-    "7f809a7619a5835474f23c113506f13559f9cd5be3": {
-      "workers": {
-        "app/document-generator/page": {
-          "moduleId": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22%2Fhome%2Fuser%2Fstudio%2Fsrc%2Fai%2Fflows%2Fdocument-generator.ts%22%2C%5B%7B%22id%22%3A%2240eeab4d403ee7e3f02436796f5711e3832e0d0cb9%22%2C%22exportedName%22%3A%22generateLegalDocument%22%7D%2C%7B%22id%22%3A%227f3bcac84173df84c4363d9bf190ca1e280edd44c0%22%2C%22exportedName%22%3A%22LegalDocumentOutputSchema%22%7D%2C%7B%22id%22%3A%227f809a7619a5835474f23c113506f13559f9cd5be3%22%2C%22exportedName%22%3A%22LegalDocumentInputSchema%22%7D%5D%5D%5D&__client_imported__=true!",
-          "async": false
-        }
-      },
-      "layer": {
-        "app/document-generator/page": "action-browser"
-      }
-    }
-  },
+  "node": {},
   "edge": {},
   "encryptionKey": "lmlv1xm0jon2onYbgswQgc2U1/vvU/N8wBxtx/ZAseE="
 }

@@ -111,8 +111,8 @@ export function Header() {
             <Image
               src="/logo.png"
               alt="CyberMozhi Logo"
-              width={48}
-              height={48}
+              width={56}
+              height={56}
               className="transition-transform duration-300 ease-in-out group-hover:scale-105 rounded-full"
             />
           </Link>
@@ -194,8 +194,8 @@ export function Header() {
                      <Image
                         src="/logo.png"
                         alt="CyberMozhi Logo"
-                        width={40}
-                        height={40} 
+                        width={48}
+                        height={48} 
                         className="transition-transform duration-300 ease-in-out group-hover:scale-105 rounded-full"
                       />
                   </Link>
